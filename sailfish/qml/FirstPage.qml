@@ -11,24 +11,6 @@ import Sailfish.Silica 1.0
 Page {
     id: root
 
-    property bool configured: settings.mqttAddress.length > 0
-
-    Connections {
-        target: server
-        onError: {
-            switch (error) {
-            case 1:
-                notification.show("Can't connect because IP address is not defined")
-                break;
-            case 2:
-                notification.show("Connection problem")
-                break;
-            default:
-                notification.show("Whoops, something went wrong")
-            }
-        }
-    }
-
     SilicaFlickable {
         id: flick
         anchors.fill: parent
@@ -46,14 +28,18 @@ Page {
             }
 
             MenuItem {
-                visible: !server.connected
-                text: qsTr("Connect")
-                onClicked: server.connectToMqtt()
+                text: server.connected ? qsTr("Disconnect") : qsTr("Connect")
+                onClicked: {
+                    if (server.connected)
+                        server.disconnectFromMqtt()
+                    else
+                        server.connectToMqtt()
+                }
             }
         }
 
         Mic {
-            visible: configured
+            visible: app.configured
             anchors.centerIn: parent
             size: root.width/2
         }
@@ -64,7 +50,7 @@ Page {
                 bottom: parent.bottom
                 bottomMargin: Theme.paddingLarge
             }
-            visible: configured
+            visible: app.configured
             color: Theme.highlightColor
             font.pixelSize: Theme.fontSizeLarge
             text: server.connected ? server.insession ?
@@ -74,7 +60,7 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: !root.configured
+            enabled: !app.configured
             text: qsTr("Not configured")
         }
     }

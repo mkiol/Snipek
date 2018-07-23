@@ -10,6 +10,10 @@ import Sailfish.Silica 1.0
 
 ApplicationWindow
 {
+    id: app
+
+    property bool configured: settings.mqttAddress.length > 0
+
     allowedOrientations: Orientation.PortraitMask
 
     cover: Qt.resolvedUrl("CoverPage.qml")
@@ -20,5 +24,21 @@ ApplicationWindow
 
     Notification {
         id: notification
+    }
+
+    Connections {
+        target: server
+        onError: {
+            switch (error) {
+            case 1:
+                notification.show("Can't connect because IP address is not defined")
+                break;
+            case 2:
+                notification.show("Connection problem")
+                break;
+            default:
+                notification.show("Whoops, something went wrong")
+            }
+        }
     }
 }

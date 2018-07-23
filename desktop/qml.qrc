@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/Mic.qml</file>
+        <file>qml/FirstPage.qml</file>
+        <file>qml/SettingsPage.qml</file>
+        <file>qml/Theme.qml</file>
+        <file>qml/qmldir</file>
+        <file>qml/PageHeader.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>qml/AboutPage.qml</file>
+        <file>qml/PaddedLabel.qml</file>
+    </qresource>
+</RCC>

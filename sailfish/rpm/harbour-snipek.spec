@@ -6,8 +6,6 @@
 Name:       harbour-snipek
 
 # >> macros
-%define __provides_exclude_from ^%{_datadir}/.*$
-%define __requires_exclude ^libpaho-mqtt3a|libpaho-mqtt3as|libpaho-mqtt3c|libpaho-mqtt3cs.*$
 # << macros
 
 %{!?qtc_qmake:%define qtc_qmake %qmake}
@@ -15,7 +13,7 @@ Name:       harbour-snipek
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Snipek
-Version:    0.9.0
+Version:    0.9.1
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
