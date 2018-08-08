@@ -51,6 +51,7 @@ bool MqttAgent::init()
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
     QByteArray id = settings->getMqttId().toUtf8();
+    qDebug() << "MQTT ID:" << id;
 
     MQTTClient_create(&client, url.data(), id.data(),
         MQTTCLIENT_PERSISTENCE_NONE, NULL);
@@ -165,7 +166,6 @@ void MqttAgent::receive()
 
     if (mqttMsg) {
         qDebug() << "New MQTT message:" << topic << "msg size:" << mqttMsg->payloadlen;
-        qDebug() << "msg id:" << mqttMsg->msgid;
 
         ++id;
 

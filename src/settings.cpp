@@ -16,7 +16,7 @@ Settings::Settings(QObject* parent) :
     settings(parent)
 {
     // Seed init, needed for rand
-    qsrand(QTime::currentTime().msec());
+    //qsrand(QTime::currentTime().msec());
 }
 
 Settings* Settings::instance(QObject* parent)
@@ -30,8 +30,7 @@ Settings* Settings::instance(QObject* parent)
 
 QString Settings::getRandId()
 {
-    int n = qrand() % 100;
-    return "snipek-" + QString::number(n);
+    return "snipek-" + randString();
 }
 
 QString Settings::getSite()
@@ -121,4 +120,20 @@ void Settings::setOutAudio(const QString& value)
         settings.setValue("outaudio", value);
         emit audioChanged();
     }
+}
+
+QString Settings::randString(int len)
+{
+   qsrand(QTime::currentTime().msec());
+   const QString pc("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+
+   QString rs;
+
+   for(int i = 0; i < len; ++i) {
+       int in = qrand() % pc.length();
+       QChar nc = pc.at(in);
+       rs.append(nc);
+   }
+
+   return rs;
 }

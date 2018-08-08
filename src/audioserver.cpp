@@ -15,6 +15,10 @@
 #include <QThread>
 #include <QMediaService>
 #include <QAudioOutputSelectorControl>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QCoreApplication>
 
 #include "audioserver.h"
 #include "settings.h"
@@ -34,8 +38,6 @@ QAudioFormat AudioServer::outFormat = QAudioFormat();
 
 qint64 AudioProcessor::readData(char* data, qint64 maxSize)
 {
-    qDebug() << "readData";
-
     Q_UNUSED(data)
     Q_UNUSED(maxSize)
     return 0;
@@ -70,7 +72,6 @@ AudioProcessor::AudioProcessor(QObject* parent) :
 
 void AudioProcessor::init()
 {
-    //qDebug() << "Thread:" << QThread::currentThreadId();
     makeHeader();
     open(QIODevice::WriteOnly);
 }
@@ -180,15 +181,23 @@ void AudioServer::processMessage(int id)
 
     if (topic == AudioServer::mqttSessionStartedTopic) {
         qDebug() << "Session started received";
+        qDebug() << "payload:" << messages[id].payload;
+
+        if (checkSiteId(messages[id].payload))
+            setInsession(true);
+
         messages.erase(id);
-        setInsession(true);
         return;
     }
 
     if (topic == AudioServer::mqttSessionEndedTopic) {
         qDebug() << "Session ended received";
+        qDebug() << "payload:" << messages[id].payload;
+
+        if (checkSiteId(messages[id].payload))
+            setInsession(false);
+
         messages.erase(id);
-        setInsession(false);
         return;
     }
 
@@ -234,6 +243,11 @@ void AudioServer::run()
             mqtt, &MqttAgent::init);
     connect(AudioServer::instance(), &AudioServer::deInitMqtt,
             mqtt, &MqttAgent::deInit);
+    connect(AudioServer::instance(), &AudioServer::quit, [this, mqtt](){
+        mqtt->deInit();
+        processor->setActive(false);
+        QThread::quit();
+    });
 
     input = std::unique_ptr<QAudioInput>(new QAudioInput(inFormat));
 
@@ -247,8 +261,7 @@ void AudioServer::run()
     //emit processorInited();
 
     // TODO: Loop exit
-    exec();
-
+    QThread::exec();
     qDebug() << "Event loop exit, thread:" << QThread::currentThreadId();
 }
 
@@ -298,6 +311,16 @@ void AudioServer::mqttConnectedHandler(bool connected)
 
     this->connected = connected;
     emit connectedChanged();
+}
+
+void AudioServer::close()
+{
+    qDebug() << "Closing audio server";
+    suspendListening();
+    emit quit();
+    disconnect(this);
+    player.stop();
+    QCoreApplication::quit();
 }
 
 void AudioServer::init()
@@ -408,7 +431,7 @@ void AudioServer::playerStateHandler(QMediaPlayer::State state)
     //qDebug() << "Thread:" << QThread::currentThreadId();
 
     int id = playQueue.front();
-    qDebug() << "Id:" << id;
+    //qDebug() << "Id:" << id;
 
     if (state == QMediaPlayer::PlayingState) {
         if (!playing) {
@@ -437,7 +460,7 @@ void AudioServer::playNext()
     }
 
     int id = playQueue.front();
-    qDebug() << "Id:" << id;
+    //qDebug() << "Id:" << id;
 
     if (!messages.count(id)) {
         qWarning() << "Messages doesn't contain id:" << id;
@@ -582,4 +605,37 @@ QStringList AudioServer::getOutAudioDevices()
     }
 
     return outAudioNames;
+}
+
+bool AudioServer::checkSiteId(const QByteArray& data)
+{
+    QJsonParseError err;
+    auto json = QJsonDocument::fromJson(data, &err);
+
+    if (err.error != QJsonParseError::NoError) {
+        qWarning() << "Error parsing json payload:" << err.errorString();
+        return false;
+    }
+
+    if (!json.isObject()) {
+        qWarning() << "Json is not a object";
+        return false;
+    }
+
+    auto siteId = json.object().value("siteId");
+    qDebug() << "Site ID:" << siteId.toString();
+
+    if (siteId.isUndefined()) {
+        qWarning() << "No siteId element";
+        return false;
+    }
+
+    auto s = Settings::instance();
+
+    if (siteId.toString() != s->getSite()) {
+        qWarning() << "Message's site ID is not my side ID";
+        return false;
+    }
+
+    return true;
 }

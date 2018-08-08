@@ -47,6 +47,7 @@ private:
 
     explicit Settings(QObject* parent = nullptr);
     QString getRandId();
+    QString randString(int len = 4);
 };
 
 #endif // SETTINGS_H

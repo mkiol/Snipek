@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
     auto app = new QGuiApplication(argc, argv);
     auto engine = new QQmlApplicationEngine();
     auto context = engine->rootContext();
+    app->setOrganizationName(app->applicationName());
+    QObject::connect(engine, &QQmlApplicationEngine::quit, app, &QCoreApplication::quit);
 #endif
 
     app->setApplicationDisplayName(APP_NAME);

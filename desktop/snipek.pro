@@ -1,5 +1,5 @@
-QT += quick multimedia quickcontrols2
-CONFIG += c++11 json
+QT += core quick multimedia quickcontrols2
+CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
@@ -21,7 +21,8 @@ HEADERS += \
 
 OTHER_FILES += \
     ../paho.mqtt.c/src/*.h \
-    ../paho.mqtt.c/src/*.c
+    ../paho.mqtt.c/src/*.c \
+    rpm/*
 
 RESOURCES += qml.qrc
 

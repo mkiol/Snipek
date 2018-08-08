@@ -84,6 +84,7 @@ public:
     static AudioServer* instance();
 
     void init();
+    Q_INVOKABLE void close();
     Q_INVOKABLE QStringList getInAudioDevices();
     Q_INVOKABLE QStringList getOutAudioDevices();
     Message& message(int id);
@@ -92,6 +93,7 @@ signals:
     void processorInited();
     void initMqtt();
     void deInitMqtt();
+    void quit();
     void error(ErrorType error);
 
     // props
@@ -144,6 +146,7 @@ private:
     void playNext();
     void sendPlayFinished(int id);
     void setInsession(bool value);
+    bool checkSiteId(const QByteArray& data);
 };
 
 #endif // AUDIOSERVER_H
