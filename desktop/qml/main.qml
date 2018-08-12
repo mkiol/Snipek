@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtQuick.Controls 2.3
+import QtQuick.Controls 2.2
 
 ApplicationWindow {
     id: app
@@ -29,8 +29,12 @@ ApplicationWindow {
         }
     }*/
 
+    onClosing: {
+        server.close()
+        close.accepted = false
+    }
+
     footer: Label {
-        //horizontalAlignment: Text.AL
         text: configured ? server.connected ? server.insession ?
                                      qsTr("Listening") :
                                      qsTr("Idle") :

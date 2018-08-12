@@ -5,8 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import QtQuick 2.0
-import QtQuick.Controls 2.3
+import QtQuick.Controls 2.2
 
 Page {
     id: root

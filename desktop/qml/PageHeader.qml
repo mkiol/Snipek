@@ -6,7 +6,7 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 2.3
+import QtQuick.Controls 2.2
 import "."
 
 ToolBar {
@@ -42,13 +42,15 @@ ToolBar {
         visible: pageStack.currentItem.objectName === "first_page"
         text: "⋮"
         font.bold: true
-        onClicked: menu.popup()
+        onClicked: menu.open()
     }
 
     Menu {
         id: menu
 
         title: qsTr("Options")
+        x: parent.width-width
+        y: 0
 
         MenuItem {
             text: server.connected ? qsTr("Disconnect") : qsTr("Connect")
