@@ -17,28 +17,24 @@
 #include <QLocale>
 #include <QTranslator>
 
-#ifdef Q_OS_SAILFISH
+#ifdef SAILFISH
 #include <sailfishapp.h>
+#include "iconprovider.h"
 #endif
 
+#include "info.h"
 #include "audioserver.h"
 #include "message.h"
 #include "settings.h"
-#include "iconprovider.h"
-
-static const char* APP_NAME = "Snipek";
-static const char* APP_VERSION = "0.9.1";
-static const char* AUTHOR = "Michal Kosciesza <michal@mkiol.net>";
-static const char* PAGE = "https://github.com/mkiol";
-static const char* LICENSE = "http://mozilla.org/MPL/2.0/";
 
 int main(int argc, char *argv[])
 {
-#ifdef Q_OS_SAILFISH
+#ifdef SAILFISH
     auto app = SailfishApp::application(argc, argv);
     auto view = SailfishApp::createView();
     auto context = view->rootContext();
     auto engine = view->engine();
+    engine->addImageProvider(QLatin1String("icons"), new IconProvider);
 #else
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     auto app = new QGuiApplication(argc, argv);
@@ -48,28 +44,26 @@ int main(int argc, char *argv[])
     QObject::connect(engine, &QQmlApplicationEngine::quit, app, &QCoreApplication::quit);
 #endif
 
-    app->setApplicationDisplayName(APP_NAME);
-    app->setApplicationVersion(APP_VERSION);
-
-    context->setContextProperty("APP_NAME", APP_NAME);
-    context->setContextProperty("APP_VERSION", APP_VERSION);
-    context->setContextProperty("AUTHOR", AUTHOR);
-    context->setContextProperty("PAGE", PAGE);
-    context->setContextProperty("LICENSE", LICENSE);
-
-    engine->addImageProvider(QLatin1String("icons"), new IconProvider);
+    context->setContextProperty("APP_NAME", Snipek::APP_NAME);
+    context->setContextProperty("APP_VERSION", Snipek::APP_VERSION);
+    context->setContextProperty("COPYRIGHT_YEAR", Snipek::COPYRIGHT_YEAR);
+    context->setContextProperty("AUTHOR", Snipek::AUTHOR);
+    context->setContextProperty("SUPPORT_EMAIL", Snipek::SUPPORT_EMAIL);
+    context->setContextProperty("PAGE", Snipek::PAGE);
+    context->setContextProperty("LICENSE", Snipek::LICENSE);
+    context->setContextProperty("LICENSE_URL", Snipek::LICENSE_URL);
 
     qRegisterMetaType<Message>("Message");
     qRegisterMetaType<AudioServer::ErrorType>("ErrorType");
 
-    AudioServer* server = AudioServer::instance();
+    auto server = AudioServer::instance();
     context->setContextProperty("server", server);
     server->init();
 
-    Settings* settings = Settings::instance();
+    auto settings = Settings::instance();
     context->setContextProperty("settings", settings);
 
-#ifdef Q_OS_SAILFISH
+#ifdef SAILFISH
     view->setSource(SailfishApp::pathTo("qml/main.qml"));
     view->show();
 #else

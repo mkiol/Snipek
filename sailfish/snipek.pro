@@ -1,46 +1,25 @@
 TARGET = harbour-snipek
 
-CONFIG += sailfishapp json
-
-DEFINES += Q_OS_SAILFISH
-
+CONFIG += c++11 sailfishapp json
 QT += multimedia
 
 PKGCONFIG += mlite5
 
-linux-g++-32 {
-    LIBS += -L$$PWD/../paho.mqtt.c/lib/ -lpaho-mqtt3c-static-i486
-}
+linux-g++-32: CONFIG += x86
+linux-g++: CONFIG += arm
 
-linux-g++ {
-    LIBS += -L$$PWD/../paho.mqtt.c/lib/ -lpaho-mqtt3c-static-armv7hl
-}
+DEFINES += SAILFISH
 
-INCLUDEPATH += $$PWD/../paho.mqtt.c/src
+PROJECTDIR = $$PWD/..
+
 INCLUDEPATH += /usr/include/c++/7
 
-SOURCES += \
-    ../src/main.cpp \
-    ../src/audioserver.cpp \
-    ../src/taskexecutor.cpp \
-    ../src/mqttagent.cpp \
-    ../src/settings.cpp \
-    ../src/iconprovider.cpp
+CONFIG += sailfish
+DEFINES += SAILFISH
 
-HEADERS += \
-    ../src/audioserver.h \
-    ../src/taskexecutor.h \
-    ../src/mqttagent.h \
-    ../src/message.h \
-    ../src/settings.h \
-    ../src/iconprovider.h
+include($$PROJECTDIR/core/snipek_core.pri)
 
 DISTFILES += \
-    harbour-snipek.desktop \
-    rpm/$${TARGET}.yaml \
-    rpm/$${TARGET}.changes.in \
-    rpm/$${TARGET}.spec \
-    translations/*.ts \
     qml/main.qml \
     qml/AboutPage.qml \
     qml/Notification.qml \
@@ -54,6 +33,13 @@ DISTFILES += \
 OTHER_FILES += \
     ../paho.mqtt.c/src/*.h \
     ../paho.mqtt.c/src/*.c
+
+OTHER_FILES += \
+    harbour-snipek.desktop \
+    rpm/$${TARGET}.yaml \
+    rpm/$${TARGET}.changes.in \
+    rpm/$${TARGET}.spec
+    translations/*.ts
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifdef Q_OS_SAILFISH
+#ifdef SAILFISH
 #include <sailfishapp.h>
 #include <mlite5/MGConfItem>
 #endif
@@ -20,7 +20,7 @@
 
 IconProvider::IconProvider() : QQuickImageProvider(QQuickImageProvider::Pixmap)
 {
-#ifdef Q_OS_SAILFISH
+#ifdef SAILFISH
     // Getting pixel ratio
     double ratio = MGConfItem("/desktop/sailfish/silica/theme_pixel_ratio").value().toDouble();
 

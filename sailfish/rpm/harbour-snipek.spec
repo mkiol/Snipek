@@ -13,11 +13,11 @@ Name:       harbour-snipek
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Snipek
-Version:    0.9.1
+Version:    1.0.0
 Release:    1
 Group:      Qt/Qt
-License:    LICENSE
-URL:        http://mozilla.org/MPL/2.0/
+License:    MPLv2.0
+URL:        https://github.com/mkiol/Snipek
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-snipek.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
@@ -28,7 +28,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-Remote microphone for Snips AI system
+Remote microphone and speaker for Snips voice assistant
 
 
 %prep

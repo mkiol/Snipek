@@ -1,23 +1,23 @@
+CONFIG += c++11 json x86_64 desktop
 QT += core quick multimedia quickcontrols2
-CONFIG += c++11
 
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS DESKTOP
 
-SOURCES += \
-    ../src/main.cpp \
-    ../src/audioserver.cpp \
-    ../src/taskexecutor.cpp \
-    ../src/mqttagent.cpp \
-    ../src/settings.cpp \
-    ../src/iconprovider.cpp
+PROJECTDIR = $$PWD/..
 
-HEADERS += \
-    ../src/audioserver.h \
-    ../src/taskexecutor.h \
-    ../src/mqttagent.h \
-    ../src/message.h \
-    ../src/settings.h \
-    ../src/iconprovider.h
+INCLUDEPATH += /usr/include/c++/7
+
+include($$PROJECTDIR/core/snipek_core.pri)
+
+DISTFILES += \
+    qml/main.qml \
+    qml/AboutPage.qml \
+    qml/SettingsPage.qml \
+    qml/PaddedLabel.qml \
+    qml/FirstPage.qml \
+    qml/Mic.qml \
+    qml/PageHeader.qml \
+    qml/Theme.qml
 
 OTHER_FILES += \
     ../paho.mqtt.c/src/*.h \
@@ -30,12 +30,6 @@ RESOURCES += qml.qrc
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-INCLUDEPATH += $$PWD/../paho.mqtt.c/src
-DEPENDPATH += $$PWD/../paho.mqtt.c
-
-unix:!macx: LIBS += -L$$PWD/../paho.mqtt.c/lib/ -lpaho-mqtt3c-static-x86_64
-unix:!macx: PRE_TARGETDEPS += $$PWD/../paho.mqtt.c/lib/libpaho-mqtt3c-static-x86_64.a
 
 DISTFILES += \
     qtquickcontrols2.conf

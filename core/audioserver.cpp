@@ -45,6 +45,7 @@ qint64 AudioProcessor::readData(char* data, qint64 maxSize)
 
 qint64 AudioProcessor::writeData(const char* data, qint64 maxSize)
 {
+    //qDebug() << "active:" << active;
     if (active) {
         buffer.append(data, static_cast<int>(maxSize));
         processBuffer();
@@ -256,7 +257,7 @@ void AudioServer::run()
     processor->init();
 
     qDebug() << "Start listening";
-    processor->setActive(true);
+    //processor->setActive(true);
     input->start(processor.get());
     //emit processorInited();
 
@@ -304,7 +305,9 @@ void AudioServer::mqttConnectedHandler(bool connected)
 {
     qDebug() << "MQTT connected:" << connected;
 
-    if (!connected) {
+    if (connected) {
+        resumeListening();
+    } else {
         setInsession(false);
         suspendListening();
     }
@@ -384,27 +387,6 @@ void AudioServer::init()
         qDebug() << " sampleRate:" << AudioServer::inFormat.sampleRate();
         qDebug() << " channelCount:" << AudioServer::inFormat.channelCount();
     }
-
-    // Set output device
-    /*QString outDevName = settings->getOutAudio();
-    qDebug() << "outDevName:" << outDevName;
-    if (!outDevName.isEmpty()) {
-        QMediaService* svc = player.service();
-        if (svc != nullptr) {
-            QAudioOutputSelectorControl* out =
-                    qobject_cast<QAudioOutputSelectorControl*>
-                    (svc->requestControl(QAudioOutputSelectorControl_iid));
-            auto out = svc->requestControl(QAudioOutputSelectorControl_iid);
-            if (out != nullptr) {
-                out->setActiveOutput(outDevName);
-                svc->releaseControl(out);
-            } else {
-                qWarning() << "out == nullptr";
-            }
-        } else {
-            qWarning() << "svc == nullptr";
-        }
-    }*/
 
     // creating input device in new thread
     start(QThread::IdlePriority);

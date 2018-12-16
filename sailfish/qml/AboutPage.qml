@@ -48,26 +48,34 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("ChangelogPage.qml"))
             }*/
 
+            Button {
+                text: qsTr("Project website")
+                anchors.horizontalCenter: parent.horizontalCenter
+                onClicked: Qt.openUrlExternally(PAGE)
+            }
+
             SectionHeader {
-                text: qsTr("Authors & license")
+                text: qsTr("Authors")
             }
 
             PaddedLabel {
                 horizontalAlignment: Text.AlignLeft
                 textFormat: Text.RichText
-                text: "Copyright &copy; 2018 Michal Kosciesza"
+                text: "Copyright &copy; %1 %2"
+                .arg(COPYRIGHT_YEAR)
+                .arg(AUTHOR)
             }
 
             PaddedLabel {
                 horizontalAlignment: Text.AlignLeft
-                text: qsTr("%1 is a free application. The source code is " +
-                           "subject to the terms of the Mozilla Public License, v. 2.0. " +
-                           "If a copy of the MPL was not distributed with this " +
-                           "app, You can obtain one at %2.").arg(APP_NAME).arg("http://mozilla.org/MPL/2.0/")
+                textFormat: Text.StyledText
+                text: qsTr("%1 is developed as an open source project under %2.")
+                .arg(APP_NAME)
+                .arg("<a href=\"" + LICENSE_URL + "\">" + LICENSE + "</a>")
             }
 
             SectionHeader {
-                text: qsTr("Third party components")
+                text: qsTr("Libraries")
             }
 
             PaddedLabel {

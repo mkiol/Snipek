@@ -1,18 +1,18 @@
 Name: harbour-snipek
 Summary: Snipek
-Version: 0.9.1
+Version: 1.0.0
 Release: 1
 # The contents of the Group field should be one of the groups listed here:
 # https://github.com/mer-tools/spectacle/blob/master/data/GROUPS
 Group: Qt/Qt
-URL: http://mozilla.org/MPL/2.0/
-License: LICENSE
+URL: https://github.com/mkiol/Snipek
+License: MPLv2.0
 # This must be generated before uploading a package to a remote build service.
 # Usually this line does not need to be modified.
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  Remote microphone for Snips AI system
+  Remote microphone and speaker for Snips voice assistant
 Configure: none
 # The qtc5 builder inserts macros to allow QtCreator to have fine
 # control over qmake/make execution

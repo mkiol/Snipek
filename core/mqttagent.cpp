@@ -119,6 +119,7 @@ void MqttAgent::deInit()
     if (client) {
         MQTTClient_disconnect(client, 10000);
         MQTTClient_destroy(&client);
+        client = nullptr;
     }
 }
 
