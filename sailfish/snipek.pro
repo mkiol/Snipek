@@ -43,6 +43,14 @@ OTHER_FILES += \
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
+CONFIG += sailfishapp_i18n
+TRANSLATIONS += \
+    translations/snipek.ts \
+    translations/snipek-pl.ts \
+    translations/snipek-ru.ts \
+    translations/snipek-de.ts \
+    translations/snipek-es.ts
+
 images.files = images/*
 images.path = /usr/share/$${TARGET}/images
 INSTALLS += images

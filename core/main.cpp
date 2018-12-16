@@ -56,6 +56,22 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Message>("Message");
     qRegisterMetaType<AudioServer::ErrorType>("ErrorType");
 
+#ifdef SAILFISH
+    QTranslator translator;
+    const QString locale = QLocale::system().name();
+    const QString transDir = SailfishApp::pathTo("translations").toLocalFile();
+    if(translator.load("snipek-" + locale, transDir)) {
+        app->installTranslator(&translator);
+    } else {
+        qWarning() << "Cannot load translation for" << locale;
+        if (translator.load("snipek", transDir)) {
+            app->installTranslator(&translator);
+        } else {
+            qWarning() << "Cannot load default translation";
+        }
+    }
+#endif
+
     auto server = AudioServer::instance();
     context->setContextProperty("server", server);
     server->init();
