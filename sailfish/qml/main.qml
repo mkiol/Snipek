@@ -31,13 +31,13 @@ ApplicationWindow
         onError: {
             switch (error) {
             case 1:
-                notification.show("Can't connect because IP address is not defined")
+                notification.show(qsTr("Cannot connect because Snips MQTT broker IP address is not defined"))
                 break;
             case 2:
-                notification.show("Connection problem")
+                notification.show(qsTr("Connection problem"))
                 break;
             default:
-                notification.show("Whoops, something went wrong")
+                notification.show(qsTr("Whoops, something went wrong"))
             }
         }
     }

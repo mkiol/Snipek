@@ -47,32 +47,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="31"/>
+        <location filename="../qml/FirstPage.qml" line="26"/>
+        <source>Configure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/FirstPage.qml" line="32"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="31"/>
+        <location filename="../qml/FirstPage.qml" line="32"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="57"/>
+        <location filename="../qml/FirstPage.qml" line="58"/>
         <source>Listening</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="58"/>
+        <location filename="../qml/FirstPage.qml" line="59"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="59"/>
+        <location filename="../qml/FirstPage.qml" line="60"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="64"/>
+        <location filename="../qml/FirstPage.qml" line="65"/>
         <source>Not configured</source>
         <translation type="unfinished"></translation>
     </message>
@@ -86,22 +91,22 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="32"/>
-        <source>Enter IP address</source>
+        <source>Enter Snips MQTT broker IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="33"/>
-        <source>MQTT broker address</source>
+        <source>Snips MQTT broker address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="48"/>
-        <source>Enter port number</source>
+        <source>Enter Snips MQTT broker port number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="49"/>
-        <source>MQTT broker port</source>
+        <source>Snips MQTT broker port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -112,6 +117,24 @@
     <message>
         <location filename="../qml/SettingsPage.qml" line="65"/>
         <source>Site ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>main</name>
+    <message>
+        <location filename="../qml/main.qml" line="34"/>
+        <source>Cannot connect because Snips MQTT broker IP address is not defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/main.qml" line="37"/>
+        <source>Connection problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/main.qml" line="40"/>
+        <source>Whoops, something went wrong</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

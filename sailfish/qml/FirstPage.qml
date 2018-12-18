@@ -23,11 +23,12 @@ Page {
             }
 
             MenuItem {
-                text: qsTr("Settings")
+                text: app.configured ? qsTr("Settings") : qsTr("Configure")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
 
             MenuItem {
+                visible: app.configured
                 text: server.connected ? qsTr("Disconnect") : qsTr("Connect")
                 onClicked: {
                     if (server.connected)
