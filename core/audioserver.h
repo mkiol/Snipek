@@ -77,6 +77,8 @@ public:
     static const QString mqttPlayFinishedTopic;
     static const QByteArray mqttSessionEndedTopic;
     static const QByteArray mqttSessionStartedTopic;
+    static const QByteArray mqttFeedbackOnTopic;
+    static const QByteArray mqttFeedbackOffTopic;
 
     static QAudioFormat inFormat;
     static QAudioFormat outFormat;
@@ -84,6 +86,7 @@ public:
 
     void init();
     void deInit();
+    void setFeedback(bool enabled);
     Q_INVOKABLE QStringList getInAudioDevices();
     Q_INVOKABLE QStringList getOutAudioDevices();
     Message& message(int id);

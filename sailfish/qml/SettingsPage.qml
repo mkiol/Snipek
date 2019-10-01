@@ -73,6 +73,15 @@ Page {
                 }
             }
 
+            TextSwitch {
+                automaticCheck: false
+                checked: settings.audioFeedback
+                text: qsTr("Audio feedback")
+                onClicked: {
+                    settings.audioFeedback = !settings.audioFeedback
+                }
+            }
+
             /*SectionHeader {
                 text: qsTr("Experimental features")
             }*/

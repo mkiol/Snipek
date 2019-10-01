@@ -30,6 +30,8 @@ const QString AudioServer::mqttPlayBytesTopic = "hermes/audioServer/%1/playBytes
 const QString AudioServer::mqttPlayFinishedTopic = "hermes/audioServer/%1/playFinished";
 const QByteArray AudioServer::mqttSessionEndedTopic = "hermes/dialogueManager/sessionEnded";
 const QByteArray AudioServer::mqttSessionStartedTopic = "hermes/dialogueManager/sessionStarted";
+const QByteArray AudioServer::mqttFeedbackOnTopic = "hermes/feedback/sound/toggleOn";
+const QByteArray AudioServer::mqttFeedbackOffTopic = "hermes/feedback/sound/toggleOff";
 
 const int AudioProcessor::numSamples = 256;
 const int AudioProcessor::maxBuffer = 5;
@@ -217,6 +219,11 @@ AudioServer::AudioServer(QObject* parent) :
     QThread(parent),
     player(parent)
 {
+    connect(Settings::instance(), &Settings::audioFeedbackChanged, [this] {
+        if (connected)
+            setFeedback(Settings::instance()->getAudioFeedback());
+    });
+
     auto mqtt = MqttAgent::instance();
     connect(mqtt, &MqttAgent::message,
             this, &AudioServer::processMessage);
@@ -244,6 +251,8 @@ void AudioServer::run()
     processor->setActive(true);
     input->start(processor.get());
     //emit processorInited();
+
+    setFeedback(Settings::instance()->getAudioFeedback());
 
     QThread::exec();
     qDebug() << "Event loop exit, thread:" << QThread::currentThreadId();
@@ -291,6 +300,7 @@ void AudioServer::mqttConnectedHandler()
 
     if (mqttConnected) {
         resumeListening();
+        setFeedback(Settings::instance()->getAudioFeedback());
     } else {
         setInsession(false);
         suspendListening();
@@ -368,6 +378,21 @@ void AudioServer::init()
 
     // creating input device in new thread
     start(QThread::IdlePriority);
+}
+
+void AudioServer::setFeedback(bool enabled)
+{
+    qDebug() << "Setting feedback:" << enabled;
+
+    QString site = Settings::instance()->getSite();
+
+    Message msg;
+    msg.topic = enabled ? AudioServer::mqttFeedbackOnTopic : AudioServer::mqttFeedbackOffTopic;
+    msg.payload = QString("{\"siteId\":\"%1\"}").arg(site).toUtf8();
+    qDebug() << "data:" << msg.payload;
+
+    auto mqtt = MqttAgent::instance();
+    mqtt->publish(msg);
 }
 
 Message& AudioServer::message(int id)

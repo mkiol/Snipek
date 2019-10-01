@@ -20,6 +20,7 @@ class Settings: public QObject
     Q_PROPERTY (QString inAudio READ getInAudio WRITE setInAudio NOTIFY audioChanged)
     Q_PROPERTY (QString outAudio READ getOutAudio WRITE setOutAudio NOTIFY audioChanged)
     Q_PROPERTY (int mqttPort READ getMqttPort WRITE setMqttPort NOTIFY mqttChanged)
+    Q_PROPERTY (bool audioFeedback READ getAudioFeedback WRITE setAudioFeedback NOTIFY audioFeedbackChanged)
 
 public:
     static Settings* instance(QObject* parent = nullptr);
@@ -35,11 +36,14 @@ public:
     void setInAudio(const QString& value);
     QString getOutAudio();
     void setOutAudio(const QString& value);
+    bool getAudioFeedback();
+    void setAudioFeedback(bool value);
 
 signals:
     void siteChanged();
     void mqttChanged();
     void audioChanged();
+    void audioFeedbackChanged();
 
 private:
     QSettings settings;

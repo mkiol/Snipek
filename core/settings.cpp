@@ -96,6 +96,19 @@ void Settings::setMqttPort(int value)
     }
 }
 
+bool Settings::getAudioFeedback()
+{
+    return settings.value("audiofeedback", true).toBool();
+}
+
+void Settings::setAudioFeedback(bool value)
+{
+    if (getAudioFeedback() != value) {
+        settings.setValue("audiofeedback", value);
+        emit audioFeedbackChanged();
+    }
+}
+
 QString Settings::getInAudio()
 {
     return settings.value("inaudio", "").toString();
