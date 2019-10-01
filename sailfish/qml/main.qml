@@ -27,7 +27,7 @@ ApplicationWindow
     }
 
     Connections {
-        target: server
+        target: mqtt
         onError: {
             switch (error) {
             case 1:

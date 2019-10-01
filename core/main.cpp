@@ -26,6 +26,7 @@
 #include "audioserver.h"
 #include "message.h"
 #include "settings.h"
+#include "mqttagent.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
     auto context = view->rootContext();
     auto engine = view->engine();
     engine->addImageProvider(QLatin1String("icons"), new IconProvider);
+    //QObject::connect(engine, &QQmlEngine::quit, app, &QCoreApplication::quit);
 #else
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     auto app = new QGuiApplication(argc, argv);
@@ -72,9 +74,13 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    auto server = AudioServer::instance();
-    context->setContextProperty("server", server);
-    server->init();
+    auto mqtt = MqttAgent::instance();
+    context->setContextProperty("mqtt", mqtt);
+    mqtt->init();
+
+    auto aserver = AudioServer::instance();
+    context->setContextProperty("aserver", aserver);
+    aserver->init();
 
     auto settings = Settings::instance();
     context->setContextProperty("settings", settings);

@@ -7,6 +7,7 @@
 
 #include <QThread>
 #include <QByteArray>
+#include <QCoreApplication>
 
 #include "mqttagent.h"
 #include "audioserver.h"
@@ -24,15 +25,18 @@ MqttAgent* MqttAgent::instance(QObject* parent)
 }
 
 MqttAgent::MqttAgent(QObject *parent) :
-    QObject(parent)
+    QThread(parent)
 {
-    //init();
+    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
+            this, &MqttAgent::deInit);
+
+    auto settings = Settings::instance();
+    connect(settings, &Settings::mqttChanged, this, &MqttAgent::deInit);
+    connect(settings, &Settings::siteChanged, this, &MqttAgent::deInit);
 }
 
 bool MqttAgent::init()
 {
-    qDebug() << "Init thread:" << QThread::currentThreadId();
-
     deInit();
 
     auto settings = Settings::instance();
@@ -100,7 +104,17 @@ bool MqttAgent::init()
         return false;
     }
 
+    start(QThread::IdlePriority);
+
     return true;
+}
+
+void MqttAgent::run()
+{
+    while (isConnected()) {
+        publishQueue();
+        receive();
+    }
 }
 
 bool MqttAgent::isConnected()
@@ -108,7 +122,7 @@ bool MqttAgent::isConnected()
     bool c = client && MQTTClient_isConnected(client);
     if (connected != c) {
         connected = c;
-        emit connectedChanged(connected);
+        emit connectedChanged();
     }
 
     return connected;
@@ -117,45 +131,60 @@ bool MqttAgent::isConnected()
 void MqttAgent::deInit()
 {
     if (client) {
+        std::lock_guard<std::mutex> guard(mutex);
+
+        qDebug() << "Deinitng MQTT agent";
         MQTTClient_disconnect(client, 10000);
         MQTTClient_destroy(&client);
         client = nullptr;
+        std::queue<Message>().swap(msgQueue);
+
+        if (connected) {
+            connected = false;
+            emit connectedChanged();
+        }
     }
 }
 
-void MqttAgent::publish(Message& msg)
+void MqttAgent::publish(const Message &msg)
 {
-    //qDebug() << "Publish thread:" << QThread::currentThreadId();
+    if (isConnected())
+        msgQueue.push(msg);
+}
 
-    if (!isConnected())
-        return;
+void MqttAgent::publishQueue()
+{
+    std::lock_guard<std::mutex> guard(mutex);
 
-    MQTTClient_message mqttMsg = MQTTClient_message_initializer;
-    mqttMsg.payload = msg.payload.data();
-    mqttMsg.payloadlen = msg.payload.length();
-    mqttMsg.qos = 0;
-    mqttMsg.retained = 0;
+    while (isConnected() && !msgQueue.empty()) {
+        auto& msg = msgQueue.front();
 
-    MQTTClient_deliveryToken token;
+        MQTTClient_message mqttMsg = MQTTClient_message_initializer;
+        mqttMsg.payload = msg.payload.data();
+        mqttMsg.payloadlen = msg.payload.length();
+        mqttMsg.qos = 0;
+        mqttMsg.retained = 0;
 
-    int rc;
+        MQTTClient_deliveryToken token;
 
-    rc = MQTTClient_publishMessage(client, msg.topic.data(), &mqttMsg, &token);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        qWarning() << "Error in MQTT publish";
-        return;
-    }
+        int rc;
 
-    rc = MQTTClient_waitForCompletion(client, token, 500);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        qWarning() << "Error in MQTT waitForCompletion";
-        return;
+        rc = MQTTClient_publishMessage(client, msg.topic.data(), &mqttMsg, &token);
+        if (rc != MQTTCLIENT_SUCCESS) {
+            qWarning() << "Error in MQTT publish";
+        } else {
+            rc = MQTTClient_waitForCompletion(client, token, 500);
+            if (rc != MQTTCLIENT_SUCCESS)
+                qWarning() << "Error in MQTT waitForCompletion";
+        }
+
+        msgQueue.pop();
     }
 }
 
 void MqttAgent::receive()
 {
-    //qDebug() << "Receive thread:" << QThread::currentThreadId();
+    std::lock_guard<std::mutex> guard(mutex);
 
     if (!isConnected())
         return;

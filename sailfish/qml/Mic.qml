@@ -12,13 +12,13 @@ Rectangle {
     id: root
 
     property alias size: root.width
-    property bool active: server.insession
+    property bool active: aserver.insession
 
-    property color dotCol1: server.connected ? "#ffffff" : Qt.darker(root.color)
+    property color dotCol1: aserver.connected ? "#ffffff" : Qt.darker(root.color)
     property color dotCol2: Qt.darker(root.color)
     property int dotSize: size/8
 
-    color: server.connected ?
+    color: aserver.connected ?
                "#1906d0" :
                "#666666"
 

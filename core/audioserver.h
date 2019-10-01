@@ -32,7 +32,6 @@ class AudioProcessor : public QIODevice
 Q_OBJECT
 
 public:
-
     AudioProcessor(QObject* parent = nullptr);
     void init();
     void setActive(bool active);
@@ -63,7 +62,7 @@ Q_OBJECT
     Q_PROPERTY (bool listening READ getListening NOTIFY listeningChanged)
     Q_PROPERTY (bool playing READ getPlaying NOTIFY playingChanged)
     Q_PROPERTY (bool insession READ getInsession NOTIFY insessionChanged)
-    Q_PROPERTY (bool connected READ getConnected NOTIFY connectedChanged)
+    Q_PROPERTY (bool connected READ isConnected NOTIFY connectedChanged)
 
 public:
     enum ErrorType {
@@ -84,16 +83,13 @@ public:
     static AudioServer* instance();
 
     void init();
-    Q_INVOKABLE void close();
+    void deInit();
     Q_INVOKABLE QStringList getInAudioDevices();
     Q_INVOKABLE QStringList getOutAudioDevices();
     Message& message(int id);
 
 signals:
     void processorInited();
-    void initMqtt();
-    void deInitMqtt();
-    void quit();
     void error(ErrorType error);
 
     // props
@@ -103,8 +99,6 @@ signals:
     void connectedChanged();
 
 public slots:
-    void connectToMqtt();
-    void disconnectFromMqtt();
     void startListening();
     void suspendListening();
     void resumeListening();
@@ -115,12 +109,12 @@ public slots:
     bool getListening();
     bool getPlaying();
     bool getInsession();
-    bool getConnected();
+    bool isConnected();
 
 private slots:
     void playFinishedHandler(int id);
     void playerStateHandler(QMediaPlayer::State state);
-    void mqttConnectedHandler(bool connected);
+    void mqttConnectedHandler();
     void mqttError(MqttAgent::ErrorType err);
 
 protected:

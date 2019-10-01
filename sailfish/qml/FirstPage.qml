@@ -29,13 +29,8 @@ Page {
 
             MenuItem {
                 visible: app.configured
-                text: server.connected ? qsTr("Disconnect") : qsTr("Connect")
-                onClicked: {
-                    if (server.connected)
-                        server.disconnectFromMqtt()
-                    else
-                        server.connectToMqtt()
-                }
+                text: mqtt.connected ? qsTr("Disconnect") : qsTr("Connect")
+                onClicked: mqtt.connected ? mqtt.deInit() : mqtt.init()
             }
         }
 
@@ -54,7 +49,7 @@ Page {
             visible: app.configured
             color: Theme.highlightColor
             font.pixelSize: Theme.fontSizeLarge
-            text: server.connected ? server.insession ?
+            text: aserver.connected ? aserver.insession ?
                                          qsTr("Listening") :
                                          qsTr("Idle") :
             qsTr("Disconnected")

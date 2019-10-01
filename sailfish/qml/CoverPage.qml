@@ -17,10 +17,10 @@ CoverBackground {
     }
 
     CoverActionList {
-        enabled: !server.connected
+        enabled: !aserver.connected
         CoverAction {
             iconSource: "image://theme/icon-cover-refresh"
-            onTriggered: server.connectToMqtt()
+            onTriggered: mqtt.init();
         }
     }
 }

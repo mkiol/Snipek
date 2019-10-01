@@ -45,14 +45,12 @@ qint64 AudioProcessor::readData(char* data, qint64 maxSize)
 
 qint64 AudioProcessor::writeData(const char* data, qint64 maxSize)
 {
-    //qDebug() << "active:" << active;
+    //qDebug() << "writeData:" << active;
+
     if (active) {
         buffer.append(data, static_cast<int>(maxSize));
         processBuffer();
     }
-
-    auto mqtt = MqttAgent::instance();
-    mqtt->receive();
 
     return maxSize;
 }
@@ -157,7 +155,6 @@ void AudioProcessor::makeHeader()
 void AudioServer::processMessage(int id)
 {
     qDebug() << "Processing message id:" << id;
-    //qDebug() << "Thread:" << QThread::currentThreadId();
 
     // TODO: Handle more types of messages
 
@@ -216,36 +213,23 @@ AudioServer* AudioServer::instance()
     return AudioServer::inst;
 }
 
-
 AudioServer::AudioServer(QObject* parent) :
     QThread(parent),
     player(parent)
 {
+    auto mqtt = MqttAgent::instance();
+    connect(mqtt, &MqttAgent::message,
+            this, &AudioServer::processMessage);
+    connect(mqtt, &MqttAgent::connectedChanged,
+            this, &AudioServer::mqttConnectedHandler);
+    this->connected = mqtt->isConnected();
 }
 
 void AudioServer::run()
 {
     qDebug() << "Starting audio server";
-    //qDebug() << "Thread:" << QThread::currentThreadId();
 
-    // MQTT agent
-    auto mqtt = MqttAgent::instance();
-    /*if (!mqtt->init()) {
-        qWarning() << "Can't connect to MQTT broker";
-        //TODO Handle can't connect to MQTT
-    }*/
-    connect(mqtt, &MqttAgent::message,
-            AudioServer::instance(), &AudioServer::processMessage);
-    connect(mqtt, &MqttAgent::connectedChanged,
-            AudioServer::instance(), &AudioServer::mqttConnectedHandler);
-    connect(mqtt, &MqttAgent::error,
-            AudioServer::instance(), &AudioServer::mqttError);
-    connect(AudioServer::instance(), &AudioServer::initMqtt,
-            mqtt, &MqttAgent::init);
-    connect(AudioServer::instance(), &AudioServer::deInitMqtt,
-            mqtt, &MqttAgent::deInit);
-    connect(AudioServer::instance(), &AudioServer::quit, [this, mqtt](){
-        mqtt->deInit();
+    connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, [this](){
         processor->setActive(false);
         QThread::quit();
     });
@@ -257,11 +241,10 @@ void AudioServer::run()
     processor->init();
 
     qDebug() << "Start listening";
-    //processor->setActive(true);
+    processor->setActive(true);
     input->start(processor.get());
     //emit processorInited();
 
-    // TODO: Loop exit
     QThread::exec();
     qDebug() << "Event loop exit, thread:" << QThread::currentThreadId();
 }
@@ -287,7 +270,6 @@ void AudioServer::sendPlayFinished(int id)
 void AudioServer::playFinishedHandler(int id)
 {
     qDebug() << "Play finished for id:" << id;
-    //qDebug() << "Thread:" << QThread::currentThreadId();
 
     if (id) {
         sendPlayFinished(id);
@@ -301,42 +283,38 @@ void AudioServer::playFinishedHandler(int id)
         playNext();
 }
 
-void AudioServer::mqttConnectedHandler(bool connected)
+void AudioServer::mqttConnectedHandler()
 {
-    qDebug() << "MQTT connected:" << connected;
+    bool mqttConnected = MqttAgent::instance()->isConnected();
 
-    if (connected) {
+    qDebug() << "MQTT connected changed:" << mqttConnected;
+
+    if (mqttConnected) {
         resumeListening();
     } else {
         setInsession(false);
         suspendListening();
     }
 
-    this->connected = connected;
+    this->connected = mqttConnected;
     emit connectedChanged();
 }
 
-void AudioServer::close()
+void AudioServer::deInit()
 {
-    qDebug() << "Closing audio server";
+    qDebug() << "De-initing audio server";
+    QThread::quit();
     suspendListening();
-    emit quit();
     disconnect(this);
     player.stop();
-    QCoreApplication::quit();
 }
 
 void AudioServer::init()
 {
     qDebug() << "Initing audio server";
-    //qDebug() << "Thread:" << QThread::currentThreadId();
 
     connect(this, &AudioServer::processorInited, this, &AudioServer::startListening);
     connect(&player, &QMediaPlayer::stateChanged, this, &AudioServer::playerStateHandler);
-
-    auto settings = Settings::instance();
-    connect(settings, &Settings::mqttChanged, this, &AudioServer::disconnectFromMqtt);
-    connect(settings, &Settings::siteChanged, this, &AudioServer::disconnectFromMqtt);
 
     // audio format supported by snips
     outFormat.setSampleRate(16000);
@@ -513,19 +491,9 @@ void AudioServer::setInsession(bool value)
     }
 }
 
-bool AudioServer::getConnected()
+bool AudioServer::isConnected()
 {
     return connected;
-}
-
-void AudioServer::connectToMqtt()
-{
-    emit initMqtt();
-}
-
-void AudioServer::disconnectFromMqtt()
-{
-    emit deInitMqtt();
 }
 
 void AudioServer::mqttError(MqttAgent::ErrorType err)

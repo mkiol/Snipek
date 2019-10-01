@@ -10,13 +10,17 @@
 
 #include <QDebug>
 #include <QObject>
+#include <QThread>
+#include <queue>
+#include <mutex>
 
 #include "MQTTClient.h"
 #include "message.h"
 
-class MqttAgent : public QObject
+class MqttAgent : public QThread
 {
     Q_OBJECT
+    Q_PROPERTY (bool connected READ isConnected NOTIFY connectedChanged)
 public:
     enum ErrorType {
         E_Unknown = 0,
@@ -25,27 +29,30 @@ public:
     };
 
     static MqttAgent* instance(QObject* parent = nullptr);
-
     bool isConnected();
-    void receive();
+    void publish(const Message &msg);
 
 public slots:
-    void publish(Message &msg);
     bool init();
     void deInit();
 
 signals:
     void message(int id);
-    void connectedChanged(bool value);
+    void connectedChanged();
     void error(ErrorType error);
 
 private:
     static MqttAgent* inst;
+    std::mutex mutex;
     MQTTClient client = nullptr;
     int id = 0;
     bool connected = false;
+    std::queue<Message> msgQueue;
 
+    void publishQueue();
+    void receive();
     MqttAgent(QObject* parent = nullptr);
+    void run();
 };
 
 #endif // MQTTAGENT_H

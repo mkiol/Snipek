@@ -12,7 +12,7 @@ DEFINES += SAILFISH
 
 PROJECTDIR = $$PWD/..
 
-INCLUDEPATH += /usr/include/c++/7
+INCLUDEPATH += /usr/include/c++/9
 
 CONFIG += sailfish
 DEFINES += SAILFISH
