@@ -12,7 +12,6 @@
 #include <QObject>
 #include <QThread>
 #include <queue>
-#include <mutex>
 
 #include "MQTTClient.h"
 #include "message.h"
@@ -31,25 +30,29 @@ public:
     static MqttAgent* instance(QObject* parent = nullptr);
     bool isConnected();
     void publish(const Message &msg);
+    void subscribe(const QString &topic);
 
 public slots:
     bool init();
     void deInit();
 
 signals:
-    void message(int id);
+    void message(const Message &msg);
     void connectedChanged();
     void error(ErrorType error);
 
 private:
     static MqttAgent* inst;
-    std::mutex mutex;
     MQTTClient client = nullptr;
     int id = 0;
     bool connected = false;
+    bool shutdown = false;
     std::queue<Message> msgQueue;
+    std::queue<QString> subscribeQueue;
 
-    void publishQueue();
+    bool checkConnected();
+    void publishAll();
+    void subscribeAll();
     void receive();
     MqttAgent(QObject* parent = nullptr);
     void run();

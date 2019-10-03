@@ -28,10 +28,10 @@ AudioServer* AudioServer::inst = nullptr;
 const QString AudioServer::mqttAudioFrameTopic = "hermes/audioServer/%1/audioFrame";
 const QString AudioServer::mqttPlayBytesTopic = "hermes/audioServer/%1/playBytes";
 const QString AudioServer::mqttPlayFinishedTopic = "hermes/audioServer/%1/playFinished";
-const QByteArray AudioServer::mqttSessionEndedTopic = "hermes/dialogueManager/sessionEnded";
-const QByteArray AudioServer::mqttSessionStartedTopic = "hermes/dialogueManager/sessionStarted";
-const QByteArray AudioServer::mqttFeedbackOnTopic = "hermes/feedback/sound/toggleOn";
-const QByteArray AudioServer::mqttFeedbackOffTopic = "hermes/feedback/sound/toggleOff";
+const QString AudioServer::mqttSessionEndedTopic = "hermes/dialogueManager/sessionEnded";
+const QString AudioServer::mqttSessionStartedTopic = "hermes/dialogueManager/sessionStarted";
+const QString AudioServer::mqttFeedbackOnTopic = "hermes/feedback/sound/toggleOn";
+const QString AudioServer::mqttFeedbackOffTopic = "hermes/feedback/sound/toggleOff";
 
 const int AudioProcessor::numSamples = 256;
 const int AudioProcessor::maxBuffer = 5;
@@ -154,55 +154,41 @@ void AudioProcessor::makeHeader()
     out << quint32(inPayloadSize);
 }
 
-void AudioServer::processMessage(int id)
+void AudioServer::processMessage(const Message &msg)
 {
-    qDebug() << "Processing message id:" << id;
+    qDebug() << "Processing message id:" << msg.id;
 
     // TODO: Handle more types of messages
 
-    if (id == 0) {
-        qWarning() << "Message id is invalid";
-        messages.erase(id);
-        return;
-    }
-
     QString site = Settings::instance()->getSite();
-    QByteArray& topic = messages[id].topic;
     QByteArray pbt = AudioServer::mqttPlayBytesTopic.arg(site).toUtf8();
 
-    qDebug() << "topic:" << topic;
+    qDebug() << "topic:" << msg.topic;
 
-    if (topic.startsWith(pbt)) {
+    if (msg.topic.startsWith(pbt)) {
         qDebug() << "Play bytes received";
         suspendListening();
-        play(id);
+        play(msg);
         return;
     }
 
-    if (topic == AudioServer::mqttSessionStartedTopic) {
+    if (msg.topic == AudioServer::mqttSessionStartedTopic.toUtf8()) {
         qDebug() << "Session started received";
-        qDebug() << "payload:" << messages[id].payload;
-
-        if (checkSiteId(messages[id].payload))
+        qDebug() << "payload:" << msg.payload;
+        if (checkSiteId(msg.payload))
             setInsession(true);
-
-        messages.erase(id);
         return;
     }
 
-    if (topic == AudioServer::mqttSessionEndedTopic) {
+    if (msg.topic == AudioServer::mqttSessionEndedTopic.toUtf8()) {
         qDebug() << "Session ended received";
-        qDebug() << "payload:" << messages[id].payload;
-
-        if (checkSiteId(messages[id].payload))
+        qDebug() << "payload:" << msg.payload;
+        if (checkSiteId(msg.payload))
             setInsession(false);
-
-        messages.erase(id);
         return;
     }
 
     qWarning() << "Unknown message received";
-    messages.erase(id);
     return;
 }
 
@@ -219,17 +205,6 @@ AudioServer::AudioServer(QObject* parent) :
     QThread(parent),
     player(parent)
 {
-    connect(Settings::instance(), &Settings::audioFeedbackChanged, [this] {
-        if (connected)
-            setFeedback(Settings::instance()->getAudioFeedback());
-    });
-
-    auto mqtt = MqttAgent::instance();
-    connect(mqtt, &MqttAgent::message,
-            this, &AudioServer::processMessage);
-    connect(mqtt, &MqttAgent::connectedChanged,
-            this, &AudioServer::mqttConnectedHandler);
-    this->connected = mqtt->isConnected();
 }
 
 void AudioServer::run()
@@ -248,42 +223,37 @@ void AudioServer::run()
     processor->init();
 
     qDebug() << "Start listening";
-    processor->setActive(true);
     input->start(processor.get());
-    //emit processorInited();
 
-    setFeedback(Settings::instance()->getAudioFeedback());
+    mqttConnectedHandler();
 
     QThread::exec();
     qDebug() << "Event loop exit, thread:" << QThread::currentThreadId();
 }
 
-void AudioServer::sendPlayFinished(int id)
+void AudioServer::sendPlayFinished(const Message& msg)
 {
     qDebug() << "Sending PlayFinished";
 
     QString site = Settings::instance()->getSite();
 
-    Message msg;
-    msg.topic = AudioServer::mqttPlayFinishedTopic.arg(site).toUtf8();
-    QString topic(messages[id].topic);
+    Message respMsg;
+    respMsg.topic = AudioServer::mqttPlayFinishedTopic.arg(site).toUtf8();
+    QString topic(msg.topic);
     QString mqttId = topic.split('/').last();
-    msg.payload = QString("{\"id\":\"%1\",\"siteId\":\"%2\",\"sessionId\":null}")
+    respMsg.payload = QString("{\"id\":\"%1\",\"siteId\":\"%2\",\"sessionId\":null}")
             .arg(mqttId).arg(site).toUtf8();
-    qDebug() << "data:" << msg.payload;
+    //qDebug() << "data:" << respMsg.payload;
 
     auto mqtt = MqttAgent::instance();
-    mqtt->publish(msg);
+    mqtt->publish(respMsg);
 }
 
-void AudioServer::playFinishedHandler(int id)
+void AudioServer::playFinishedHandler(const Message& msg)
 {
-    qDebug() << "Play finished for id:" << id;
+    qDebug() << "Play finished for id:" << msg.id;
 
-    if (id) {
-        sendPlayFinished(id);
-        messages.erase(id);
-    }
+    sendPlayFinished(msg);
 
     playQueue.pop();
     if (playQueue.empty())
@@ -294,13 +264,23 @@ void AudioServer::playFinishedHandler(int id)
 
 void AudioServer::mqttConnectedHandler()
 {
-    bool mqttConnected = MqttAgent::instance()->isConnected();
+    auto mqtt = MqttAgent::instance();
+    bool mqttConnected = mqtt->isConnected();
 
     qDebug() << "MQTT connected changed:" << mqttConnected;
 
     if (mqttConnected) {
+        auto s = Settings::instance();
+        // subscriptions
+        // play bytes
+        mqtt->subscribe(AudioServer::mqttPlayBytesTopic.arg(s->getSite()).toUtf8() + "/#");
+        // session started
+        mqtt->subscribe(AudioServer::mqttSessionStartedTopic);
+        // session ended
+        mqtt->subscribe(AudioServer::mqttSessionEndedTopic);
+
+        setFeedback(s->getAudioFeedback());
         resumeListening();
-        setFeedback(Settings::instance()->getAudioFeedback());
     } else {
         setInsession(false);
         suspendListening();
@@ -376,6 +356,17 @@ void AudioServer::init()
         qDebug() << " channelCount:" << AudioServer::inFormat.channelCount();
     }
 
+    auto mqtt = MqttAgent::instance();
+    this->connected = mqtt->isConnected();
+    connect(mqtt, &MqttAgent::message,
+            this, &AudioServer::processMessage);
+    connect(mqtt, &MqttAgent::connectedChanged,
+            this, &AudioServer::mqttConnectedHandler);
+    connect(Settings::instance(), &Settings::audioFeedbackChanged, [this] {
+        if (connected)
+            setFeedback(Settings::instance()->getAudioFeedback());
+    });
+
     // creating input device in new thread
     start(QThread::IdlePriority);
 }
@@ -387,7 +378,8 @@ void AudioServer::setFeedback(bool enabled)
     QString site = Settings::instance()->getSite();
 
     Message msg;
-    msg.topic = enabled ? AudioServer::mqttFeedbackOnTopic : AudioServer::mqttFeedbackOffTopic;
+    msg.topic = enabled ? AudioServer::mqttFeedbackOnTopic.toUtf8() :
+                          AudioServer::mqttFeedbackOffTopic.toUtf8();
     msg.payload = QString("{\"siteId\":\"%1\"}").arg(site).toUtf8();
     qDebug() << "data:" << msg.payload;
 
@@ -395,17 +387,10 @@ void AudioServer::setFeedback(bool enabled)
     mqtt->publish(msg);
 }
 
-Message& AudioServer::message(int id)
-{
-    return messages[id];
-}
-
-void AudioServer::play(int id)
+void AudioServer::play(const Message& msg)
 {
     bool play = playQueue.empty();
-
-    playQueue.push(id);
-
+    playQueue.push(msg);
     if (play)
         playNext();
 }
@@ -413,10 +398,8 @@ void AudioServer::play(int id)
 void AudioServer::playerStateHandler(QMediaPlayer::State state)
 {
     qDebug() << "Player new state:" << state;
-    //qDebug() << "Thread:" << QThread::currentThreadId();
 
-    int id = playQueue.front();
-    //qDebug() << "Id:" << id;
+    auto& msg = playQueue.front();
 
     if (state == QMediaPlayer::PlayingState) {
         if (!playing) {
@@ -429,7 +412,7 @@ void AudioServer::playerStateHandler(QMediaPlayer::State state)
             emit playingChanged();
 
             buffer.close();
-            playFinishedHandler(id);
+            playFinishedHandler(msg);
         }
     }
 }
@@ -437,22 +420,15 @@ void AudioServer::playerStateHandler(QMediaPlayer::State state)
 void AudioServer::playNext()
 {
     qDebug() << "Play next";
-    //qDebug() << "Thread:" << QThread::currentThreadId();
 
     if (playQueue.empty()) {
         qWarning() << "Out queue is empty";
         return;
     }
 
-    int id = playQueue.front();
-    //qDebug() << "Id:" << id;
+    auto& msg = playQueue.front();
 
-    if (!messages.count(id)) {
-        qWarning() << "Messages doesn't contain id:" << id;
-        return;
-    }
-
-    QByteArray& payload = messages[id].payload;
+    QByteArray& payload = msg.payload;
     buffer.setBuffer(&payload);
     buffer.open(QIODevice::ReadOnly);
 
@@ -519,20 +495,6 @@ void AudioServer::setInsession(bool value)
 bool AudioServer::isConnected()
 {
     return connected;
-}
-
-void AudioServer::mqttError(MqttAgent::ErrorType err)
-{
-    switch (err) {
-    case MqttAgent::E_NoAddr:
-        emit error(E_Mqtt_NoAddr);
-        break;
-    case MqttAgent::E_Conn:
-        emit error(E_Mqtt_Conn);
-        break;
-    default:
-        emit error(E_Unknown);
-    }
 }
 
 QStringList AudioServer::getInAudioDevices()

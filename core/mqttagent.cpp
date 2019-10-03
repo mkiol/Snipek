@@ -10,7 +10,6 @@
 #include <QCoreApplication>
 
 #include "mqttagent.h"
-#include "audioserver.h"
 #include "settings.h"
 
 MqttAgent* MqttAgent::inst = nullptr;
@@ -38,6 +37,8 @@ MqttAgent::MqttAgent(QObject *parent) :
 bool MqttAgent::init()
 {
     deInit();
+
+    qDebug() << "MQTT init";
 
     auto settings = Settings::instance();
 
@@ -72,56 +73,62 @@ bool MqttAgent::init()
         return false;
     }
 
-    QByteArray topic;
-
-    // play bytes subscription
-    topic = AudioServer::mqttPlayBytesTopic.arg(settings->getSite()).toUtf8() + "/#";
-    rc = MQTTClient_subscribe(client, topic.data(), 0);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        qWarning() << "Failed to subscribe PlayBytes, return code:" << rc;
-        MQTTClient_destroy(&client);
-        emit error(E_Conn);
-        return false;
-    }
-
-    // session started subscription
-    topic = AudioServer::mqttSessionStartedTopic;
-    rc = MQTTClient_subscribe(client, topic.data(), 0);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        qWarning() << "Failed to subscribe SessionStarted, return code:" << rc;
-        MQTTClient_destroy(&client);
-        emit error(E_Conn);
-        return false;
-    }
-
-    // session ended subscription
-    topic = AudioServer::mqttSessionEndedTopic;
-    rc = MQTTClient_subscribe(client, topic.data(), 0);
-    if (rc != MQTTCLIENT_SUCCESS) {
-        qWarning() << "Failed to subscribe SessionEnded, return code:" << rc;
-        MQTTClient_destroy(&client);
-        emit error(E_Conn);
-        return false;
-    }
-
+    shutdown = false;
     start(QThread::IdlePriority);
 
     return true;
 }
 
+void MqttAgent::subscribe(const QString& topic)
+{
+    subscribeQueue.push(topic);
+}
+
+void MqttAgent::subscribeAll()
+{
+    while (!subscribeQueue.empty()) {
+        const QByteArray topic = subscribeQueue.front().toUtf8();
+        qWarning() << "Subscribe topic:" << topic;
+
+        int rc = MQTTClient_subscribe(client, topic.data(), 0);
+        if (rc != MQTTCLIENT_SUCCESS) {
+            qWarning() << "Failed to subscribe topic:" << topic << ", code:" << rc;
+        }
+
+        subscribeQueue.pop();
+    }
+}
+
 void MqttAgent::run()
 {
-    while (isConnected()) {
-        publishQueue();
+    while (checkConnected()) {
+        subscribeAll();
+        publishAll();
         receive();
     }
 }
 
 bool MqttAgent::isConnected()
 {
+    return connected;
+}
+
+bool MqttAgent::checkConnected()
+{
+    if (client && shutdown) {
+        qDebug() << "Deinitng MQTT agent";
+        MQTTClient_disconnect(client, 10000);
+        MQTTClient_destroy(&client);
+        client = nullptr;
+        std::queue<Message>().swap(msgQueue);
+        std::queue<QString>().swap(subscribeQueue);
+        shutdown = false;
+    }
+
     bool c = client && MQTTClient_isConnected(client);
     if (connected != c) {
         connected = c;
+        qDebug() << "isConnected connected:" << connected;
         emit connectedChanged();
     }
 
@@ -130,33 +137,17 @@ bool MqttAgent::isConnected()
 
 void MqttAgent::deInit()
 {
-    if (client) {
-        std::lock_guard<std::mutex> guard(mutex);
-
-        qDebug() << "Deinitng MQTT agent";
-        MQTTClient_disconnect(client, 10000);
-        MQTTClient_destroy(&client);
-        client = nullptr;
-        std::queue<Message>().swap(msgQueue);
-
-        if (connected) {
-            connected = false;
-            emit connectedChanged();
-        }
-    }
+    shutdown = true;
 }
 
 void MqttAgent::publish(const Message &msg)
 {
-    if (isConnected())
-        msgQueue.push(msg);
+    msgQueue.push(msg);
 }
 
-void MqttAgent::publishQueue()
+void MqttAgent::publishAll()
 {
-    std::lock_guard<std::mutex> guard(mutex);
-
-    while (isConnected() && !msgQueue.empty()) {
+    while (!msgQueue.empty()) {
         auto& msg = msgQueue.front();
 
         MQTTClient_message mqttMsg = MQTTClient_message_initializer;
@@ -184,11 +175,6 @@ void MqttAgent::publishQueue()
 
 void MqttAgent::receive()
 {
-    std::lock_guard<std::mutex> guard(mutex);
-
-    if (!isConnected())
-        return;
-
     char* topic;
     int topicLen;
     MQTTClient_message* mqttMsg = nullptr;
@@ -196,16 +182,12 @@ void MqttAgent::receive()
 
     if (mqttMsg) {
         qDebug() << "New MQTT message:" << topic << "msg size:" << mqttMsg->payloadlen;
-
         ++id;
-
-        Message& msg = AudioServer::instance()->message(id);
+        Message msg;
         msg.id = id;
         msg.payload = QByteArray(static_cast<char*>(mqttMsg->payload), mqttMsg->payloadlen);
         msg.topic = QByteArray(topic, topicLen);
-
-        emit message(id);
-
+        emit message(msg);
         MQTTClient_freeMessage(&mqttMsg);
     }
 }

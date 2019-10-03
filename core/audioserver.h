@@ -66,19 +66,17 @@ Q_OBJECT
 
 public:
     enum ErrorType {
-        E_Unknown = 0,
-        E_Mqtt_NoAddr,
-        E_Mqtt_Conn
+        E_Unknown = 0
     };
     Q_ENUM(ErrorType)
 
     static const QString mqttAudioFrameTopic;
     static const QString mqttPlayBytesTopic;
     static const QString mqttPlayFinishedTopic;
-    static const QByteArray mqttSessionEndedTopic;
-    static const QByteArray mqttSessionStartedTopic;
-    static const QByteArray mqttFeedbackOnTopic;
-    static const QByteArray mqttFeedbackOffTopic;
+    static const QString mqttSessionEndedTopic;
+    static const QString mqttSessionStartedTopic;
+    static const QString mqttFeedbackOnTopic;
+    static const QString mqttFeedbackOffTopic;
 
     static QAudioFormat inFormat;
     static QAudioFormat outFormat;
@@ -89,7 +87,6 @@ public:
     void setFeedback(bool enabled);
     Q_INVOKABLE QStringList getInAudioDevices();
     Q_INVOKABLE QStringList getOutAudioDevices();
-    Message& message(int id);
 
 signals:
     void processorInited();
@@ -105,8 +102,8 @@ public slots:
     void startListening();
     void suspendListening();
     void resumeListening();
-    void play(int id);
-    void processMessage(int id);
+    void play(const Message& msg);
+    void processMessage(const Message& msg);
 
     // props
     bool getListening();
@@ -115,10 +112,9 @@ public slots:
     bool isConnected();
 
 private slots:
-    void playFinishedHandler(int id);
+    void playFinishedHandler(const Message &msg);
     void playerStateHandler(QMediaPlayer::State state);
     void mqttConnectedHandler();
-    void mqttError(MqttAgent::ErrorType err);
 
 protected:
     void run();
@@ -127,8 +123,7 @@ private:
     static AudioServer* inst;
     std::unique_ptr<AudioProcessor> processor;
     std::unique_ptr<QAudioInput> input;
-    std::unordered_map<int, Message> messages;
-    std::queue<int> playQueue;
+    std::queue<Message> playQueue;
     QBuffer buffer;
     QMediaPlayer player;
     QStringList inAudioNames;
@@ -141,7 +136,7 @@ private:
 
     AudioServer(QObject* parent = nullptr);
     void playNext();
-    void sendPlayFinished(int id);
+    void sendPlayFinished(const Message &msg);
     void setInsession(bool value);
     bool checkSiteId(const QByteArray& data);
 };
