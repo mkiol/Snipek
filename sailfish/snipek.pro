@@ -41,15 +41,17 @@ OTHER_FILES += \
     rpm/$${TARGET}.spec
     translations/*.ts
 
-SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
+SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172 256x256
 
-CONFIG += sailfishapp_i18n
+TRANSLATION_SOURCE_DIRS += $$PROJECTDIR/core
+CONFIG += sailfishapp_i18n_include_obsolete
 TRANSLATIONS += \
-    translations/snipek.ts \
+    translations/snipek-en.ts \
     translations/snipek-pl.ts \
     translations/snipek-ru.ts \
     translations/snipek-de.ts \
     translations/snipek-es.ts
+include(sailfishapp_i18n.pri)
 
 images.files = images/*
 images.path = /usr/share/$${TARGET}/images
