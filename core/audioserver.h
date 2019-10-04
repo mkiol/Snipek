@@ -84,7 +84,7 @@ public:
 
     void init();
     void deInit();
-    void setFeedback(bool enabled);
+    void setFeedback();
     Q_INVOKABLE QStringList getInAudioDevices();
     Q_INVOKABLE QStringList getOutAudioDevices();
 
@@ -139,6 +139,7 @@ private:
     void sendPlayFinished(const Message &msg);
     void setInsession(bool value);
     bool checkSiteId(const QByteArray& data);
+    void subscribe();
 };
 
 #endif // AUDIOSERVER_H

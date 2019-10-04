@@ -182,12 +182,31 @@ void MqttAgent::receive()
 
     if (mqttMsg) {
         qDebug() << "New MQTT message:" << topic << "msg size:" << mqttMsg->payloadlen;
+
         ++id;
+
         Message msg;
         msg.id = id;
         msg.payload = QByteArray(static_cast<char*>(mqttMsg->payload), mqttMsg->payloadlen);
         msg.topic = QByteArray(topic, topicLen);
+
         emit message(msg);
+        QList<QByteArray> st = msg.topic.split('/');
+        if (st.length() > 1) {
+            const auto& type = st.at(1);
+            qDebug() << "type:" << type;
+            if (type == "audioServer")
+                emit audioServerMessage(msg);
+            else if (type == "dialogueManager")
+                emit dialogueManagerMessage(msg);
+            else if (type == "tts")
+                emit ttsMessage(msg);
+            else if (type == "asr")
+                emit asrMessage(msg);
+            else if (type == "intent")
+                emit intentMessage(msg);
+        }
+
         MQTTClient_freeMessage(&mqttMsg);
     }
 }

@@ -38,6 +38,11 @@ public slots:
 
 signals:
     void message(const Message &msg);
+    void audioServerMessage(const Message &msg);
+    void dialogueManagerMessage(const Message &msg);
+    void ttsMessage(const Message &msg);
+    void asrMessage(const Message &msg);
+    void intentMessage(const Message &msg);
     void connectedChanged();
     void error(ErrorType error);
 

@@ -158,8 +158,6 @@ void AudioServer::processMessage(const Message &msg)
 {
     qDebug() << "Processing message id:" << msg.id;
 
-    // TODO: Handle more types of messages
-
     QString site = Settings::instance()->getSite();
     QByteArray pbt = AudioServer::mqttPlayBytesTopic.arg(site).toUtf8();
 
@@ -262,24 +260,26 @@ void AudioServer::playFinishedHandler(const Message& msg)
         playNext();
 }
 
-void AudioServer::mqttConnectedHandler()
+void AudioServer::subscribe()
 {
     auto mqtt = MqttAgent::instance();
-    bool mqttConnected = mqtt->isConnected();
+    // play bytes
+    mqtt->subscribe(AudioServer::mqttPlayBytesTopic.arg(
+                        Settings::instance()->getSite()).toUtf8() + "/#");
+    // session started
+    mqtt->subscribe(AudioServer::mqttSessionStartedTopic);
+    // session ended
+    mqtt->subscribe(AudioServer::mqttSessionEndedTopic);
+}
 
+void AudioServer::mqttConnectedHandler()
+{
+    bool mqttConnected = MqttAgent::instance()->isConnected();
     qDebug() << "MQTT connected changed:" << mqttConnected;
 
     if (mqttConnected) {
-        auto s = Settings::instance();
-        // subscriptions
-        // play bytes
-        mqtt->subscribe(AudioServer::mqttPlayBytesTopic.arg(s->getSite()).toUtf8() + "/#");
-        // session started
-        mqtt->subscribe(AudioServer::mqttSessionStartedTopic);
-        // session ended
-        mqtt->subscribe(AudioServer::mqttSessionEndedTopic);
-
-        setFeedback(s->getAudioFeedback());
+        subscribe();
+        setFeedback();
         resumeListening();
     } else {
         setInsession(false);
@@ -358,21 +358,24 @@ void AudioServer::init()
 
     auto mqtt = MqttAgent::instance();
     this->connected = mqtt->isConnected();
-    connect(mqtt, &MqttAgent::message,
+    connect(mqtt, &MqttAgent::audioServerMessage,
+            this, &AudioServer::processMessage);
+    connect(mqtt, &MqttAgent::dialogueManagerMessage,
             this, &AudioServer::processMessage);
     connect(mqtt, &MqttAgent::connectedChanged,
             this, &AudioServer::mqttConnectedHandler);
     connect(Settings::instance(), &Settings::audioFeedbackChanged, [this] {
         if (connected)
-            setFeedback(Settings::instance()->getAudioFeedback());
+            setFeedback();
     });
 
     // creating input device in new thread
     start(QThread::IdlePriority);
 }
 
-void AudioServer::setFeedback(bool enabled)
+void AudioServer::setFeedback()
 {
+    bool enabled = Settings::instance()->getAudioFeedback();
     qDebug() << "Setting feedback:" << enabled;
 
     QString site = Settings::instance()->getSite();
