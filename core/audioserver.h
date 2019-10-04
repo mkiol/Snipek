@@ -23,7 +23,6 @@
 #include <QStringList>
 #include <QMediaPlayer>
 
-#include "taskexecutor.h"
 #include "mqttagent.h"
 #include "message.h"
 

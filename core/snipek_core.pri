@@ -5,13 +5,11 @@ INCLUDEPATH += $$CORE_DIR
 SOURCES += \
     $$CORE_DIR/main.cpp \
     $$CORE_DIR/audioserver.cpp \
-    $$CORE_DIR/taskexecutor.cpp \
     $$CORE_DIR/mqttagent.cpp \
     $$CORE_DIR/settings.cpp
 
 HEADERS += \
     $$CORE_DIR/audioserver.h \
-    $$CORE_DIR/taskexecutor.h \
     $$CORE_DIR/mqttagent.h \
     $$CORE_DIR/message.h \
     $$CORE_DIR/settings.h \

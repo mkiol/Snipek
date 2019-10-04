@@ -315,11 +315,7 @@ void AudioServer::init()
     outFormat.setSampleType(QAudioFormat::SignedInt);
     inFormat = outFormat;
 
-    // tasks
-    TaskExecutor::instance(this);
-
     // audio input
-
     qDebug() << "Required format:";
     qDebug() << " codec:" << AudioServer::inFormat.codec();
     qDebug() << " sampleSize:" << AudioServer::inFormat.sampleSize();
