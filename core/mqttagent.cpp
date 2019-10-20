@@ -194,7 +194,6 @@ void MqttAgent::receive()
         QList<QByteArray> st = msg.topic.split('/');
         if (st.length() > 1) {
             const auto& type = st.at(1);
-            qDebug() << "type:" << type;
             if (type == "audioServer")
                 emit audioServerMessage(msg);
             else if (type == "dialogueManager")

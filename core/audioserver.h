@@ -10,7 +10,6 @@
 
 #include <memory>
 #include <queue>
-#include <unordered_map>
 
 #include <QObject>
 #include <QAudio>
@@ -22,6 +21,9 @@
 #include <QBuffer>
 #include <QStringList>
 #include <QMediaPlayer>
+#include <QMediaResource>
+#include <QAudioOutput>
+#include <QHash>
 
 #include "mqttagent.h"
 #include "message.h"
@@ -51,8 +53,7 @@ private:
     QByteArray header;
     qint32 inPayloadSize;
     qint32 outPayloadSize;
-
-    void makeHeader();
+    void makeRiffHeader();
 };
 
 class AudioServer : public QThread
@@ -63,6 +64,9 @@ Q_OBJECT
     Q_PROPERTY (bool insession READ getInsession NOTIFY insessionChanged)
     Q_PROPERTY (bool connected READ isConnected NOTIFY connectedChanged)
 
+    struct MessageDetails;
+    struct AudioDetails;
+
 public:
     enum ErrorType {
         E_Unknown = 0
@@ -72,10 +76,13 @@ public:
     static const QString mqttAudioFrameTopic;
     static const QString mqttPlayBytesTopic;
     static const QString mqttPlayFinishedTopic;
+    static const QString mqttStreamFinishedTopic;
+    static const QString mqttPlayBytesStreamingTopic;
     static const QString mqttSessionEndedTopic;
     static const QString mqttSessionStartedTopic;
     static const QString mqttFeedbackOnTopic;
     static const QString mqttFeedbackOffTopic;
+    static const QString mqttLoadedTopic;
 
     static QAudioFormat inFormat;
     static QAudioFormat outFormat;
@@ -90,6 +97,7 @@ public:
 signals:
     void processorInited();
     void error(ErrorType error);
+    void audioWriteNeeded();
 
     // props
     void listeningChanged();
@@ -101,8 +109,7 @@ public slots:
     void startListening();
     void suspendListening();
     void resumeListening();
-    void play(const Message& msg);
-    void processMessage(const Message& msg);
+    void processMessage(const  Message& msg);
 
     // props
     bool getListening();
@@ -110,21 +117,46 @@ public slots:
     bool getInsession();
     bool isConnected();
 
-private slots:
-    void playFinishedHandler(const Message &msg);
-    void playerStateHandler(QMediaPlayer::State state);
-    void mqttConnectedHandler();
-
 protected:
     void run();
 
 private:
+    enum MessageType {
+        MSG_UNKNOWN = 0,
+        MSG_PLAYBYTES,
+        MSG_STREAMBYTES,
+        MSG_SESSIONSTARTED,
+        MSG_SESSIONENDED
+    };
+    struct AudioDetails {
+        QAudioFormat format;
+        int start = 0;
+        int size = 0;
+        bool invalid = true;
+    };
+    struct MessageDetails {
+        MessageType type;
+        QString siteId;
+        QString reqId;
+        int chunk = 0;
+        bool lastChunk = false;
+        AudioDetails audioDetails;
+        MessageDetails();
+        MessageDetails(MessageType type,
+                       QString siteId = QString(),
+                       QString reqId = QString(),
+                       int chunk = 0, bool lastChunk = false);
+    };
+
     static AudioServer* inst;
     std::unique_ptr<AudioProcessor> processor;
     std::unique_ptr<QAudioInput> input;
-    std::queue<Message> playQueue;
-    QBuffer buffer;
-    QMediaPlayer player;
+    std::unique_ptr<QAudioOutput> output;
+    std::queue<QString> playQueue; // reqId
+    QHash<QString, QByteArray> reqIdToDataMap;
+    QHash<QString, MessageDetails> reqIdToDetailsMap;
+    QIODevice* buffer;
+    QString currReqId;
     QStringList inAudioNames;
     QStringList outAudioNames;
 
@@ -134,11 +166,25 @@ private:
     bool connected = false;
 
     AudioServer(QObject* parent = nullptr);
+    static MessageDetails makeDetails(const Message &msg);
     void playNext();
-    void sendPlayFinished(const Message &msg);
+    void sendPlayFinished(const MessageDetails &md);
+    void sendStreamFinished(const MessageDetails &md);
     void setInsession(bool value);
     bool checkSiteId(const QByteArray& data);
     void subscribe();
+    void loaded();
+    AudioDetails audioDetailsFromRiff(const QByteArray &data);
+    void play(const MessageDetails &md, const Message &msg);
+    void updateMd(const MessageDetails& newMd, MessageDetails& md);
+    bool isPlayingFinished();
+    void setPlaying(bool playing);
+
+private slots:
+    void playFinishedHandler();
+    void handleAudioOutputStateChanged(QAudio::State newState);
+    void handleMqttConnected();
+    void writeAudio();
 };
 
 #endif // AUDIOSERVER_H

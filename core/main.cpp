@@ -27,6 +27,7 @@
 #include "message.h"
 #include "settings.h"
 #include "mqttagent.h"
+#include "skillserver.h"
 
 int main(int argc, char *argv[])
 {
@@ -81,6 +82,9 @@ int main(int argc, char *argv[])
     auto aserver = AudioServer::instance();
     context->setContextProperty("aserver", aserver);
     aserver->init();
+
+    auto skills = SkillServer::instance();
+    context->setContextProperty("skills", skills);
 
     auto settings = Settings::instance();
     context->setContextProperty("settings", settings);

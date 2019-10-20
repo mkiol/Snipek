@@ -6,14 +6,16 @@ SOURCES += \
     $$CORE_DIR/main.cpp \
     $$CORE_DIR/audioserver.cpp \
     $$CORE_DIR/mqttagent.cpp \
-    $$CORE_DIR/settings.cpp
+    $$CORE_DIR/settings.cpp \
+    $$PWD/skillserver.cpp
 
 HEADERS += \
     $$CORE_DIR/audioserver.h \
     $$CORE_DIR/mqttagent.h \
     $$CORE_DIR/message.h \
     $$CORE_DIR/settings.h \
-    $$CORE_DIR/info.h
+    $$CORE_DIR/info.h \
+    $$PWD/skillserver.h
 
 sailfish {
     HEADERS += \

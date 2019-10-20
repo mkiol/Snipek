@@ -28,6 +28,9 @@ AudioServer* AudioServer::inst = nullptr;
 const QString AudioServer::mqttAudioFrameTopic = "hermes/audioServer/%1/audioFrame";
 const QString AudioServer::mqttPlayBytesTopic = "hermes/audioServer/%1/playBytes";
 const QString AudioServer::mqttPlayFinishedTopic = "hermes/audioServer/%1/playFinished";
+const QString AudioServer::mqttLoadedTopic = "hermes/audioServer/%1/loaded";
+const QString AudioServer::mqttStreamFinishedTopic = "hermes/audioServer/%1/streamFinished";
+const QString AudioServer::mqttPlayBytesStreamingTopic = "hermes/audioServer/%1/playBytesStreaming";
 const QString AudioServer::mqttSessionEndedTopic = "hermes/dialogueManager/sessionEnded";
 const QString AudioServer::mqttSessionStartedTopic = "hermes/dialogueManager/sessionStarted";
 const QString AudioServer::mqttFeedbackOnTopic = "hermes/feedback/sound/toggleOn";
@@ -50,7 +53,7 @@ qint64 AudioProcessor::writeData(const char* data, qint64 maxSize)
     //qDebug() << "writeData:" << active;
 
     if (active) {
-        buffer.append(data, static_cast<int>(maxSize));
+        buffer.append(data, int(maxSize));
         processBuffer();
     }
 
@@ -73,7 +76,7 @@ AudioProcessor::AudioProcessor(QObject* parent) :
 
 void AudioProcessor::init()
 {
-    makeHeader();
+    makeRiffHeader();
     open(QIODevice::WriteOnly);
 }
 
@@ -103,7 +106,7 @@ void AudioProcessor::processBuffer()
     }
 }
 
-void AudioProcessor::makeHeader()
+void AudioProcessor::makeRiffHeader()
 {
     /*qDebug() << "Required output format:";
     qDebug() << " codec:" << AudioServer::outFormat.codec();
@@ -154,40 +157,115 @@ void AudioProcessor::makeHeader()
     out << quint32(inPayloadSize);
 }
 
-void AudioServer::processMessage(const Message &msg)
+AudioServer::AudioDetails AudioServer::audioDetailsFromRiff(const QByteArray &data)
 {
-    qDebug() << "Processing message id:" << msg.id;
+    AudioDetails details;
 
-    QString site = Settings::instance()->getSite();
-    QByteArray pbt = AudioServer::mqttPlayBytesTopic.arg(site).toUtf8();
+    QDataStream in(data); // read-only
+    in.setByteOrder(QDataStream::LittleEndian);
 
-    qDebug() << "topic:" << msg.topic;
-
-    if (msg.topic.startsWith(pbt)) {
-        qDebug() << "Play bytes received";
-        suspendListening();
-        play(msg);
-        return;
+    char buf[4];
+    in.readRawData(buf, 4);
+    if (strcmp(buf, "RIFF") != 0) {
+        qWarning() << "Data is not RIFF";
+        details.invalid = true;
+        return details;
     }
 
-    if (msg.topic == AudioServer::mqttSessionStartedTopic.toUtf8()) {
+    in.skipRawData(16);
+    quint16 audioFormat, channelCount, sampleSize;
+    quint32 sampleRate, dataSize;
+    in >> audioFormat >> channelCount >> sampleRate;
+    in.skipRawData(6);
+    in >> sampleSize;
+    in.skipRawData(4);
+    in >> dataSize;
+    qDebug() << "audioFormat:" << audioFormat
+             << "channelCount:" << channelCount
+             << "sampleRate:" << sampleRate
+             << "sampleSize:" << sampleSize
+             << "dataSize:" << dataSize;
+
+    details.invalid = audioFormat != 1; // 1 = PCM
+    details.format.setChannelCount(channelCount);
+    details.format.setSampleRate(sampleRate);
+    details.format.setSampleSize(sampleSize);
+    details.format.setCodec("audio/pcm");
+    details.format.setByteOrder(QAudioFormat::LittleEndian);
+    details.format.setSampleType(QAudioFormat::UnSignedInt);
+    details.start = 44;
+    details.size = dataSize;
+
+    return details;
+}
+
+AudioServer::MessageDetails AudioServer::makeDetails(const Message &msg)
+{
+    const auto stype = QString(msg.topic).split('/');
+
+    if (stype.at(0) == "hermes") {
+        if (stype.size() == 7 && stype.at(3) == "playBytesStreaming") {
+            return MessageDetails(MSG_STREAMBYTES, stype.at(2),
+                        stype.at(4), stype.at(5).toInt(),
+                        stype.at(6).toInt() == 0 ? false : true);
+        }
+
+        if (stype.size() == 5 && stype.at(3) == "playBytes") {
+            return MessageDetails(MSG_PLAYBYTES, stype.at(2), stype.at(4), 0, true);
+        }
+
+        if (stype.size() == 3) {
+            if (stype.at(2) == "sessionStarted") {
+                return MessageDetails(MSG_SESSIONSTARTED);
+            }
+            if (stype.at(2) == "sessionEnded") {
+                return MessageDetails(MSG_SESSIONENDED);
+            }
+        }
+    } else {
+        qWarning() << "Not hermes message received";
+    }
+
+    qWarning() << "Unknown message received";
+    return MessageDetails(MSG_UNKNOWN);
+}
+
+void AudioServer::processMessage(const Message &msg)
+{
+    qDebug() << "Processing message id:" << msg.id << msg.topic;
+
+    auto md = makeDetails(msg);
+
+    switch (md.type) {
+    case MSG_STREAMBYTES:
+        qDebug() << "Play bytes stream received";
+        qDebug() << "siteId:" << md.siteId;
+        qDebug() << "reqId:" << md.reqId;
+        qDebug() << "chunk:" << md.chunk;
+        qDebug() << "lastChunk:" << md.lastChunk;
+        play(md, msg);
+        break;
+    case MSG_PLAYBYTES:
+        qDebug() << "Play bytes received";
+        qDebug() << "siteId:" << md.siteId;
+        qDebug() << "reqId:" << md.reqId;
+        play(md, msg);
+        break;
+    case MSG_SESSIONSTARTED:
         qDebug() << "Session started received";
         qDebug() << "payload:" << msg.payload;
         if (checkSiteId(msg.payload))
             setInsession(true);
-        return;
-    }
-
-    if (msg.topic == AudioServer::mqttSessionEndedTopic.toUtf8()) {
+        break;
+    case MSG_SESSIONENDED:
         qDebug() << "Session ended received";
         qDebug() << "payload:" << msg.payload;
         if (checkSiteId(msg.payload))
             setInsession(false);
-        return;
+        break;
+    default:
+        qWarning() << "Unknown message received";
     }
-
-    qWarning() << "Unknown message received";
-    return;
 }
 
 AudioServer* AudioServer::instance()
@@ -200,9 +278,10 @@ AudioServer* AudioServer::instance()
 }
 
 AudioServer::AudioServer(QObject* parent) :
-    QThread(parent),
-    player(parent)
+    QThread(parent)
 {
+    connect(this, &AudioServer::audioWriteNeeded, this,
+            &AudioServer::writeAudio, Qt::QueuedConnection);
 }
 
 void AudioServer::run()
@@ -223,35 +302,53 @@ void AudioServer::run()
     qDebug() << "Start listening";
     input->start(processor.get());
 
-    mqttConnectedHandler();
+    handleMqttConnected();
 
     QThread::exec();
     qDebug() << "Event loop exit, thread:" << QThread::currentThreadId();
 }
 
-void AudioServer::sendPlayFinished(const Message& msg)
+void AudioServer::sendPlayFinished(const MessageDetails& md)
 {
     qDebug() << "Sending PlayFinished";
 
-    QString site = Settings::instance()->getSite();
-
     Message respMsg;
-    respMsg.topic = AudioServer::mqttPlayFinishedTopic.arg(site).toUtf8();
-    QString topic(msg.topic);
-    QString mqttId = topic.split('/').last();
+    respMsg.topic = AudioServer::mqttPlayFinishedTopic.arg(md.siteId).toUtf8();
     respMsg.payload = QString("{\"id\":\"%1\",\"siteId\":\"%2\",\"sessionId\":null}")
-            .arg(mqttId).arg(site).toUtf8();
-    //qDebug() << "data:" << respMsg.payload;
+            .arg(md.reqId).arg(md.siteId).toUtf8();
 
     auto mqtt = MqttAgent::instance();
     mqtt->publish(respMsg);
 }
 
-void AudioServer::playFinishedHandler(const Message& msg)
+void AudioServer::sendStreamFinished(const MessageDetails& md)
 {
-    qDebug() << "Play finished for id:" << msg.id;
+    qDebug() << "Sending StreamFinished";
 
-    sendPlayFinished(msg);
+    Message respMsg;
+    respMsg.topic = AudioServer::mqttStreamFinishedTopic.arg(md.siteId).toUtf8();
+    respMsg.payload = QString("{\"id\":\"%1\",\"siteId\":\"%2\"}")
+            .arg(md.reqId).arg(md.siteId).toUtf8();
+    qDebug() << "data:" << respMsg.payload;
+
+    auto mqtt = MqttAgent::instance();
+    mqtt->publish(respMsg);
+}
+
+void AudioServer::playFinishedHandler()
+{
+    const auto& md = reqIdToDetailsMap[currReqId];
+    qDebug() << "Play finished for reqId:" << md.reqId;
+
+    if (md.type == MSG_STREAMBYTES) {
+        sendStreamFinished(md);
+    } else {
+        sendPlayFinished(md);
+    }
+
+    reqIdToDetailsMap.remove(currReqId);
+    reqIdToDataMap.remove(currReqId);
+    currReqId.clear();
 
     playQueue.pop();
     if (playQueue.empty())
@@ -263,21 +360,22 @@ void AudioServer::playFinishedHandler(const Message& msg)
 void AudioServer::subscribe()
 {
     auto mqtt = MqttAgent::instance();
+    QString siteId = Settings::instance()->getSite();
     // play bytes
-    mqtt->subscribe(AudioServer::mqttPlayBytesTopic.arg(
-                        Settings::instance()->getSite()).toUtf8() + "/#");
-    // session started
+    mqtt->subscribe(AudioServer::mqttPlayBytesTopic.arg(siteId) + "/#");
+    mqtt->subscribe(AudioServer::mqttPlayBytesStreamingTopic.arg(siteId) + "/#");
+    // session started/ended
     mqtt->subscribe(AudioServer::mqttSessionStartedTopic);
-    // session ended
     mqtt->subscribe(AudioServer::mqttSessionEndedTopic);
 }
 
-void AudioServer::mqttConnectedHandler()
+void AudioServer::handleMqttConnected()
 {
     bool mqttConnected = MqttAgent::instance()->isConnected();
     qDebug() << "MQTT connected changed:" << mqttConnected;
 
     if (mqttConnected) {
+        loaded();
         subscribe();
         setFeedback();
         resumeListening();
@@ -296,7 +394,8 @@ void AudioServer::deInit()
     QThread::quit();
     suspendListening();
     disconnect(this);
-    player.stop();
+    output.reset();
+    buffer = nullptr;
 }
 
 void AudioServer::init()
@@ -304,7 +403,6 @@ void AudioServer::init()
     qDebug() << "Initing audio server";
 
     connect(this, &AudioServer::processorInited, this, &AudioServer::startListening);
-    connect(&player, &QMediaPlayer::stateChanged, this, &AudioServer::playerStateHandler);
 
     // audio format supported by snips
     outFormat.setSampleRate(16000);
@@ -359,7 +457,7 @@ void AudioServer::init()
     connect(mqtt, &MqttAgent::dialogueManagerMessage,
             this, &AudioServer::processMessage);
     connect(mqtt, &MqttAgent::connectedChanged,
-            this, &AudioServer::mqttConnectedHandler);
+            this, &AudioServer::handleMqttConnected);
     connect(Settings::instance(), &Settings::audioFeedbackChanged, [this] {
         if (connected)
             setFeedback();
@@ -374,45 +472,95 @@ void AudioServer::setFeedback()
     bool enabled = Settings::instance()->getAudioFeedback();
     qDebug() << "Setting feedback:" << enabled;
 
-    QString site = Settings::instance()->getSite();
+    QString siteId = Settings::instance()->getSite();
 
     Message msg;
     msg.topic = enabled ? AudioServer::mqttFeedbackOnTopic.toUtf8() :
                           AudioServer::mqttFeedbackOffTopic.toUtf8();
-    msg.payload = QString("{\"siteId\":\"%1\"}").arg(site).toUtf8();
+    msg.payload = QString("{\"siteId\":\"%1\"}").arg(siteId).toUtf8();
     qDebug() << "data:" << msg.payload;
 
     auto mqtt = MqttAgent::instance();
     mqtt->publish(msg);
 }
 
-void AudioServer::play(const Message& msg)
+void AudioServer::loaded()
 {
-    bool play = playQueue.empty();
-    playQueue.push(msg);
-    if (play)
-        playNext();
+    QString siteId = Settings::instance()->getSite();
+
+    Message msg;
+    msg.topic = AudioServer::mqttLoadedTopic.arg(siteId).toUtf8();
+    msg.payload = QString("{\"id\":null,\"reloaded\":false,\"siteId\":\"%1\"}").arg(siteId).toUtf8();
+    qDebug() << "data:" << msg.payload;
+
+    auto mqtt = MqttAgent::instance();
+    mqtt->publish(msg);
 }
 
-void AudioServer::playerStateHandler(QMediaPlayer::State state)
+void AudioServer::handleAudioOutputStateChanged(QAudio::State newState)
 {
-    qDebug() << "Player new state:" << state;
+    qDebug() << "handleAudioOutputStateChanged";
 
-    auto& msg = playQueue.front();
-
-    if (state == QMediaPlayer::PlayingState) {
-        if (!playing) {
-            playing = true;
-            emit playingChanged();
+    switch (newState) {
+    case QAudio::IdleState:
+        qDebug() << "State: idle";
+        if (isPlayingFinished()) {
+            setPlaying(false);
+            playFinishedHandler();
+            output.reset();
+            buffer = nullptr;
+        } else {
+            emit audioWriteNeeded();
         }
+        break;
+    case QAudio::StoppedState:
+        qDebug() << "State: stopped";
+        break;
+    case QAudio::SuspendedState:
+        qDebug() << "State: suspend";
+        break;
+    case QAudio::ActiveState:
+        qDebug() << "State: active";
+        setPlaying(true);
+        suspendListening();
+        break;
+    default:
+        qDebug() << "State: other";
+    }
+}
+
+void AudioServer::updateMd(const MessageDetails& newMd, MessageDetails& md)
+{
+    md.chunk = newMd.chunk;
+    md.lastChunk = newMd.lastChunk;
+}
+
+void AudioServer::play(const MessageDetails& md, const Message& msg)
+{
+    auto ad = audioDetailsFromRiff(msg.payload);
+    if (ad.invalid) {
+        qDebug() << "Invalid audio format";
+        return;
+    }
+
+    if (currReqId == md.reqId) {
+        qDebug() << "currReqId == mw.reqId";
+        updateMd(md, reqIdToDetailsMap[md.reqId]);
+        reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
+    } else if (reqIdToDataMap.contains(md.reqId)) {
+        qDebug() << "reqIdToDataMap.contains(md.reqId)";
+        updateMd(md, reqIdToDetailsMap[md.reqId]);
+        reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
     } else {
-        if (playing) {
-            playing = false;
-            emit playingChanged();
+        qDebug() << "new reqId";
+        reqIdToDetailsMap[md.reqId] = md;
+        reqIdToDetailsMap[md.reqId].audioDetails = ad;
+        reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
 
-            buffer.close();
-            playFinishedHandler(msg);
-        }
+        bool play = playQueue.empty();
+        playQueue.push(md.reqId);
+        if (play)
+            playNext();
     }
 }
 
@@ -425,15 +573,96 @@ void AudioServer::playNext()
         return;
     }
 
-    auto& msg = playQueue.front();
+    auto& md = reqIdToDetailsMap[playQueue.front()];
 
-    QByteArray& payload = msg.payload;
-    buffer.setBuffer(&payload);
-    buffer.open(QIODevice::ReadOnly);
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(md.audioDetails.format)) {
+        qWarning() << "Audio format not supported";
+        if (output) {
+            output.reset();
+            buffer = nullptr;
+        }
+        playQueue.pop();
+        return;
+    }
 
-    QMediaContent cnt;
-    player.setMedia(cnt, &buffer);
-    player.play();
+    currReqId = md.reqId;
+
+    /*if (output && output->format() == md.audioDetails.format) {
+        qDebug() << "Reusing already existing audio output";
+    } else {
+        qDebug() << "Creating new audio output";
+        output = std::unique_ptr<QAudioOutput>(new QAudioOutput(md.audioDetails.format));
+        output->setBufferSize(10000);
+        qDebug() << "output->setBufferSize:" << output->bufferSize();
+        connect(output.get(), &QAudioOutput::stateChanged,
+                this, &AudioServer::handleAudioOutputStateChanged);
+        buffer = output->start();
+    }*/
+
+    qDebug() << "Creating new audio output";
+    output = std::unique_ptr<QAudioOutput>(new QAudioOutput(md.audioDetails.format));
+    output->setBufferSize(10000);
+    qDebug() << "output->setBufferSize:" << output->bufferSize();
+    connect(output.get(), &QAudioOutput::stateChanged,
+            this, &AudioServer::handleAudioOutputStateChanged);
+    buffer = output->start();
+}
+
+bool AudioServer::isPlayingFinished()
+{
+    if (reqIdToDataMap.contains(currReqId)) {
+        return reqIdToDetailsMap[currReqId].lastChunk &&
+                reqIdToDataMap[currReqId].isEmpty();
+    }
+
+    qWarning() << "Unknown reqId";
+    return true;
+}
+
+void AudioServer::setPlaying(bool playing)
+{
+    if (playing != this->playing) {
+        this->playing = playing;
+        emit playingChanged();
+    }
+}
+
+void AudioServer::writeAudio()
+{
+    if (buffer && reqIdToDataMap.contains(currReqId)) {
+        int size = reqIdToDataMap[currReqId].size();
+        //qDebug() << "writeAudio size:" << size;
+
+        if (size > 0) {
+            int wrote = buffer->write(reqIdToDataMap[currReqId]);
+            reqIdToDataMap[currReqId].remove(0, wrote);
+            /*if (wrote > 0) {
+                qDebug() << "size:" << size << "wrote:" << wrote
+                         << "left:" << size - wrote << "error:" << output->error();
+            }*/
+            if (output->error() == QAudio::NoError) {
+                size -= wrote;
+            } else {
+                qWarning() << "Audio output error, so ending playing";
+                size = 0;
+                reqIdToDataMap[currReqId].clear();
+            }
+        }
+
+        if (size == 0) {
+            qDebug() << "All data was written";
+            if (!reqIdToDetailsMap[currReqId].lastChunk) {
+                qDebug() << "Didn't receive last chunk, so waiting";
+                //TODO Make timeout for waiting
+                emit audioWriteNeeded();
+            }
+        } else {
+            emit audioWriteNeeded();
+        }
+    } else {
+        qWarning() << "Unknown id, so ignoring";
+    }
 }
 
 void AudioServer::startListening()
@@ -488,6 +717,14 @@ void AudioServer::setInsession(bool value)
     if (insession != value) {
         insession = value;
         emit insessionChanged();
+    }
+
+    //TODO Clear audio streams when session is ended
+    if (!value && !reqIdToDetailsMap.isEmpty()) {
+        qWarning() << "Session ended but some streams are not finished";
+        //reqIdToDetailsMap.clear();
+        //output.reset();
+        //buffer = nullptr;
     }
 }
 
@@ -574,4 +811,15 @@ bool AudioServer::checkSiteId(const QByteArray& data)
     }
 
     return true;
+}
+
+AudioServer::MessageDetails::MessageDetails(MessageType type, QString siteId,
+               QString reqId, int chunk, bool lastChunk) :
+    type(type), siteId(siteId), reqId(reqId), chunk(chunk), lastChunk(lastChunk)
+{
+}
+
+AudioServer::MessageDetails::MessageDetails() :
+    type(MSG_UNKNOWN), chunk(0), lastChunk(0)
+{
 }
