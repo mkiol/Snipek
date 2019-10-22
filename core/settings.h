@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QString>
 #include <QSettings>
+#include <QLocale>
 
 class Settings: public QObject
 {
@@ -38,6 +39,7 @@ public:
     void setOutAudio(const QString& value);
     bool getAudioFeedback();
     void setAudioFeedback(bool value);
+    QLocale locale();
 
 signals:
     void siteChanged();

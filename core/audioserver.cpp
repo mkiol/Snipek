@@ -544,15 +544,12 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
     }
 
     if (currReqId == md.reqId) {
-        qDebug() << "currReqId == mw.reqId";
         updateMd(md, reqIdToDetailsMap[md.reqId]);
         reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
     } else if (reqIdToDataMap.contains(md.reqId)) {
-        qDebug() << "reqIdToDataMap.contains(md.reqId)";
         updateMd(md, reqIdToDetailsMap[md.reqId]);
         reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
     } else {
-        qDebug() << "new reqId";
         reqIdToDetailsMap[md.reqId] = md;
         reqIdToDetailsMap[md.reqId].audioDetails = ad;
         reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
@@ -602,8 +599,7 @@ void AudioServer::playNext()
 
     qDebug() << "Creating new audio output";
     output = std::unique_ptr<QAudioOutput>(new QAudioOutput(md.audioDetails.format));
-    output->setBufferSize(10000);
-    qDebug() << "output->setBufferSize:" << output->bufferSize();
+    //output->setBufferSize(10000);
     connect(output.get(), &QAudioOutput::stateChanged,
             this, &AudioServer::handleAudioOutputStateChanged);
     buffer = output->start();

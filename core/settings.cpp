@@ -150,3 +150,18 @@ QString Settings::randString(int len)
 
    return rs;
 }
+
+QLocale Settings::locale()
+{
+    /* languages supported by Snips:
+        English
+        French
+        German
+        Japanese
+        Italian
+        Spanish
+        Portuguese (Brazil)
+    */
+
+    return QLocale("en");
+}

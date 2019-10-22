@@ -7,7 +7,9 @@ SOURCES += \
     $$CORE_DIR/audioserver.cpp \
     $$CORE_DIR/mqttagent.cpp \
     $$CORE_DIR/settings.cpp \
-    $$PWD/skillserver.cpp
+    $$CORE_DIR/datetimeskill.cpp \
+    $$CORE_DIR/skill.cpp \
+    $$CORE_DIR/skillserver.cpp
 
 HEADERS += \
     $$CORE_DIR/audioserver.h \
@@ -15,7 +17,9 @@ HEADERS += \
     $$CORE_DIR/message.h \
     $$CORE_DIR/settings.h \
     $$CORE_DIR/info.h \
-    $$PWD/skillserver.h
+    $$CORE_DIR/datetimeskill.h \
+    $$CORE_DIR/skill.h \
+    $$CORE_DIR/skillserver.h
 
 sailfish {
     HEADERS += \
