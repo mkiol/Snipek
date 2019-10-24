@@ -5,11 +5,34 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <QDebug>
 #include <QTime>
+#include <QStringList>
+#include <QLocale>
 
 #include "settings.h"
 
 Settings* Settings::inst = nullptr;
+
+/* languages supported by Snips:
+        German
+        English
+        Spanish
+        French
+        Italian
+        Japanese
+        Portuguese (Brazil)
+*/
+QStringList Settings::snipsLangs = {
+    "auto",
+    "de",
+    "en",
+    "es",
+    "fr",
+    "it",
+    "ja",
+    "pt_br"
+};
 
 Settings::Settings(QObject* parent) :
     QObject(parent),
@@ -153,15 +176,41 @@ QString Settings::randString(int len)
 
 QLocale Settings::locale()
 {
-    /* languages supported by Snips:
-        English
-        French
-        German
-        Japanese
-        Italian
-        Spanish
-        Portuguese (Brazil)
-    */
+    auto lang = getSnipsLang();
 
-    return QLocale("en");
+    if (lang == "auto") {
+        auto sysLocale = QLocale::system();
+        if (isLangSupportedBySnips(sysLocale.name()))
+            return sysLocale;
+        return QLocale(QLocale::English); // default
+    }
+
+    return QLocale(lang);
+}
+
+bool Settings::isLangSupportedBySnips(const QString &langName)
+{
+    for (const auto& l : snipsLangs) {
+        if (l.contains(langName, Qt::CaseInsensitive))
+            return true;
+    }
+
+    return false;
+}
+
+QString Settings::getSnipsLang()
+{
+    return settings.value("snipslang", "auto").toString();
+}
+
+void Settings::setSnipsLang(const QString& value)
+{
+    if (isLangSupportedBySnips(value)) {
+        if (getSnipsLang() != value) {
+            settings.setValue("snipslang", value);
+            emit snipsLangChanged();
+        }
+    } else {
+        qWarning() << "Lang is not supported by Snips:" << value;
+    }
 }

@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include <QHash>
+#include <QLocale>
 
 #include "mqttagent.h"
 #include "skill.h"
@@ -21,6 +22,8 @@ public:
     static SkillServer* instance(QObject* parent = nullptr);
     static void endSession(const QString& sessionId, const QString& text = QString());
     static void continueSession(const QString& sessionId, const QString& text);
+    static QString translate(const char *text, const QLocale& locale);
+    static QString translate(const char *text);
 
 public slots:
     void processMessage(const Message& msg);

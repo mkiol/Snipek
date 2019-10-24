@@ -26,16 +26,15 @@ QString DateTimeSkill::friendlyName()
 void DateTimeSkill::handleIntent(const Intent& intent)
 {
     QString text;
-
     auto locale = Settings::instance()->locale();
 
     if (intent.name == "muki:getTime") {
-        text = QObject::tr("It is %1").arg(
-                 locale.toString(QTime::currentTime(), QLocale::ShortFormat));
+        auto time = locale.toString(QTime::currentTime(), QLocale::ShortFormat);
+        text = SkillServer::translate("It is %1", locale).arg(time);
     } else if (intent.name == "muki:getDate"){
         auto date = locale.toString(QDateTime::currentDateTime().date(),
                                     QLocale::LongFormat);
-        text = QObject::tr("It is %1").arg(date);
+        text = SkillServer::translate("It is %1", locale).arg(date);
     }
 
     SkillServer::endSession(intent.sessionId, text);
