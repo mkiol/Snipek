@@ -20,7 +20,7 @@ QStringList DateTimeSkill::names()
 
 QString DateTimeSkill::friendlyName()
 {
-    return QObject::tr("Date and Time");
+    return tr("Date and Time");
 }
 
 void DateTimeSkill::handleIntent(const Intent& intent)
@@ -30,11 +30,15 @@ void DateTimeSkill::handleIntent(const Intent& intent)
 
     if (intent.name == "muki:getTime") {
         auto time = locale.toString(QTime::currentTime(), QLocale::ShortFormat);
-        text = SkillServer::translate("It is %1", locale).arg(time);
-    } else if (intent.name == "muki:getDate"){
+        text = locale.language() == QLocale::English ?
+                    QString("It is %1").arg(time) :
+                    tr("It is %1").arg(time);
+    } else if (intent.name == "muki:getDate") {
         auto date = locale.toString(QDateTime::currentDateTime().date(),
                                     QLocale::LongFormat);
-        text = SkillServer::translate("It is %1", locale).arg(date);
+        text = locale.language() == QLocale::English ?
+                QString("It is %1").arg(date) :
+                tr("It is %1").arg(date);
     }
 
     SkillServer::endSession(intent.sessionId, text);

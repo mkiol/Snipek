@@ -8,6 +8,7 @@
 #ifndef DATETIMESKILL_H
 #define DATETIMESKILL_H
 
+#include <QCoreApplication>
 #include <QString>
 #include <QStringList>
 
@@ -15,6 +16,8 @@
 
 class DateTimeSkill : public Skill
 {
+    Q_DECLARE_TR_FUNCTIONS(DateTimeSkill)
+
 public:
     QStringList names();
     QString friendlyName();

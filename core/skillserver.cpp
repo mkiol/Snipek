@@ -162,14 +162,3 @@ void SkillServer::handleIntent(const Intent& intent)
     auto skill = skills[intent.name];
     skill->handleIntent(intent);
 }
-
-QString SkillServer::translate(const char *text, const QLocale& locale)
-{
-    return locale.language() == QLocale::English ?
-                QString::fromUtf8(text) : QObject::tr(text);
-}
-
-QString SkillServer::translate(const char *text)
-{
-    return translate(text, Settings::instance()->locale());
-}
