@@ -21,7 +21,7 @@ class Settings: public QObject
     Q_PROPERTY (QString mqttAddress READ getMqttAddress WRITE setMqttAddress NOTIFY mqttChanged)
     Q_PROPERTY (QString inAudio READ getInAudio WRITE setInAudio NOTIFY audioChanged)
     Q_PROPERTY (QString outAudio READ getOutAudio WRITE setOutAudio NOTIFY audioChanged)
-    Q_PROPERTY (QString snipsLang READ getSnipsLang WRITE setSnipsLang NOTIFY snipsLangChanged)
+    Q_PROPERTY (QString lang READ getLang WRITE setLang NOTIFY langChanged)
     Q_PROPERTY (int mqttPort READ getMqttPort WRITE setMqttPort NOTIFY mqttChanged)
     Q_PROPERTY (bool audioFeedback READ getAudioFeedback WRITE setAudioFeedback NOTIFY audioFeedbackChanged)
 
@@ -42,20 +42,22 @@ public:
     void setOutAudio(const QString& value);
     bool getAudioFeedback();
     void setAudioFeedback(bool value);
-    QString getSnipsLang();
-    void setSnipsLang(const QString& value);
+    QString getLang();
+    void setLang(const QString& value);
     QLocale locale();
     bool isLangSupportedBySnips(const QString &langName);
+    void setNoTranslation() {noTranslation = true;}
 
 signals:
     void siteChanged();
     void mqttChanged();
     void audioChanged();
     void audioFeedbackChanged();
-    void snipsLangChanged();
+    void langChanged();
 
 private:
     QSettings settings;
+    bool noTranslation = false;
     static Settings* inst;
 
     explicit Settings(QObject* parent = nullptr);

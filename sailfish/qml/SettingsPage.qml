@@ -84,7 +84,7 @@ Page {
 
             ComboBox {
                 width: parent.width
-                label: qsTr("Snips language")
+                label: qsTr("Language")
                 currentIndex: {
                     if (settings.snipsLang === "de")
                         return 1;
@@ -105,33 +105,33 @@ Page {
 
                 menu: ContextMenu {
                     MenuItem { text: qsTr("Auto") }
-                    MenuItem { text: qsTr("German") }
-                    MenuItem { text: qsTr("English") }
-                    MenuItem { text: qsTr("Spanish") }
-                    MenuItem { text: qsTr("French") }
-                    MenuItem { text: qsTr("Italian") }
-                    MenuItem { text: qsTr("Japanese") }
-                    MenuItem { text: qsTr("Portuguese (Brazil)") }
+                    MenuItem { text: "Deutsch" }
+                    MenuItem { text: "English" }
+                    MenuItem { text: "Español" }
+                    MenuItem { text: "Français" }
+                    MenuItem { text: "Italiano" }
+                    MenuItem { text: "日本語" }
+                    MenuItem { text: "Português (do Brasil)" }
                 }
 
                 onCurrentIndexChanged: {
                     switch (currentIndex) {
                     case 1:
-                        settings.snipsLang = "de"; break
+                        settings.lang = "de"; break
                     case 2:
-                        settings.snipsLang = "en"; break
+                        settings.lang = "en"; break
                     case 3:
-                        settings.snipsLang = "es"; break
+                        settings.lang = "es"; break
                     case 4:
-                        settings.snipsLang = "fr"; break
+                        settings.lang = "fr"; break
                     case 5:
-                        settings.snipsLang = "it"; break
+                        settings.lang = "it"; break
                     case 6:
-                        settings.snipsLang = "ja"; break
+                        settings.lang = "ja"; break
                     case 7:
-                        settings.snipsLang = "pt_br"; break
+                        settings.lang = "pt_br"; break
                     default:
-                        settings.snipsLang = "auto"
+                        settings.lang = "auto"
                     }
                 }
             }

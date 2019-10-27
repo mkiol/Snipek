@@ -176,7 +176,11 @@ QString Settings::randString(int len)
 
 QLocale Settings::locale()
 {
-    auto lang = getSnipsLang();
+    if (noTranslation) {
+        return QLocale(QLocale::English); // default
+    }
+
+    auto lang = getLang();
 
     if (lang == "auto") {
         auto sysLocale = QLocale::system();
@@ -198,17 +202,17 @@ bool Settings::isLangSupportedBySnips(const QString &langName)
     return false;
 }
 
-QString Settings::getSnipsLang()
+QString Settings::getLang()
 {
-    return settings.value("snipslang", "auto").toString();
+    return settings.value("lang", "auto").toString();
 }
 
-void Settings::setSnipsLang(const QString& value)
+void Settings::setLang(const QString& value)
 {
     if (isLangSupportedBySnips(value)) {
-        if (getSnipsLang() != value) {
-            settings.setValue("snipslang", value);
-            emit snipsLangChanged();
+        if (getLang() != value) {
+            settings.setValue("lang", value);
+            emit langChanged();
         }
     } else {
         qWarning() << "Lang is not supported by Snips:" << value;

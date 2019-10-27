@@ -34,12 +34,10 @@ void DateTimeSkill::handleIntent(const Intent& intent)
 
     if (intent.name == "muki:getTime") {
         auto time = locale.toString(QTime::currentTime(), QLocale::ShortFormat);
-        //: Do not translate if language is not supported by Snips
         out << tr("It is %1.").arg(time);
     } else if (intent.name == "muki:getDate") {
         auto date = locale.toString(QDateTime::currentDateTime().date(),
                                     QLocale::LongFormat);
-        //: Do not translate if language is not supported by Snips
         out << tr("It is %1.").arg(date);
     }
 

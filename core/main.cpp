@@ -59,12 +59,16 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Message>("Message");
     qRegisterMetaType<AudioServer::ErrorType>("ErrorType");
 
+    auto settings = Settings::instance();
+    context->setContextProperty("settings", settings);
+
 #ifdef SAILFISH
     QTranslator translator;
     auto transDir = SailfishApp::pathTo("translations").toLocalFile();
-    auto locale = QLocale::system().name();
+    auto locale = settings->locale().name();
     if(!translator.load(locale, "snipek", "-", transDir, ".qm")) {
         qDebug() << "Cannot load translation:" << locale << transDir;
+        settings->setNoTranslation();
         if (!translator.load("snipek-en", transDir)) {
             qDebug() << "Cannot load default translation";
         }
@@ -82,9 +86,6 @@ int main(int argc, char *argv[])
 
     auto skills = SkillServer::instance();
     context->setContextProperty("skills", skills);
-
-    auto settings = Settings::instance();
-    context->setContextProperty("settings", settings);
 
 #ifdef SAILFISH
     view->setSource(SailfishApp::pathTo("qml/main.qml"));

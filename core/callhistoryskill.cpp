@@ -47,7 +47,6 @@ CallHistorySkill::Call CallHistorySkill::makeCall(const Event &event)
 
     QString contact = event.contactName();
     if (contact.isEmpty()) {
-        //: Do not translate if language is not supported by Snips
         contact = tr("Unknown");
     }
 
@@ -113,29 +112,21 @@ void CallHistorySkill::handleIntent(const Intent& intent)
     QTextStream out(&text, QIODevice::WriteOnly);
 
     if (list.isEmpty()) {
-        if (missedOnly) {
-            //: Do not translate if language is not supported by Snips
+        if (missedOnly)
             out << tr("You don't have missed calls.");
-        } else {
-            //: Do not translate if language is not supported by Snips
+        else
             out << tr("You don't have call events.");
-        }
     } else {
-        //: Do not translate if language is not supported by Snips
         out << tr("You have %n call(s).", nullptr, list.size());
         for (int i = 1; i <= list.size(); ++i) {
             const auto& call = list[i-1];
             out << " ";
-            if (call.type == Missed) {
-                //: Do not translate if language is not supported by Snips
+            if (call.type == Missed)
                 out << tr("%1. Missed call from %2.").arg(i).arg(call.contact);
-            } else if (call.type == Incoming) {
-                //: Do not translate if language is not supported by Snips
+            else if (call.type == Incoming)
                 out << tr("%1. Incoming call from %2.").arg(i).arg(call.contact);
-            } else {
-                //: Do not translate if language is not supported by Snips
+            else
                 out << tr("%1. Outgoing call to %2.").arg(i).arg(call.contact);
-            }
         }
     }
 
