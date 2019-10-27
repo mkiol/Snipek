@@ -8,6 +8,8 @@
 #include <QObject>
 #include <QTime>
 #include <QDateTime>
+#include <QTextStream>
+#include <QIODevice>
 
 #include "datetimeskill.h"
 #include "skillserver.h"
@@ -26,19 +28,19 @@ QString DateTimeSkill::friendlyName()
 void DateTimeSkill::handleIntent(const Intent& intent)
 {
     QString text;
+    QTextStream out(&text, QIODevice::WriteOnly);
+
     auto locale = Settings::instance()->locale();
 
     if (intent.name == "muki:getTime") {
         auto time = locale.toString(QTime::currentTime(), QLocale::ShortFormat);
-        text = locale.language() == QLocale::English ?
-                    QString("It is %1").arg(time) :
-                    tr("It is %1").arg(time);
+        //: Do not translate if language is not supported by Snips
+        out << tr("It is %1.").arg(time);
     } else if (intent.name == "muki:getDate") {
         auto date = locale.toString(QDateTime::currentDateTime().date(),
                                     QLocale::LongFormat);
-        text = locale.language() == QLocale::English ?
-                QString("It is %1").arg(date) :
-                tr("It is %1").arg(date);
+        //: Do not translate if language is not supported by Snips
+        out << tr("It is %1.").arg(date);
     }
 
     SkillServer::endSession(intent.sessionId, text);

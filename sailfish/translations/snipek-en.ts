@@ -90,14 +90,15 @@
 <context>
     <name>DateTimeSkill</name>
     <message>
-        <location filename="../../core/datetimeskill.cpp" line="23"/>
+        <location filename="../../core/datetimeskill.cpp" line="25"/>
         <source>Date and Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/datetimeskill.cpp" line="35"/>
-        <location filename="../../core/datetimeskill.cpp" line="41"/>
-        <source>It is %1</source>
+        <location filename="../../core/datetimeskill.cpp" line="38"/>
+        <location filename="../../core/datetimeskill.cpp" line="43"/>
+        <source>It is %1.</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

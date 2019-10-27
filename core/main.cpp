@@ -61,18 +61,15 @@ int main(int argc, char *argv[])
 
 #ifdef SAILFISH
     QTranslator translator;
-    const QString locale = QLocale::system().name();
-    const QString transDir = SailfishApp::pathTo("translations").toLocalFile();
-    if(translator.load("snipek-" + locale, transDir)) {
-        app->installTranslator(&translator);
-    } else {
-        qWarning() << "Cannot load translation for" << locale;
-        if (translator.load("snipek", transDir)) {
-            app->installTranslator(&translator);
-        } else {
-            qWarning() << "Cannot load default translation";
+    auto transDir = SailfishApp::pathTo("translations").toLocalFile();
+    auto locale = QLocale::system().name();
+    if(!translator.load(locale, "snipek", "-", transDir, ".qm")) {
+        qDebug() << "Cannot load translation:" << locale << transDir;
+        if (!translator.load("snipek-en", transDir)) {
+            qDebug() << "Cannot load default translation";
         }
     }
+    app->installTranslator(&translator);
 #endif
 
     auto mqtt = MqttAgent::instance();
