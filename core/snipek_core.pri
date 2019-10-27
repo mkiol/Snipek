@@ -23,10 +23,12 @@ HEADERS += \
 
 sailfish {
     HEADERS += \
-        $$CORE_DIR/iconprovider.h
+        $$CORE_DIR/iconprovider.h \
+        $$CORE_DIR/callhistoryskill.h
 
     SOURCES += \
-        $$CORE_DIR/iconprovider.cpp
+        $$CORE_DIR/iconprovider.cpp \
+        $$CORE_DIR/callhistoryskill.cpp
 }
 
 x86_64 {

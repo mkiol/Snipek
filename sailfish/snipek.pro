@@ -3,7 +3,7 @@ TARGET = harbour-snipek
 CONFIG += c++11 sailfishapp json
 QT += multimedia
 
-PKGCONFIG += mlite5
+PKGCONFIG += mlite5 commhistory-qt5 Qt5Contacts
 
 linux-g++-32: CONFIG += x86
 linux-g++: CONFIG += arm

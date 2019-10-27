@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="en_US">
 <context>
     <name>AboutPage</name>
     <message>
@@ -31,6 +31,73 @@
     <message>
         <location filename="../qml/AboutPage.qml" line="78"/>
         <source>Libraries</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CallHistorySkill</name>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="27"/>
+        <source>Call history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="51"/>
+        <source>Unknown</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="118"/>
+        <source>You don&apos;t have missed calls.</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="121"/>
+        <source>You don&apos;t have call events.</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../../core/callhistoryskill.cpp" line="125"/>
+        <source>You have %n call(s).</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation>
+            <numerusform>You have %n call.</numerusform>
+            <numerusform>You have %n calls.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="131"/>
+        <source>%1. Missed call from %2.</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="134"/>
+        <source>%1. Incoming call from %2.</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="137"/>
+        <source>%1. Outgoing call to %2.</source>
+        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DateTimeSkill</name>
+    <message>
+        <location filename="../../core/datetimeskill.cpp" line="23"/>
+        <source>Date and Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/datetimeskill.cpp" line="35"/>
+        <location filename="../../core/datetimeskill.cpp" line="41"/>
+        <source>It is %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -91,22 +158,22 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="32"/>
-        <source>Enter Snips MQTT broker IP address</source>
+        <source>Enter Snips IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="33"/>
-        <source>Snips MQTT broker address</source>
+        <source>Snips IP address (e.g. 192.168.1.5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="48"/>
-        <source>Enter Snips MQTT broker port number</source>
+        <source>Enter Snips port number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="49"/>
-        <source>Snips MQTT broker port</source>
+        <source>Snips port number (e.g. 1883)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -122,6 +189,51 @@
     <message>
         <location filename="../qml/SettingsPage.qml" line="79"/>
         <source>Audio feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="87"/>
+        <source>Snips language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="107"/>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="108"/>
+        <source>German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="109"/>
+        <source>English</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="110"/>
+        <source>Spanish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="111"/>
+        <source>French</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="112"/>
+        <source>Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="113"/>
+        <source>Japanese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="114"/>
+        <source>Portuguese (Brazil)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

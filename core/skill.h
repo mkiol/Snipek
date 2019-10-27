@@ -10,13 +10,15 @@
 
 #include <QString>
 #include <QStringList>
-
+#include <QHash>
+#include <QVariant>
 
 struct Intent
 {
     QString name;
     QString sessionId;
     QString siteId;
+    QHash<QString, QVariant> slotList;
 };
 
 class Skill

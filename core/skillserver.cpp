@@ -8,10 +8,14 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
+#include <QJsonArray>
 
 #include "skillserver.h"
 #include "settings.h"
 #include "datetimeskill.h"
+#ifdef SAILFISH
+#include "callhistoryskill.h"
+#endif
 
 SkillServer* SkillServer::inst = nullptr;
 
@@ -27,11 +31,12 @@ SkillServer* SkillServer::instance(QObject* parent)
 SkillServer::SkillServer(QObject *parent) : QObject(parent)
 {
     // skills
-
     registerSkill(new DateTimeSkill());
+#ifdef SAILFISH
+    registerSkill(new CallHistorySkill());
+#endif
 
     // mqtt
-
     auto mqtt = MqttAgent::instance();
     connect(mqtt, &MqttAgent::intentMessage,
             this, &SkillServer::processMessage);
@@ -146,6 +151,14 @@ void SkillServer::parseIntent(const QByteArray& data)
     if (intent.siteId != Settings::instance()->getSite()) {
         qWarning() << "Intent site ID is not my side ID";
         return;
+    }
+
+
+    QJsonArray slotArr = obj.value("slots").toArray();
+    if (!slotArr.isEmpty()) {
+        auto name = slotArr[0].toObject().value("slotName").toString();
+        auto value = slotArr[0].toObject().value("value").toObject().value("value").toVariant();
+        intent.slotList.insert(name, value);
     }
 
     if (!skills.contains(intent.name)) {
