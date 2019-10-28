@@ -42,48 +42,41 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="51"/>
+        <location filename="../../core/callhistoryskill.cpp" line="50"/>
         <source>Unknown</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="116"/>
+        <source>You don&apos;t have missed calls.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../core/callhistoryskill.cpp" line="118"/>
-        <source>You don&apos;t have missed calls.</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../core/callhistoryskill.cpp" line="121"/>
         <source>You don&apos;t have call events.</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../../core/callhistoryskill.cpp" line="125"/>
+        <location filename="../../core/callhistoryskill.cpp" line="120"/>
         <source>You have %n call(s).</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation>
             <numerusform>You have %n call.</numerusform>
             <numerusform>You have %n calls.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="131"/>
+        <location filename="../../core/callhistoryskill.cpp" line="125"/>
         <source>%1. Missed call from %2.</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="134"/>
+        <location filename="../../core/callhistoryskill.cpp" line="127"/>
         <source>%1. Incoming call from %2.</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="137"/>
+        <location filename="../../core/callhistoryskill.cpp" line="129"/>
         <source>%1. Outgoing call to %2.</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -95,10 +88,9 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/datetimeskill.cpp" line="38"/>
-        <location filename="../../core/datetimeskill.cpp" line="43"/>
+        <location filename="../../core/datetimeskill.cpp" line="37"/>
+        <location filename="../../core/datetimeskill.cpp" line="41"/>
         <source>It is %1.</source>
-        <extracomment>Do not translate if language is not supported by Snips</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -130,22 +122,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="53"/>
+        <location filename="../qml/FirstPage.qml" line="56"/>
         <source>Listening</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="54"/>
-        <source>Idle</source>
+        <location filename="../qml/FirstPage.qml" line="57"/>
+        <source>Say wake-up-word or tap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="55"/>
-        <source>Disconnected</source>
+        <location filename="../qml/FirstPage.qml" line="59"/>
+        <source>Say wake-up-word</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/FirstPage.qml" line="58"/>
+        <source>Tap to wake up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="60"/>
+        <source>Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/FirstPage.qml" line="65"/>
         <source>Not configured</source>
         <translation type="unfinished"></translation>
     </message>
@@ -194,47 +196,32 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="87"/>
-        <source>Snips language</source>
+        <source>Wake up method</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="107"/>
+        <location filename="../qml/SettingsPage.qml" line="91"/>
+        <source>Wake-up-word or tap gesture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="92"/>
+        <source>Tap gesture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="93"/>
+        <source>Wake-up-word</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="103"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="123"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="108"/>
-        <source>German</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="109"/>
-        <source>English</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="110"/>
-        <source>Spanish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="111"/>
-        <source>French</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="112"/>
-        <source>Italian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="113"/>
-        <source>Japanese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="114"/>
-        <source>Portuguese (Brazil)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

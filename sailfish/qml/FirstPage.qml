@@ -38,6 +38,9 @@ Page {
             visible: app.configured
             anchors.centerIn: parent
             size: root.width/2
+            enabled: settings.sessionStart < 2 &&
+                     aserver.connected && !aserver.insession
+            onClicked: aserver.startSession()
         }
 
         Label {
@@ -50,9 +53,11 @@ Page {
             color: Theme.highlightColor
             font.pixelSize: Theme.fontSizeLarge
             text: aserver.connected ? aserver.insession ?
-                                         qsTr("Listening") :
-                                         qsTr("Idle") :
-            qsTr("Disconnected")
+                          qsTr("Listening") :
+                          settings.sessionStart == 0 ? qsTr("Say wake-up-word or tap") :
+                          settings.sessionStart == 1 ? qsTr("Tap to wake up") :
+                          settings.sessionStart == 2 ? qsTr("Say wake-up-word") :
+                          "" : qsTr("Disconnected")
         }
 
         ViewPlaceholder {

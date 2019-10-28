@@ -84,6 +84,22 @@ Page {
 
             ComboBox {
                 width: parent.width
+                label: qsTr("Wake up method")
+                currentIndex: settings.sessionStart
+
+                menu: ContextMenu {
+                    MenuItem { text: qsTr("Wake-up-word or tap gesture") }
+                    MenuItem { text: qsTr("Tap gesture") }
+                    MenuItem { text: qsTr("Wake-up-word") }
+                }
+
+                onCurrentIndexChanged: {
+                    settings.sessionStart = currentIndex
+                }
+            }
+
+            ComboBox {
+                width: parent.width
                 label: qsTr("Language")
                 currentIndex: {
                     if (settings.snipsLang === "de")

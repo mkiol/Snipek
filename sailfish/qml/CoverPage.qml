@@ -17,10 +17,20 @@ CoverBackground {
     }
 
     CoverActionList {
-        enabled: !aserver.connected
+        enabled: !aserver.connected ||
+                 (settings.sessionStart < 2 && !aserver.insession)
         CoverAction {
-            iconSource: "image://theme/icon-cover-refresh"
-            onTriggered: mqtt.init();
+            iconSource: aserver.connected ?
+                            "image://theme/icon-cover-unmute" :
+                            "image://theme/icon-cover-refresh"
+            onTriggered: {
+                if (aserver.connected) {
+                    if (!aserver.insession)
+                        aserver.startSession()
+                } else {
+                    mqtt.init();
+                }
+            }
         }
     }
 }

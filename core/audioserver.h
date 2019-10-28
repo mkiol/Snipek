@@ -36,6 +36,7 @@ public:
     AudioProcessor(QObject* parent = nullptr);
     void init();
     void setActive(bool active);
+    bool getActive();
 
 protected:
     virtual qint64 readData(char* data, qint64 maxSize);
@@ -80,6 +81,7 @@ public:
     static const QString mqttPlayBytesStreamingTopic;
     static const QString mqttSessionEndedTopic;
     static const QString mqttSessionStartedTopic;
+    static const QString mqttSessionStartTopic;
     static const QString mqttFeedbackOnTopic;
     static const QString mqttFeedbackOffTopic;
     static const QString mqttLoadedTopic;
@@ -110,6 +112,7 @@ public slots:
     void suspendListening();
     void resumeListening();
     void processMessage(const  Message& msg);
+    void startSession();
 
     // props
     bool getListening();
@@ -161,9 +164,9 @@ private:
     QStringList outAudioNames;
 
     bool playing = false;
-    bool listening = false;
     bool insession = false;
     bool connected = false;
+    bool shouldListen = false;
 
     AudioServer(QObject* parent = nullptr);
     static MessageDetails makeDetails(const Message &msg);
@@ -179,6 +182,7 @@ private:
     void updateMd(const MessageDetails& newMd, MessageDetails& md);
     bool isPlayingFinished();
     void setPlaying(bool playing);
+    void updateListening();
 
 private slots:
     void playFinishedHandler();

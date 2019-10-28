@@ -218,3 +218,23 @@ void Settings::setLang(const QString& value)
         qWarning() << "Lang is not supported by Snips:" << value;
     }
 }
+
+int Settings::getSessionStart()
+{
+    /* 0 - hot-word & tap
+     * 1 - only tap
+     * 2 - only hot-word */
+    return settings.value("sessionstart", 0).toInt();
+}
+
+void Settings::setSessionStart(int value)
+{
+    if (value < 0 || value > 2)
+        value = 0;
+
+    if (getSessionStart() != value) {
+        settings.setValue("sessionstart", value);
+        emit sessionStartChanged();
+    }
+}
+

@@ -24,6 +24,7 @@ class Settings: public QObject
     Q_PROPERTY (QString lang READ getLang WRITE setLang NOTIFY langChanged)
     Q_PROPERTY (int mqttPort READ getMqttPort WRITE setMqttPort NOTIFY mqttChanged)
     Q_PROPERTY (bool audioFeedback READ getAudioFeedback WRITE setAudioFeedback NOTIFY audioFeedbackChanged)
+    Q_PROPERTY (int sessionStart READ getSessionStart WRITE setSessionStart NOTIFY sessionStartChanged)
 
 public:
     static Settings* instance(QObject* parent = nullptr);
@@ -47,6 +48,8 @@ public:
     QLocale locale();
     bool isLangSupportedBySnips(const QString &langName);
     void setNoTranslation() {noTranslation = true;}
+    int getSessionStart();
+    void setSessionStart(int value);
 
 signals:
     void siteChanged();
@@ -54,6 +57,7 @@ signals:
     void audioChanged();
     void audioFeedbackChanged();
     void langChanged();
+    void sessionStartChanged();
 
 private:
     QSettings settings;

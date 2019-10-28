@@ -33,6 +33,7 @@ const QString AudioServer::mqttStreamFinishedTopic = "hermes/audioServer/%1/stre
 const QString AudioServer::mqttPlayBytesStreamingTopic = "hermes/audioServer/%1/playBytesStreaming";
 const QString AudioServer::mqttSessionEndedTopic = "hermes/dialogueManager/sessionEnded";
 const QString AudioServer::mqttSessionStartedTopic = "hermes/dialogueManager/sessionStarted";
+const QString AudioServer::mqttSessionStartTopic = "hermes/dialogueManager/startSession";
 const QString AudioServer::mqttFeedbackOnTopic = "hermes/feedback/sound/toggleOn";
 const QString AudioServer::mqttFeedbackOffTopic = "hermes/feedback/sound/toggleOff";
 
@@ -67,6 +68,11 @@ void AudioProcessor::setActive(bool active)
             buffer.clear();
         this->active = active;
     }
+}
+
+bool AudioProcessor::getActive()
+{
+    return active;
 }
 
 AudioProcessor::AudioProcessor(QObject* parent) :
@@ -360,13 +366,27 @@ void AudioServer::playFinishedHandler()
 void AudioServer::subscribe()
 {
     auto mqtt = MqttAgent::instance();
-    QString siteId = Settings::instance()->getSite();
+    auto siteId = Settings::instance()->getSite();
     // play bytes
     mqtt->subscribe(AudioServer::mqttPlayBytesTopic.arg(siteId) + "/#");
     mqtt->subscribe(AudioServer::mqttPlayBytesStreamingTopic.arg(siteId) + "/#");
     // session started/ended
     mqtt->subscribe(AudioServer::mqttSessionStartedTopic);
     mqtt->subscribe(AudioServer::mqttSessionEndedTopic);
+}
+
+void AudioServer::startSession()
+{
+    auto siteId = Settings::instance()->getSite();
+
+    Message msg;
+    msg.topic = AudioServer::mqttSessionStartTopic.toUtf8();
+    msg.payload = QString("{\"siteId\":\"%1\",\"init\":{\"type\":\"action\","
+                          "\"canBeEnqueued\":false}}")
+            .arg(siteId).toUtf8();
+
+    auto mqtt = MqttAgent::instance();
+    mqtt->publish(msg);
 }
 
 void AudioServer::handleMqttConnected()
@@ -458,7 +478,12 @@ void AudioServer::init()
             this, &AudioServer::processMessage);
     connect(mqtt, &MqttAgent::connectedChanged,
             this, &AudioServer::handleMqttConnected);
-    connect(Settings::instance(), &Settings::audioFeedbackChanged, [this] {
+
+    auto settings = Settings::instance();
+    connect(settings, &Settings::sessionStartChanged, [this] {
+        updateListening();
+    });
+    connect(settings, &Settings::audioFeedbackChanged, [this] {
         if (connected)
             setFeedback();
     });
@@ -499,7 +524,7 @@ void AudioServer::loaded()
 
 void AudioServer::handleAudioOutputStateChanged(QAudio::State newState)
 {
-    qDebug() << "handleAudioOutputStateChanged";
+    qDebug() << "Audio output state changed";
 
     switch (newState) {
     case QAudio::IdleState:
@@ -663,32 +688,41 @@ void AudioServer::writeAudio()
 
 void AudioServer::startListening()
 {
-    qDebug() << "Start listening";
-
-    processor->setActive(true);
+    qDebug() << "Start listening requested";
+    shouldListen = true;
+    updateListening();
     input->start(processor.get());
 }
 
 void AudioServer::resumeListening()
 {
-    qDebug() << "Resume listening";
-
-    processor->setActive(true);
-
-    if (!listening) {
-        listening = true;
-        emit listeningChanged();
-    }
+    qDebug() << "Resume listening requested";
+    shouldListen = true;
+    updateListening();
 }
 
 void AudioServer::suspendListening()
 {
-    qDebug() << "Suspend listening";
+    qDebug() << "Suspend listening requested";
+    shouldListen = false;
+    updateListening();
+}
 
-    processor->setActive(false);
+void AudioServer::updateListening()
+{
+    bool listening = processor->getActive();
+    qDebug() << "Listening update (current:" << listening
+             << ", desired:" << shouldListen << ")";
 
-    if (listening) {
-        listening = false;
+    if (shouldListen && Settings::instance()->getSessionStart() == 1) {
+        // Wake up only by tap gesture, so audio is sent only during session
+        processor->setActive(getInsession());
+    } else {
+        processor->setActive(shouldListen);
+    }
+
+    if (listening != processor->getActive()) {
+        qDebug() << "Listening changed";
         emit listeningChanged();
     }
 }
@@ -700,7 +734,7 @@ bool AudioServer::getPlaying()
 
 bool AudioServer::getListening()
 {
-    return listening;
+    return processor->getActive();
 }
 
 bool AudioServer::getInsession()
@@ -713,6 +747,7 @@ void AudioServer::setInsession(bool value)
     if (insession != value) {
         insession = value;
         emit insessionChanged();
+        updateListening();
     }
 
     //TODO Clear audio streams when session is ended

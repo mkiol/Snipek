@@ -74,7 +74,7 @@ bool MqttAgent::init()
     }
 
     shutdown = false;
-    start(QThread::IdlePriority);
+    start(QThread::HighPriority);
 
     return true;
 }
@@ -142,6 +142,8 @@ void MqttAgent::deInit()
 
 void MqttAgent::publish(const Message &msg)
 {
+    /*if (!msg.topic.endsWith("audioFrame"))
+        qDebug() << "Adding to publish queue:" << msg.topic;*/
     msgQueue.push(msg);
 }
 
