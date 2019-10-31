@@ -286,8 +286,11 @@ AudioServer* AudioServer::instance()
 AudioServer::AudioServer(QObject* parent) :
     QThread(parent)
 {
-    connect(this, &AudioServer::audioWriteNeeded, this,
-            &AudioServer::writeAudio, Qt::QueuedConnection);
+    writeTimer.setInterval(100);
+    connect(&writeTimer, &QTimer::timeout, this, &AudioServer::writeAudio);
+    clearTimer.setInterval(1000);
+    clearTimer.setSingleShot(true);
+    connect(&clearTimer, &QTimer::timeout, this, &AudioServer::clearAudio);
 }
 
 void AudioServer::run()
@@ -527,22 +530,20 @@ void AudioServer::handleAudioOutputStateChanged(QAudio::State newState)
     qDebug() << "Audio output state changed";
 
     switch (newState) {
+    case QAudio::SuspendedState:
+    case QAudio::StoppedState:
     case QAudio::IdleState:
-        qDebug() << "State: idle";
+        qDebug() << "State: idle, suspended or stopped";
         if (isPlayingFinished()) {
             setPlaying(false);
             playFinishedHandler();
             output.reset();
             buffer = nullptr;
-        } else {
-            emit audioWriteNeeded();
+            clearTimer.stop();
+        } else if (!writeTimer.isActive()){
+            qDebug() << "Audio write is needed";
+            writeTimer.start();
         }
-        break;
-    case QAudio::StoppedState:
-        qDebug() << "State: stopped";
-        break;
-    case QAudio::SuspendedState:
-        qDebug() << "State: suspend";
         break;
     case QAudio::ActiveState:
         qDebug() << "State: active";
@@ -568,12 +569,13 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
         return;
     }
 
-    if (currReqId == md.reqId) {
+    if (reqIdToDataMap.contains(md.reqId)) {
         updateMd(md, reqIdToDetailsMap[md.reqId]);
         reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
-    } else if (reqIdToDataMap.contains(md.reqId)) {
-        updateMd(md, reqIdToDetailsMap[md.reqId]);
-        reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
+        if (currReqId == md.reqId && !writeTimer.isActive()) {
+            qDebug() << "Audio write is needed";
+            writeTimer.start();
+        }
     } else {
         reqIdToDetailsMap[md.reqId] = md;
         reqIdToDetailsMap[md.reqId].audioDetails = ad;
@@ -610,21 +612,9 @@ void AudioServer::playNext()
 
     currReqId = md.reqId;
 
-    /*if (output && output->format() == md.audioDetails.format) {
-        qDebug() << "Reusing already existing audio output";
-    } else {
-        qDebug() << "Creating new audio output";
-        output = std::unique_ptr<QAudioOutput>(new QAudioOutput(md.audioDetails.format));
-        output->setBufferSize(10000);
-        qDebug() << "output->setBufferSize:" << output->bufferSize();
-        connect(output.get(), &QAudioOutput::stateChanged,
-                this, &AudioServer::handleAudioOutputStateChanged);
-        buffer = output->start();
-    }*/
-
     qDebug() << "Creating new audio output";
     output = std::unique_ptr<QAudioOutput>(new QAudioOutput(md.audioDetails.format));
-    //output->setBufferSize(10000);
+    //output->setBufferSize(50000);
     connect(output.get(), &QAudioOutput::stateChanged,
             this, &AudioServer::handleAudioOutputStateChanged);
     buffer = output->start();
@@ -649,6 +639,17 @@ void AudioServer::setPlaying(bool playing)
     }
 }
 
+void AudioServer::clearAudio()
+{
+    qWarning() << "Clearing audio";
+    if (buffer && reqIdToDataMap.contains(currReqId)) {
+        reqIdToDataMap[currReqId].clear();
+        reqIdToDetailsMap[currReqId].lastChunk = true;
+        output->stop();
+    }
+    writeTimer.stop();
+}
+
 void AudioServer::writeAudio()
 {
     if (buffer && reqIdToDataMap.contains(currReqId)) {
@@ -658,31 +659,27 @@ void AudioServer::writeAudio()
         if (size > 0) {
             int wrote = buffer->write(reqIdToDataMap[currReqId]);
             reqIdToDataMap[currReqId].remove(0, wrote);
-            /*if (wrote > 0) {
-                qDebug() << "size:" << size << "wrote:" << wrote
-                         << "left:" << size - wrote << "error:" << output->error();
-            }*/
             if (output->error() == QAudio::NoError) {
                 size -= wrote;
             } else {
                 qWarning() << "Audio output error, so ending playing";
+                writeTimer.stop();
                 size = 0;
                 reqIdToDataMap[currReqId].clear();
+                reqIdToDetailsMap[currReqId].lastChunk = true;
             }
         }
 
         if (size == 0) {
             qDebug() << "All data was written";
-            if (!reqIdToDetailsMap[currReqId].lastChunk) {
+            if (!reqIdToDetailsMap[currReqId].lastChunk)
                 qDebug() << "Didn't receive last chunk, so waiting";
-                //TODO Make timeout for waiting
-                emit audioWriteNeeded();
-            }
-        } else {
-            emit audioWriteNeeded();
+            writeTimer.stop();
+            clearTimer.start();
         }
     } else {
         qWarning() << "Unknown id, so ignoring";
+        writeTimer.stop();
     }
 }
 
@@ -711,8 +708,8 @@ void AudioServer::suspendListening()
 void AudioServer::updateListening()
 {
     bool listening = processor->getActive();
-    qDebug() << "Listening update (current:" << listening
-             << ", desired:" << shouldListen << ")";
+    qDebug() << "Listening update, current:" << listening
+             << " desired:" << shouldListen;
 
     if (shouldListen && Settings::instance()->getSessionStart() == 1) {
         // Wake up only by tap gesture, so audio is sent only during session
@@ -750,13 +747,8 @@ void AudioServer::setInsession(bool value)
         updateListening();
     }
 
-    //TODO Clear audio streams when session is ended
-    if (!value && !reqIdToDetailsMap.isEmpty()) {
+    if (!value && !reqIdToDetailsMap.isEmpty())
         qWarning() << "Session ended but some streams are not finished";
-        //reqIdToDetailsMap.clear();
-        //output.reset();
-        //buffer = nullptr;
-    }
 }
 
 bool AudioServer::isConnected()

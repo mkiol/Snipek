@@ -24,6 +24,7 @@
 #include <QMediaResource>
 #include <QAudioOutput>
 #include <QHash>
+#include <QTimer>
 
 #include "mqttagent.h"
 #include "message.h"
@@ -162,11 +163,14 @@ private:
     QString currReqId;
     QStringList inAudioNames;
     QStringList outAudioNames;
+    QTimer writeTimer;
+    QTimer clearTimer;
 
     bool playing = false;
     bool insession = false;
     bool connected = false;
     bool shouldListen = false;
+    bool waitingForAudio = false;
 
     AudioServer(QObject* parent = nullptr);
     static MessageDetails makeDetails(const Message &msg);
@@ -189,6 +193,7 @@ private slots:
     void handleAudioOutputStateChanged(QAudio::State newState);
     void handleMqttConnected();
     void writeAudio();
+    void clearAudio();
 };
 
 #endif // AUDIOSERVER_H
