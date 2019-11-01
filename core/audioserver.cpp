@@ -186,11 +186,11 @@ AudioServer::AudioDetails AudioServer::audioDetailsFromRiff(const QByteArray &da
     in >> sampleSize;
     in.skipRawData(4);
     in >> dataSize;
-    qDebug() << "audioFormat:" << audioFormat
+    /*qDebug() << "audioFormat:" << audioFormat
              << "channelCount:" << channelCount
              << "sampleRate:" << sampleRate
              << "sampleSize:" << sampleSize
-             << "dataSize:" << dataSize;
+             << "dataSize:" << dataSize;*/
 
     details.invalid = audioFormat != 1; // 1 = PCM
     details.format.setChannelCount(channelCount);
@@ -244,17 +244,17 @@ void AudioServer::processMessage(const Message &msg)
 
     switch (md.type) {
     case MSG_STREAMBYTES:
-        qDebug() << "Play bytes stream received";
+        /*qDebug() << "Play bytes stream received";
         qDebug() << "siteId:" << md.siteId;
         qDebug() << "reqId:" << md.reqId;
         qDebug() << "chunk:" << md.chunk;
-        qDebug() << "lastChunk:" << md.lastChunk;
+        qDebug() << "lastChunk:" << md.lastChunk;*/
         play(md, msg);
         break;
     case MSG_PLAYBYTES:
-        qDebug() << "Play bytes received";
+        /*qDebug() << "Play bytes received";
         qDebug() << "siteId:" << md.siteId;
-        qDebug() << "reqId:" << md.reqId;
+        qDebug() << "reqId:" << md.reqId;*/
         play(md, msg);
         break;
     case MSG_SESSIONSTARTED:
@@ -814,7 +814,7 @@ bool AudioServer::checkSiteId(const QByteArray& data)
     }
 
     if (!json.isObject()) {
-        qWarning() << "Json is not a object";
+        qWarning() << "Json is not an object";
         return false;
     }
 

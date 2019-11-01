@@ -9,6 +9,8 @@
 #include <QJsonParseError>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTextStream>
+#include <QRegExp>
 
 #include "skillserver.h"
 #include "settings.h"
@@ -40,6 +42,8 @@ SkillServer::SkillServer(QObject *parent) : QObject(parent)
     auto mqtt = MqttAgent::instance();
     connect(mqtt, &MqttAgent::intentMessage,
             this, &SkillServer::processMessage);
+    connect(mqtt, &MqttAgent::dialogueManagerMessage,
+            this, &SkillServer::processMessage);
     connect(mqtt, &MqttAgent::connectedChanged,
             this, &SkillServer::mqttConnectedHandler);
     mqttConnectedHandler();
@@ -48,7 +52,7 @@ SkillServer::SkillServer(QObject *parent) : QObject(parent)
 void SkillServer::registerSkill(Skill* skill)
 {
     for (auto name : skill->names()) {
-        skills.insert(name, skill);
+        intentNameToSkills.insert(name, skill);
     }
 }
 
@@ -59,8 +63,11 @@ void SkillServer::processMessage(const Message &msg)
 
     const auto st = QString(msg.topic).split('/');
 
-    if (st.size() > 2 && st.at(0) == "hermes" && st.at(1) == "intent") {
-        parseIntent(msg.payload);
+    if (st.size() > 2 && st.at(0) == "hermes") {
+        if (st.at(1) == "intent")
+            parseIntent(msg.payload);
+        else if (st.at(2) == "sessionEnded")
+            parseSessionEnded(msg.payload);
     } else {
         qWarning() << "Unknown message received";
     }
@@ -74,7 +81,9 @@ void SkillServer::subscribe()
 
     QString tmpl = "hermes/intent/%1";
 
-    QHashIterator<QString, Skill*> i(skills);
+    mqtt->subscribe(tmpl.arg("muki:confirmation")); // confirmation intent
+
+    QHashIterator<QString, Skill*> i(intentNameToSkills);
     while (i.hasNext()) {
         i.next();
         mqtt->subscribe(tmpl.arg(i.key()));
@@ -90,26 +99,87 @@ void SkillServer::mqttConnectedHandler()
 
 void SkillServer::endSession(const QString& sessionId, const QString& text)
 {
-    Message msg;
-    msg.topic = "hermes/dialogueManager/endSession";
-    msg.payload = text.isEmpty() ?
-                QString("{\"sessionId\":\"%1\"}").arg(sessionId).toUtf8() :
-                QString("{\"sessionId\":\"%1\",\"text\":\"%2\"}")
-                .arg(sessionId).arg(text).toUtf8();
+    auto ss = SkillServer::instance();
+    if (ss->sessionIdToSkills.contains(sessionId)) {
+        Message msg;
+        msg.topic = "hermes/dialogueManager/endSession";
+        msg.payload = text.isEmpty() ?
+                    QString("{\"sessionId\":\"%1\"}").arg(sessionId).toUtf8() :
+                    QString("{\"sessionId\":\"%1\",\"text\":\"%2\"}")
+                    .arg(sessionId).arg(text).toUtf8();
 
-    auto mqtt = MqttAgent::instance();
-    mqtt->publish(msg);
+        auto mqtt = MqttAgent::instance();
+        mqtt->publish(msg);
+    } else {
+        qWarning() << "Session doesn't exists";
+    }
 }
 
-void SkillServer::continueSession(const QString& sessionId, const QString& text)
+void SkillServer::continueSession(const QString& sessionId,
+                                  const QString& text,
+                                  const QStringList& intentFilters)
 {
-    Message msg;
-    msg.topic = "hermes/dialogueManager/continueSession";
-    msg.payload = QString("{\"sessionId\":\"%1\",\"text\":\"%2\"}")
-            .arg(sessionId).arg(text).toUtf8();
+    auto ss = SkillServer::instance();
+    if (ss->sessionIdToSkills.contains(sessionId)) {
+        Message msg;
+        msg.topic = "hermes/dialogueManager/continueSession";
+        if (intentFilters.isEmpty()) {
+            msg.payload = QString("{\"sessionId\":\"%1\",\"text\":\"%2\"}")
+                    .arg(sessionId).arg(text).toUtf8();
+        } else {
+            QStringList list(intentFilters);
+            list.replaceInStrings(QRegExp("^(.*)$"), "\"\\1\"");
+            msg.payload = QString("{\"sessionId\":\"%1\",\"text\":\"%2\",\"intentFilter\":[%3]}")
+                            .arg(sessionId).arg(text).arg(list.join(',')).toUtf8();
+        }
 
-    auto mqtt = MqttAgent::instance();
-    mqtt->publish(msg);
+        auto mqtt = MqttAgent::instance();
+        mqtt->publish(msg);
+    } else {
+        qWarning() << "Session doesn't exists";
+    }
+}
+
+void SkillServer::askForConfirmation(const QString& sessionId, const QString& text)
+{
+    continueSession(sessionId, text, {"muki:confirmation"});
+}
+
+void SkillServer::parseSessionEnded(const QByteArray& data)
+{
+    QJsonParseError err;
+    auto json = QJsonDocument::fromJson(data, &err);
+
+    if (err.error != QJsonParseError::NoError) {
+        qWarning() << "Error parsing json payload:" << err.errorString();
+        return;
+    }
+
+    if (!json.isObject()) {
+        qWarning() << "Json is not an object";
+        return;
+    }
+
+    auto sessionId = json.object().value("sessionId").toString();
+
+    if (sessionId.isEmpty()) {
+        qWarning() << "SessionId is empty";
+        return;
+    }
+
+    handleSessionEnded(sessionId);
+}
+
+void SkillServer::handleSessionEnded(const QString& sessionId)
+{
+    if (sessionIdToSkills.contains(sessionId)) {
+        qDebug() << "Session exists, so will be removed:" << sessionId;
+        auto skill = sessionIdToSkills[sessionId];
+        skill->handleSessionEnded(sessionId);
+        sessionIdToSkills.remove(sessionId);
+    } else {
+        qDebug() << "Session doesn't exist";
+    }
 }
 
 void SkillServer::parseIntent(const QByteArray& data)
@@ -161,17 +231,22 @@ void SkillServer::parseIntent(const QByteArray& data)
         intent.slotList.insert(name, value);
     }
 
-    if (!skills.contains(intent.name)) {
-        qDebug() << "Doesn't have skill for intent";
-        endSession(intent.sessionId);
-        return;
-    }
-
     handleIntent(intent);
 }
 
 void SkillServer::handleIntent(const Intent& intent)
 {
-    auto skill = skills[intent.name];
-    skill->handleIntent(intent);
+    if (sessionIdToSkills.contains(intent.sessionId)) {
+        qDebug() << "Session exists for intent";
+        auto skill = sessionIdToSkills[intent.sessionId];
+        skill->handleIntent(intent);
+    } else if (intentNameToSkills.contains(intent.name)) {
+        qDebug() << "New session for intent";
+        auto skill = intentNameToSkills[intent.name];
+        sessionIdToSkills.insert(intent.sessionId, skill);
+        skill->handleIntent(intent);
+    } else {
+        qDebug() << "Do not have skill for intent";
+        endSession(intent.sessionId);
+    }
 }

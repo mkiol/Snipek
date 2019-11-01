@@ -142,8 +142,8 @@ void MqttAgent::deInit()
 
 void MqttAgent::publish(const Message &msg)
 {
-    /*if (!msg.topic.endsWith("audioFrame"))
-        qDebug() << "Adding to publish queue:" << msg.topic;*/
+    if (!msg.topic.endsWith("audioFrame"))
+        qDebug() << "Adding to publish queue:" << msg.topic << msg.payload;
     msgQueue.push(msg);
 }
 

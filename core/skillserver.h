@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QHash>
 #include <QLocale>
+#include <QStringList>
 
 #include "mqttagent.h"
 #include "skill.h"
@@ -20,8 +21,13 @@ class SkillServer : public QObject
     Q_OBJECT
 public:
     static SkillServer* instance(QObject* parent = nullptr);
-    static void endSession(const QString& sessionId, const QString& text = QString());
-    static void continueSession(const QString& sessionId, const QString& text);
+    static void endSession(const QString& sessionId,
+                           const QString& text = QString());
+    static void continueSession(const QString& sessionId,
+                                const QString& text,
+                                const QStringList& intentFilters = QStringList());
+    static void askForConfirmation(const QString& sessionId,
+                                   const QString& text);
 
 public slots:
     void processMessage(const Message& msg);
@@ -32,9 +38,12 @@ private slots:
 private:
     static SkillServer* inst;
     explicit SkillServer(QObject *parent = nullptr);
-    QHash<QString, Skill*> skills;
+    QHash<QString, Skill*> intentNameToSkills;
+    QHash<QString, Skill*> sessionIdToSkills;
 
     void subscribe();
+    void parseSessionEnded(const QByteArray& data);
+    void handleSessionEnded(const QString& sessionId);
     void parseIntent(const QByteArray& data);
     void handleIntent(const Intent& intent);
     void registerSkill(Skill* skill);

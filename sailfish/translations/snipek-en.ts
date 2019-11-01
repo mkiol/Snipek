@@ -37,47 +37,106 @@
 <context>
     <name>CallHistorySkill</name>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="27"/>
+        <location filename="../../core/callhistoryskill.cpp" line="26"/>
         <source>Call history</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="50"/>
+        <location filename="../../core/callhistoryskill.cpp" line="49"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="116"/>
-        <source>You don&apos;t have missed calls.</source>
+        <location filename="../../core/callhistoryskill.cpp" line="112"/>
+        <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="118"/>
-        <source>You don&apos;t have call events.</source>
+        <location filename="../../core/callhistoryskill.cpp" line="145"/>
+        <location filename="../../core/callhistoryskill.cpp" line="205"/>
+        <source>Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="181"/>
+        <source>You didn&apos;t have any missed calls today.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="183"/>
+        <source>You didn&apos;t have any missed calls since %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="186"/>
+        <source>You didn&apos;t have any calls today.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="188"/>
+        <source>You didn&apos;t have any calls since %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../../core/callhistoryskill.cpp" line="120"/>
-        <source>You have %n call(s).</source>
+        <location filename="../../core/callhistoryskill.cpp" line="198"/>
+        <source>You had %n call(s) today.</source>
         <translation>
-            <numerusform>You have %n call.</numerusform>
-            <numerusform>You have %n calls.</numerusform>
+            <numerusform>You had %n call.</numerusform>
+            <numerusform>You had %n calls.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../../core/callhistoryskill.cpp" line="200"/>
+        <source>You had %n call(s) since %1.</source>
+        <translation>
+            <numerusform>You had %n call since %1.</numerusform>
+            <numerusform>You had %n calls since %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../../core/callhistoryskill.cpp" line="193"/>
+        <source>You had %n missed call(s) today.</source>
+        <translation>
+            <numerusform>You had %n missed call today.</numerusform>
+            <numerusform>You had %n missed calls today.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../../core/callhistoryskill.cpp" line="195"/>
+        <source>You had %n missed call(s) since %1.</source>
+        <translation>
+            <numerusform>You had %n missed call since %1.</numerusform>
+            <numerusform>You had %n missed calls since %1.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="125"/>
-        <source>%1. Missed call from %2.</source>
+        <location filename="../../core/callhistoryskill.cpp" line="117"/>
+        <source>Missed call from %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="127"/>
-        <source>%1. Incoming call from %2.</source>
+        <location filename="../../core/callhistoryskill.cpp" line="119"/>
+        <source>Incoming call from %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="129"/>
-        <source>%1. Outgoing call to %2.</source>
+        <location filename="../../core/callhistoryskill.cpp" line="121"/>
+        <source>Outgoing call to %2.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>You had %n call(s) since %1</source>
+        <translation type="vanished">
+            <numerusform>You had %n call since %1.</numerusform>
+            <numerusform>You had %n calls since %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You have %n call(s).</source>
+        <translation type="vanished">
+            <numerusform>You have %n call.</numerusform>
+            <numerusform>You have %n calls.</numerusform>
+        </translation>
     </message>
 </context>
 <context>

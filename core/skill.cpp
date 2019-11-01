@@ -23,3 +23,7 @@ void Skill::handleIntent(const Intent& intent)
     Q_UNUSED(intent);
 }
 
+void Skill::handleSessionEnded(const QString& sessionId)
+{
+    Q_UNUSED(sessionId);
+}

@@ -10,8 +10,7 @@
 #include <QDebug>
 #include <QObject>
 #include <QEventLoop>
-#include <QTextStream>
-#include <QIODevice>
+#include <QDate>
 #include <CommHistory/CallModel>
 
 #include "skillserver.h"
@@ -58,17 +57,9 @@ QList<CallHistorySkill::Call> CallHistorySkill::getCalls(bool onlyMissed,
 {
     QList<CallHistorySkill::Call> list;
 
-    QDateTime rf;
-    if (!refTime.isValid()) {
-        rf = QDateTime::currentDateTime().addDays(-7);
-        rf.setTime({0,0});
-    } else {
-        rf = refTime;
-    }
-
     CallModel model;
     model.setFilter(CallModel::SortByTime, onlyMissed ?
-                        CallEvent::MissedCallType : CallEvent::UnknownCallType, rf);
+                        CallEvent::MissedCallType : CallEvent::UnknownCallType, refTime);
     model.setResolveContacts(CallModel::ResolveImmediately);
     model.setQueryMode(EventModel::AsyncQuery);
 
@@ -86,7 +77,7 @@ QList<CallHistorySkill::Call> CallHistorySkill::getCalls(bool onlyMissed,
         loop.exec();
     }
 
-    for (int i = 0; i < model.rowCount() && i < 10; i++) {
+    for (int i = 0; i < model.rowCount() && i < 25; i++) {
         Event e = model.event(model.index(i, 0));
         printEvent(e);
         list.push_back(makeCall(e));
@@ -95,38 +86,126 @@ QList<CallHistorySkill::Call> CallHistorySkill::getCalls(bool onlyMissed,
     return list;
 }
 
+bool CallHistorySkill::readNextCalls(SessionData& session, QTextStream& out, int count)
+{
+    auto& i = session.idx;
+    auto& list = session.callList;
+    int size = list.size();
+    const int maxIdx = i + count;
+
+    auto locale = Settings::instance()->locale();
+
+    for (; i < size && i < maxIdx; ++i) {
+        const auto& call = list[i];
+
+        auto time = locale.toString(call.time.time(), QLocale::ShortFormat);
+        auto date = locale.toString(call.time.date(), "dddd MMMM d");
+
+        if (size == 1)
+            out << " ";
+        else
+            out << " " << (i + 1) << ". ";
+
+        if (QDate::currentDate() == call.time.date()) // today
+            out << time << ", ";
+        else if (QDate::currentDate().addDays(-1) == call.time.date()) // yesterday
+            out << tr("Yesterday") << ", " << time << ", ";
+        else
+            out << date << ", " << time << ", ";
+
+        if (call.type == Missed)
+            out << tr("Missed call from %2.").arg(call.contact);
+        else if (call.type == Incoming)
+            out << tr("Incoming call from %2.").arg(call.contact);
+        else
+            out << tr("Outgoing call to %2.").arg(call.contact);
+    }
+
+    return i < size;
+}
+
+void CallHistorySkill::handleSessionEnded(const QString& sessionId)
+{
+    if (sessions.contains(sessionId)) {
+        qDebug() << "Session ended, so removing session data:" << sessionId;
+        sessions.remove(sessionId);
+    }
+}
+
 void CallHistorySkill::handleIntent(const Intent& intent)
 {
-    QDateTime refTime;
-    if (intent.slotList.contains("refTime")) {
-        refTime = intent.slotList.value("refTime").toDateTime();
-        if (refTime.isValid()) {
-            qDebug() << "Got ref time:" << refTime;
-        }
-    }
-    bool missedOnly = intent.name.contains("getMissedCalls");
-
-    auto list = getCalls(missedOnly, refTime);
-
     QString text;
-    QTextStream out(&text, QIODevice::WriteOnly);
+    QTextStream out(&text);
 
-    if (list.isEmpty()) {
-        if (missedOnly)
-            out << tr("You don't have missed calls.");
-        else
-            out << tr("You don't have call events.");
-    } else {
-        out << tr("You have %n call(s).", nullptr, list.size());
-        for (int i = 1; i <= list.size(); ++i) {
-            const auto& call = list[i-1];
-            out << " ";
-            if (call.type == Missed)
-                out << tr("%1. Missed call from %2.").arg(i).arg(call.contact);
-            else if (call.type == Incoming)
-                out << tr("%1. Incoming call from %2.").arg(i).arg(call.contact);
-            else
-                out << tr("%1. Outgoing call to %2.").arg(i).arg(call.contact);
+    if (intent.name.contains("confirmation") && sessions.contains(intent.sessionId)) {
+        qDebug() << "Confirmation intent received:" << intent.slotList.value("answer");
+        if (intent.slotList.value("answer") == "yes") {
+            if (readNextCalls(sessions[intent.sessionId], out, 1)) {
+                qDebug() << "Next confirmation is required";
+                out << " " << tr("Continue?");
+                SkillServer::askForConfirmation(intent.sessionId, text);
+                return;
+            }
+        }
+    } else if (intent.name.contains("getCalls") ||
+               intent.name.contains("getMissedCalls")) {
+        QDateTime refTime;
+        bool todayTime = false;
+        if (intent.slotList.contains("refTime"))
+            refTime = intent.slotList.value("refTime").toDateTime();
+        if (refTime.isValid() && QDateTime::currentDateTime() >= refTime) {
+            qDebug() << "Intent contains valid ref time:" << refTime;
+            if (QDateTime::currentDateTime().date() == refTime.date())
+                todayTime = true;
+        } else {
+            qDebug() << "Ref time is invalid or in the future:" << refTime;
+            // default ref time is today
+            refTime = QDateTime::currentDateTime();
+            refTime.setTime({0,0});
+            todayTime = true;
+        }
+
+        bool missedOnly = intent.name.contains("getMissedCalls");
+
+        // new session data
+        auto& session = sessions[intent.sessionId];
+        session.sessionId = intent.sessionId;
+        session.callList = getCalls(missedOnly, refTime);
+
+        int size = session.callList.size();
+        auto date = Settings::instance()->locale().toString(refTime.date(), "dddd MMMM d");
+
+        if (size == 0) {
+            if (missedOnly) {
+                if (todayTime)
+                    out << tr("You didn't have any missed calls today.");
+                else
+                    out << tr("You didn't have any missed calls since %1.").arg(date);
+            } else {
+                if (todayTime)
+                    out << tr("You didn't have any calls today.");
+                else
+                    out << tr("You didn't have any calls since %1.").arg(date);
+            }
+        } else {
+            if (missedOnly) {
+                if (todayTime)
+                    out << tr("You had %n missed call(s) today.", nullptr, size);
+                else
+                    out << tr("You had %n missed call(s) since %1.", nullptr, size).arg(date);
+            } else {
+                if (todayTime)
+                    out << tr("You had %n call(s) today.", nullptr, size);
+                else
+                    out << tr("You had %n call(s) since %1.", nullptr, size).arg(date);
+            }
+
+            if (readNextCalls(session, out, 1)) {
+                qDebug() << "Confirmation is required";
+                out << " " << tr("Continue?");
+                SkillServer::askForConfirmation(intent.sessionId, text);
+                return;
+            }
         }
     }
 

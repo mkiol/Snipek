@@ -14,6 +14,8 @@
 #include <QDateTime>
 #include <QList>
 #include <QDateTime>
+#include <QHash>
+#include <QTextStream>
 #include <CommHistory/Event>
 
 #include "skill.h"
@@ -38,14 +40,24 @@ public:
         QString contact;
     };
 
-    static void printEvent(const Event &event);
+    struct SessionData
+    {
+        QString sessionId;
+        int idx = 0;
+        QList<Call> callList;
+    };
+
     QStringList names();
     QString friendlyName();
     void handleIntent(const Intent& intent);
+    void handleSessionEnded(const QString& sessionId);
 
 private:
+    static void printEvent(const Event &event);
+    QHash<QString, SessionData> sessions;
     Call makeCall(const Event &event);
-    QList<Call> getCalls(bool onlyMissed = false, const QDateTime &refTime = QDateTime());
+    QList<Call> getCalls(bool onlyMissed, const QDateTime &refTime);
+    bool readNextCalls(SessionData &session, QTextStream& out, int count);
 };
 
 #endif // CALLHISTORYSKILL_H

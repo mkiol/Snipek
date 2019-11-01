@@ -27,6 +27,7 @@ public:
     virtual QStringList names();
     virtual QString friendlyName();
     virtual void handleIntent(const Intent& intent);
+    virtual void handleSessionEnded(const QString& sessionId);
 };
 
 #endif // SKILL_H
