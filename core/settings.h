@@ -50,6 +50,8 @@ public:
     void setNoTranslation() {noTranslation = true;}
     int getSessionStart();
     void setSessionStart(int value);
+    Q_INVOKABLE bool isSkillEnabled(const QString& name);
+    Q_INVOKABLE void setSkillEnabled(const QString& name, bool value);
 
 signals:
     void siteChanged();
@@ -58,6 +60,7 @@ signals:
     void audioFeedbackChanged();
     void langChanged();
     void sessionStartChanged();
+    void skillEnabledChanged();
 
 private:
     QSettings settings;

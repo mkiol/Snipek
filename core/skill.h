@@ -24,7 +24,8 @@ struct Intent
 class Skill
 {
 public:
-    virtual QStringList names();
+    virtual QStringList intentsNames();
+    virtual QString name();
     virtual QString friendlyName();
     virtual void handleIntent(const Intent& intent);
     virtual void handleSessionEnded(const QString& sessionId);

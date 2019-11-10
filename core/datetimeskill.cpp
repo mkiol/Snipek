@@ -15,9 +15,14 @@
 #include "skillserver.h"
 #include "settings.h"
 
-QStringList DateTimeSkill::names()
+QStringList DateTimeSkill::intentsNames()
 {
     return {"muki:getTime", "muki:getDate"};
+}
+
+QString DateTimeSkill::name()
+{
+    return tr("datetime");
 }
 
 QString DateTimeSkill::friendlyName()

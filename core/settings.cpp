@@ -238,3 +238,15 @@ void Settings::setSessionStart(int value)
     }
 }
 
+bool Settings::isSkillEnabled(const QString &name)
+{
+    return settings.value("skill_" + name, true).toBool();
+}
+
+void Settings::setSkillEnabled(const QString &name, bool value)
+{
+    if (isSkillEnabled(name) != value) {
+        settings.setValue("skill_" + name, value);
+        emit skillEnabledChanged();
+    }
+}

@@ -19,6 +19,40 @@
 #include "callhistoryskill.h"
 #endif
 
+SkillItem::SkillItem(const QString &name,
+                     const QString &friendlyName,
+                     const QString &description,
+                     QObject *parent) :
+    ListItem(parent),
+    m_id(name),
+    m_name(name),
+    m_friendlyName(friendlyName),
+    m_description(description)
+{}
+
+QHash<int, QByteArray> SkillItem::roleNames() const
+{
+    QHash<int, QByteArray> names;
+    names[NameRole] = "name";
+    names[FriendlyNameRole] = "friendlyName";
+    names[DescriptionRole] = "description";
+    return names;
+}
+
+QVariant SkillItem::data(int role) const
+{
+    switch(role) {
+    case NameRole:
+        return m_name;
+    case FriendlyNameRole:
+        return m_friendlyName;
+    case DescriptionRole:
+        return m_description;
+    default:
+        return QVariant();
+    }
+}
+
 SkillServer* SkillServer::inst = nullptr;
 
 SkillServer* SkillServer::instance(QObject* parent)
@@ -30,7 +64,7 @@ SkillServer* SkillServer::instance(QObject* parent)
     return SkillServer::inst;
 }
 
-SkillServer::SkillServer(QObject *parent) : QObject(parent)
+SkillServer::SkillServer(QObject *parent) : ListModel(new SkillItem, parent)
 {
     // skills
     registerSkill(new DateTimeSkill());
@@ -47,13 +81,25 @@ SkillServer::SkillServer(QObject *parent) : QObject(parent)
     connect(mqtt, &MqttAgent::connectedChanged,
             this, &SkillServer::mqttConnectedHandler);
     mqttConnectedHandler();
+
+    // settings
+    auto s = Settings::instance();
+    connect(s, &Settings::skillEnabledChanged,
+            this, &SkillServer::handleSettingsChange);
+}
+
+void SkillServer::handleSettingsChange()
+{
+    if (MqttAgent::instance()->isConnected()) {
+        subscribe();
+    }
 }
 
 void SkillServer::registerSkill(Skill* skill)
 {
-    for (auto name : skill->names()) {
+    for (auto name : skill->intentsNames())
         intentNameToSkills.insert(name, skill);
-    }
+    appendRow(new SkillItem(skill->name(), skill->friendlyName(), QString()));
 }
 
 void SkillServer::processMessage(const Message &msg)
@@ -78,6 +124,7 @@ void SkillServer::processMessage(const Message &msg)
 void SkillServer::subscribe()
 {
     auto mqtt = MqttAgent::instance();
+    auto s = Settings::instance();
 
     QString tmpl = "hermes/intent/%1";
 
@@ -86,7 +133,10 @@ void SkillServer::subscribe()
     QHashIterator<QString, Skill*> i(intentNameToSkills);
     while (i.hasNext()) {
         i.next();
-        mqtt->subscribe(tmpl.arg(i.key()));
+        if (s->isSkillEnabled(i.value()->name()))
+            mqtt->subscribe(tmpl.arg(i.key()));
+        else
+            mqtt->unsubscribe(tmpl.arg(i.key()));
     }
 }
 

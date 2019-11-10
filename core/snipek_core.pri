@@ -9,7 +9,8 @@ SOURCES += \
     $$CORE_DIR/settings.cpp \
     $$CORE_DIR/datetimeskill.cpp \
     $$CORE_DIR/skill.cpp \
-    $$CORE_DIR/skillserver.cpp
+    $$CORE_DIR/skillserver.cpp \
+    $$CORE_DIR/listmodel.cpp
 
 HEADERS += \
     $$CORE_DIR/audioserver.h \
@@ -19,7 +20,8 @@ HEADERS += \
     $$CORE_DIR/info.h \
     $$CORE_DIR/datetimeskill.h \
     $$CORE_DIR/skill.h \
-    $$CORE_DIR/skillserver.h
+    $$CORE_DIR/skillserver.h \
+    $$CORE_DIR/listmodel.h
 
 sailfish {
     HEADERS += \

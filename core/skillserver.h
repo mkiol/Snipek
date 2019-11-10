@@ -12,11 +12,44 @@
 #include <QHash>
 #include <QLocale>
 #include <QStringList>
+#include <QByteArray>
+#include <QVariant>
 
+#include "listmodel.h"
 #include "mqttagent.h"
 #include "skill.h"
 
-class SkillServer : public QObject
+class SkillItem : public ListItem
+{
+    Q_OBJECT
+public:
+    enum Roles {
+        FriendlyNameRole = Qt::DisplayRole,
+        NameRole = Qt::UserRole,
+        DescriptionRole
+    };
+
+public:
+    SkillItem(QObject *parent = nullptr): ListItem(parent) {}
+    explicit SkillItem(const QString &name,
+                       const QString &friendlyName,
+                       const QString &description,
+                       QObject *parent = nullptr);
+    QVariant data(int role) const;
+    QHash<int, QByteArray> roleNames() const;
+    inline QString id() const { return m_name; }
+    inline QString name() const { return m_name; }
+    inline QString friendlyName() const { return m_friendlyName; }
+    inline QString description() const { return m_description; }
+
+private:
+    QString m_id;
+    QString m_name;
+    QString m_friendlyName;
+    QString m_description;
+};
+
+class SkillServer : public ListModel
 {
     Q_OBJECT
 public:
@@ -34,6 +67,7 @@ public slots:
 
 private slots:
     void mqttConnectedHandler();
+    void handleSettingsChange();
 
 private:
     static SkillServer* inst;

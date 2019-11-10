@@ -16,9 +16,14 @@
 #include "skillserver.h"
 #include "settings.h"
 
-QStringList CallHistorySkill::names()
+QStringList CallHistorySkill::intentsNames()
 {
     return {"muki:getCalls", "muki:getMissedCalls"};
+}
+
+QString CallHistorySkill::name()
+{
+    return tr("callhistory");
 }
 
 QString CallHistorySkill::friendlyName()

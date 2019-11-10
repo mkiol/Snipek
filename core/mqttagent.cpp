@@ -99,9 +99,30 @@ void MqttAgent::subscribeAll()
     }
 }
 
+void MqttAgent::unsubscribe(const QString& topic)
+{
+    unsubscribeQueue.push(topic);
+}
+
+void MqttAgent::unsubscribeAll()
+{
+    while (!unsubscribeQueue.empty()) {
+        const QByteArray topic = unsubscribeQueue.front().toUtf8();
+        qWarning() << "Unsubscribe topic:" << topic;
+
+        int rc = MQTTClient_unsubscribe(client, topic.data());
+        if (rc != MQTTCLIENT_SUCCESS) {
+            qWarning() << "Failed to unsubscribe topic:" << topic << ", code:" << rc;
+        }
+
+        unsubscribeQueue.pop();
+    }
+}
+
 void MqttAgent::run()
 {
     while (checkConnected()) {
+        unsubscribeAll();
         subscribeAll();
         publishAll();
         receive();
@@ -122,6 +143,7 @@ bool MqttAgent::checkConnected()
         client = nullptr;
         std::queue<Message>().swap(msgQueue);
         std::queue<QString>().swap(subscribeQueue);
+        std::queue<QString>().swap(unsubscribeQueue);
         shutdown = false;
     }
 

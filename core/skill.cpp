@@ -8,9 +8,14 @@
 #include "skill.h"
 #include "skillserver.h"
 
-QStringList Skill::names()
+QStringList Skill::intentsNames()
 {
     return QStringList();
+}
+
+QString Skill::name()
+{
+    return QString();
 }
 
 QString Skill::friendlyName()

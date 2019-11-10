@@ -31,6 +31,7 @@ public:
     bool isConnected();
     void publish(const Message &msg);
     void subscribe(const QString &topic);
+    void unsubscribe(const QString &topic);
 
 public slots:
     bool init();
@@ -54,10 +55,12 @@ private:
     bool shutdown = false;
     std::queue<Message> msgQueue;
     std::queue<QString> subscribeQueue;
+    std::queue<QString> unsubscribeQueue;
 
     bool checkConnected();
     void publishAll();
     void subscribeAll();
+    void unsubscribeAll();
     void receive();
     MqttAgent(QObject* parent = nullptr);
     void run();

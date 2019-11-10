@@ -47,7 +47,8 @@ public:
         QList<Call> callList;
     };
 
-    QStringList names();
+    QStringList intentsNames();
+    QString name();
     QString friendlyName();
     void handleIntent(const Intent& intent);
     void handleSessionEnded(const QString& sessionId);

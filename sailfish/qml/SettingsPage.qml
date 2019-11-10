@@ -152,6 +152,21 @@ Page {
                 }
             }
 
+            SectionHeader {
+                text: qsTr("Skills")
+            }
+
+            Repeater {
+                model: skills
+                delegate: TextSwitch {
+                    text: model.friendlyName
+                    checked: settings.isSkillEnabled(model.name)
+                    onCheckedChanged: {
+                        settings.setSkillEnabled(model.name, checked)
+                    }
+                }
+            }
+
             /*SectionHeader {
                 text: qsTr("Experimental features")
             }*/
