@@ -145,6 +145,8 @@ void CallHistorySkill::handleIntent(const Intent& intent)
                 out << " " << tr("Continue?");
                 SkillServer::askForConfirmation(intent.sessionId, text);
                 return;
+            } else {
+                out << " " << tr("That was the last call event.");
             }
         }
     } else if (intent.name.contains("getCalls") ||
