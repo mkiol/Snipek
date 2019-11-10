@@ -51,7 +51,7 @@ Snipek assistant provides Intents for [Snipek built-in skills](#snipek-built-in-
 To download and install Snipek assistant file on Debian/Raspbian execute following commands:
 
     ```shell
-    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
+    # wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
     # mkdir -p /usr/share/snips
     # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
     ```
@@ -74,40 +74,40 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9 syst
    For details see [Debian guide](https://wiki.debian.org/SourcesList).
 3. Add Snips repository.
 
-    ```shell
-    # apt install dirmngr apt-transport-https
-    # bash -c 'echo "deb https://debian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list'
-    # apt-key adv --fetch-keys  https://debian.snips.ai/5FFCD0DEB5BA45CD.pub
-    # apt update
-    ```
+        ```shell
+        # apt install dirmngr apt-transport-https
+        # bash -c 'echo "deb https://debian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list'
+        # apt-key adv --fetch-keys  https://debian.snips.ai/5FFCD0DEB5BA45CD.pub
+        # apt update
+        ```
 
 4. Install Mosquitto MQTT broker.
 
-    ```shell
-    # apt install mosquitto
-    ```
+        ```shell
+        # apt install mosquitto
+        ```
 
 5. Install essential Snips packages.
 
-    ```shell
-    # apt install snips-platform-voice snips-tts snips-watch
-    ```
+        ```shell
+        # apt install snips-platform-voice snips-tts snips-watch
+        ```
 
 6. Download and install Snipek assistant file.
 
-    ```shell
-    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
-    # apt-get install unzip
-    # mkdir -p /usr/share/snips
-    # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
-    ```
+        ```shell
+        # wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
+        # apt-get install unzip
+        # mkdir -p /usr/share/snips
+        # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
+        ```
 
 7. Start Snips and check if all components are active.
 
-    ```shell
-    # systemctl start snips-*
-    $ systemctl status snips-*
-    ```
+        ```shell
+        # systemctl start snips-*
+        # systemctl status snips-*
+        ```
 
 8. Start Snipek app on your phone, configure IP address and port of
    MQTT broker (default MQTT port is 1883) and connect.
