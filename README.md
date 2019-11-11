@@ -49,13 +49,19 @@ More skills are under implementation...
 Snipek assistant provides Intents for [Snipek built-in skills](#snipek-built-in-skills).
 Intents are defined for particular language. Currently only English is supported.
 
-To download and install Snipek assistant file on Debian/Raspbian, execute following commands:
+There are two ways to install Snipek assistant:
+
+1. Download Snipek assistant file and unpack it on Snips server.
+   To download and install on Debian/Raspbian, execute following commands:
 
    ```
    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
    # mkdir -p /usr/share/snips
    # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
    ```
+
+2. Create your own assistant with [Snips console](https://console.snips.ai) and add Snipek intents.
+   Snipek intents published under my [console account](https://console.snips.ai/user/user_wm5pno63qoqd).
 
 ## Snips server installation
 
