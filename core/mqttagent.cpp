@@ -32,6 +32,11 @@ MqttAgent::MqttAgent(QObject *parent) :
     auto settings = Settings::instance();
     connect(settings, &Settings::mqttChanged, this, &MqttAgent::deInit);
     connect(settings, &Settings::siteChanged, this, &MqttAgent::deInit);
+
+    reconTimer.setSingleShot(true);
+    reconTimer.setTimerType(Qt::VeryCoarseTimer);
+    connect(&reconTimer, &QTimer::timeout, this, &MqttAgent::reconnect);
+    connect(this, &MqttAgent::doReconnect, this, &MqttAgent::reconnect);
 }
 
 bool MqttAgent::init()
@@ -69,13 +74,15 @@ bool MqttAgent::init()
     if (rc != MQTTCLIENT_SUCCESS) {
         qWarning() << "Failed to connect, return code:" << rc;
         MQTTClient_destroy(&client);
-        emit error(E_Conn);
+        if (reconCounter == 0)
+            emit error(E_Conn);
         return false;
     }
 
     shutdown = false;
     start(QThread::HighPriority);
 
+    reconCounter = 0;
     return true;
 }
 
@@ -129,6 +136,27 @@ void MqttAgent::run()
     }
 }
 
+void MqttAgent::reconnect()
+{
+    qDebug() << "Reconnecting";
+    if (!connected) {
+        if (reconCounter == 0) {
+            reconCounter++;
+            reconTimer.setInterval(100);
+            reconTimer.start();
+        } else if (!init()) {
+            if (reconCounter < 10) {
+                reconCounter++;
+                reconTimer.setInterval(1000);
+                reconTimer.start();
+            } else {
+                qDebug() << "Reconnect attempts limit reached";
+                reconCounter == 0;
+            }
+        }
+    }
+}
+
 bool MqttAgent::isConnected()
 {
     return connected;
@@ -145,13 +173,19 @@ bool MqttAgent::checkConnected()
         std::queue<QString>().swap(subscribeQueue);
         std::queue<QString>().swap(unsubscribeQueue);
         shutdown = false;
+        connected = false;
+        emit connectedChanged();
+        return true;
     }
 
     bool c = client && MQTTClient_isConnected(client);
     if (connected != c) {
         connected = c;
-        qDebug() << "isConnected connected:" << connected;
         emit connectedChanged();
+        if (!connected) {
+            reconCounter = 0;
+            emit doReconnect();
+        }
     }
 
     return connected;

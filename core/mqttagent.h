@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QObject>
 #include <QThread>
+#include <QTimer>
 #include <queue>
 
 #include "MQTTClient.h"
@@ -46,6 +47,7 @@ signals:
     void intentMessage(const Message &msg);
     void connectedChanged();
     void error(ErrorType error);
+    void doReconnect();
 
 private:
     static MqttAgent* inst;
@@ -56,6 +58,8 @@ private:
     std::queue<Message> msgQueue;
     std::queue<QString> subscribeQueue;
     std::queue<QString> unsubscribeQueue;
+    int reconCounter = 0;
+    QTimer reconTimer;
 
     bool checkConnected();
     void publishAll();
@@ -64,6 +68,9 @@ private:
     void receive();
     MqttAgent(QObject* parent = nullptr);
     void run();
+
+private slots:
+    void reconnect();
 };
 
 #endif // MQTTAGENT_H

@@ -397,6 +397,15 @@ void AudioServer::handleMqttConnected()
     bool mqttConnected = MqttAgent::instance()->isConnected();
     qDebug() << "MQTT connected changed:" << mqttConnected;
 
+    if (!currReqId.isEmpty()) {
+        writeTimer.stop();
+        output.reset();
+        reqIdToDetailsMap.remove(currReqId);
+        reqIdToDataMap.remove(currReqId);
+        currReqId.clear();
+        buffer = nullptr;
+    }
+
     if (mqttConnected) {
         loaded();
         subscribe();
