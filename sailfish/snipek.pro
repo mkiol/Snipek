@@ -28,7 +28,9 @@ DISTFILES += \
     qml/PaddedLabel.qml \
     qml/FirstPage.qml \
     qml/Mic.qml \
-    qml/CoverPage
+    qml/CoverPage.qml \
+    qml/ChangelogPage.qml \
+    qml/LogItem.qml
 
 OTHER_FILES += \
     ../paho.mqtt.c/src/*.h \

@@ -44,11 +44,11 @@ Page {
                 text: qsTr("Version %1").arg(APP_VERSION);
             }
 
-            /*Button {
+            Button {
                 text: qsTr("Changelog")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: pageStack.push(Qt.resolvedUrl("ChangelogPage.qml"))
-            }*/
+            }
 
             Button {
                 text: qsTr("Project website")
