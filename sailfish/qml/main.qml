@@ -14,7 +14,7 @@ ApplicationWindow
 
     property bool configured: settings.mqttAddress.length > 0
 
-    allowedOrientations: Orientation.PortraitMask
+    allowedOrientations: Orientation.All
 
     cover: Qt.resolvedUrl("CoverPage.qml")
 

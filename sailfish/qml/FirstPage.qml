@@ -11,6 +11,8 @@ import Sailfish.Silica 1.0
 Page {
     id: root
 
+    allowedOrientations: Orientation.All
+
     SilicaFlickable {
         id: flick
         anchors.fill: parent
@@ -37,7 +39,7 @@ Page {
         Mic {
             visible: app.configured
             anchors.centerIn: parent
-            size: root.width/2
+            size: root.isLandscape ? root.height/2 : root.width/2
             enabled: settings.sessionStart < 2 &&
                      aserver.connected && !aserver.insession
             onClicked: aserver.startSession()
