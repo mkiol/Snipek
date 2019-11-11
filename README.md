@@ -22,7 +22,7 @@ described in [Snipek built-in skills section](#snipek-built-in-skills).
 Possible use cases for Snipek are in [Use cases section](#use-cases-section).
 
 *Snipek does not provide Snips server components. They should be installed seperatly
-on a different machine (e.g. Raspberry Pi).*
+on a different machine (e.g. Raspberry Pi or any Debian machine).*
 
 ## Use cases
 
@@ -39,34 +39,36 @@ Snipek can be used in several configuration options. Here are few examples:
 
 | Name | Skill behaviour | Intents | Trigger phrase (examples) |
 |:-----|:----------------|:--------|:--------------------------|
-| Date & Time | Reads current time and date. | getTime, getDate | What's the time? What's the date? |
-| Call History | Reads call history e.g. last missed calls. | getCalls, getMissedCalls | Read today's calls. Read missed calls since yesterday. |
+| Date & Time | Reads current time or date. | getTime, getDate | What's the time? What's the date? |
+| Call History | Reads events from call history e.g. all missed calls. | getCalls, getMissedCalls | Read today's calls. Read missed calls since yesterday. |
 
 More skills are under implementation...
 
 ## Snipek assistant installation
 
 Snipek assistant provides Intents for [Snipek built-in skills](#snipek-built-in-skills).
+Intents are defined for particular language. Currently only English is supported.
 
-To download and install Snipek assistant file on Debian/Raspbian execute following commands:
+To download and install Snipek assistant file on Debian/Raspbian, execute following commands:
 
-    ```shell
-    # wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
-    # mkdir -p /usr/share/snips
-    # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
-    ```
+   ```
+   $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
+   # mkdir -p /usr/share/snips
+   # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
+   ```
 
 ## Snips server installation
 
 According [Snips documentation](https://docs.snips.ai/), Snips supports installation
-on Raspberry Pi 3 (but it works also on Raspberry Pi 2) and any Debian Linux server.
+on Raspberry Pi and any Debian machine.
 The easiest way is to use Raspberry Pi because it is officially supported platform
-and well documented. The guide how to do it is
+and well documented. The guide how to do it is available
 [here](https://docs.snips.ai/getting-started/quick-start-raspberry-pi).
-Alternatively you can also install Snips on Debian system (it also could be Debian
-installed on a virtual machine).
 
-Here is quick step-by-step guide for Snips installation on a fresh Debian 9 system:
+Alternatively you can also manually install Snips on Debian system
+(it could be installed on phisical or virtual machine).
+
+Here is quick step-by-step guide for Snips installation on a fresh Debian 9:
 
 1. Make sure that your Debian server is connected to local network and its
    IP address is "visible" for your phone.
@@ -74,44 +76,44 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9 syst
    For details see [Debian guide](https://wiki.debian.org/SourcesList).
 3. Add Snips repository.
 
-        ```shell
-        # apt install dirmngr apt-transport-https
-        # bash -c 'echo "deb https://debian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list'
-        # apt-key adv --fetch-keys  https://debian.snips.ai/5FFCD0DEB5BA45CD.pub
-        # apt update
-        ```
+   ```
+   # apt install dirmngr apt-transport-https
+   # bash -c 'echo "deb https://debian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list'
+   # apt-key adv --fetch-keys  https://debian.snips.ai/5FFCD0DEB5BA45CD.pub
+   # apt update
+   ```
 
 4. Install Mosquitto MQTT broker.
 
-        ```shell
-        # apt install mosquitto
-        ```
+   ```
+   # apt install mosquitto
+   ```
 
 5. Install essential Snips packages.
 
-        ```shell
-        # apt install snips-platform-voice snips-tts snips-watch
-        ```
+   ```
+   # apt install snips-platform-voice snips-tts snips-watch
+   ```
 
 6. Download and install Snipek assistant file.
 
-        ```shell
-        # wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
-        # apt-get install unzip
-        # mkdir -p /usr/share/snips
-        # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
-        ```
+   ```
+   $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
+   # apt-get install unzip
+   # mkdir -p /usr/share/snips
+   # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
+   ```
 
 7. Start Snips and check if all components are active.
 
-        ```shell
-        # systemctl start snips-*
-        # systemctl status snips-*
-        ```
+   ```
+   # systemctl start snips-*
+   # systemctl status snips-*
+   ```
 
 8. Start Snipek app on your phone, configure IP address and port of
    MQTT broker (default MQTT port is 1883) and connect.
-9. Say "Hey Snips" (default wake-up-word) and check if Snipek reacts.
+9. Say "Hey Snips" (default wake word) and check if Snipek reacts.
 
 ## Languages support
 
@@ -142,5 +144,5 @@ Binary packages for Sailfish OS can be downloaded from
 Snipek is developed as an open source project under
 [Mozilla Public License Version 2.0](https://www.mozilla.org/MPL/2.0/).
 
-The use of Snips assistant file are governed by
+The use of Snips assistant file is governed by
 [Snips Terms of Use](https://docs.snips.ai/additional-resources/legal-and-privacy/terms-of-use-highlights).

@@ -26,57 +26,11 @@ Page {
                 title: qsTr("Settings")
             }
 
-            TextField {
-                width: parent.width
-                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
-                placeholderText: qsTr("Enter Snips IP address")
-                label: qsTr("Snips IP address (e.g. 192.168.1.5)")
-                validator: RegExpValidator { regExp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$|^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/ }
-
-                onTextChanged: {
-                    settings.mqttAddress = text
-                }
-
-                Component.onCompleted: {
-                    text = settings.mqttAddress
-                }
-            }
-
-            TextField {
-                width: parent.width
-                inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
-                placeholderText: qsTr("Enter Snips port number")
-                label: qsTr("Snips port number (e.g. 1883)")
-                validator: IntValidator { bottom: 1; top: 65535 }
-
-                onTextChanged: {
-                    settings.mqttPort = parseInt(text)
-                }
-
-                Component.onCompleted: {
-                    text = settings.mqttPort
-                }
-            }
-
-            TextField {
-                width: parent.width
-                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
-                placeholderText: qsTr("Enter site ID")
-                label: qsTr("Site ID")
-
-                onTextChanged: {
-                    settings.site = text
-                }
-
-                Component.onCompleted: {
-                    text = settings.site
-                }
-            }
-
             TextSwitch {
                 automaticCheck: false
                 checked: settings.audioFeedback
                 text: qsTr("Audio feedback")
+                description: qsTr("Enables notification sound when voice assistant is activated (e.g. a wake word is detected).")
                 onClicked: {
                     settings.audioFeedback = !settings.audioFeedback
                 }
@@ -84,13 +38,14 @@ Page {
 
             ComboBox {
                 width: parent.width
-                label: qsTr("Wake up method")
+                label: qsTr("Wake-up method")
+                description: qsTr("The way you can activate the voice assistant.")
                 currentIndex: settings.sessionStart
 
                 menu: ContextMenu {
-                    MenuItem { text: qsTr("Wake-up-word or tap gesture") }
-                    MenuItem { text: qsTr("Tap gesture") }
-                    MenuItem { text: qsTr("Wake-up-word") }
+                    MenuItem { text: qsTr("Wake word or tap gesture") }
+                    MenuItem { text: qsTr("Tap gesture only") }
+                    MenuItem { text: qsTr("Wake word only") }
                 }
 
                 onCurrentIndexChanged: {
@@ -101,6 +56,7 @@ Page {
             ComboBox {
                 width: parent.width
                 label: qsTr("Language")
+                description: qsTr("Language used for UI and built-in skills. Remember to install Snips assistant that supports selected language as well.")
                 currentIndex: {
                     if (settings.snipsLang === "de")
                         return 1;
@@ -149,6 +105,57 @@ Page {
                     default:
                         settings.lang = "auto"
                     }
+                }
+            }
+
+            SectionHeader {
+                text: qsTr("Snips configuration")
+            }
+
+            TextField {
+                width: parent.width
+                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
+                placeholderText: qsTr("Enter MQTT IP address (e.g. 192.168.1.5)")
+                label: qsTr("IP address for MQTT")
+                validator: RegExpValidator { regExp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$|^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/ }
+
+                onTextChanged: {
+                    settings.mqttAddress = text
+                }
+
+                Component.onCompleted: {
+                    text = settings.mqttAddress
+                }
+            }
+
+            TextField {
+                width: parent.width
+                inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
+                placeholderText: qsTr("Enter MQTT port number (e.g. 1883)")
+                label: qsTr("MQTT port number")
+                validator: IntValidator { bottom: 1; top: 65535 }
+
+                onTextChanged: {
+                    settings.mqttPort = parseInt(text)
+                }
+
+                Component.onCompleted: {
+                    text = settings.mqttPort
+                }
+            }
+
+            TextField {
+                width: parent.width
+                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
+                placeholderText: qsTr("Enter unique site ID")
+                label: qsTr("Site ID")
+
+                onTextChanged: {
+                    settings.site = text
+                }
+
+                Component.onCompleted: {
+                    text = settings.site
                 }
             }
 

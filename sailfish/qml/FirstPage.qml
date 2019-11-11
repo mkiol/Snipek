@@ -54,9 +54,9 @@ Page {
             font.pixelSize: Theme.fontSizeLarge
             text: aserver.connected ? aserver.insession ?
                           qsTr("Listening") :
-                          settings.sessionStart == 0 ? qsTr("Say wake-up-word or tap") :
+                          settings.sessionStart == 0 ? qsTr("Say wake word or tap") :
                           settings.sessionStart == 1 ? qsTr("Tap to wake up") :
-                          settings.sessionStart == 2 ? qsTr("Say wake-up-word") :
+                          settings.sessionStart == 2 ? qsTr("Say wake word") :
                           "" : qsTr("Disconnected")
         }
 
