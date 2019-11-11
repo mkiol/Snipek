@@ -66,7 +66,7 @@ and well documented. The guide how to do it is available
 [here](https://docs.snips.ai/getting-started/quick-start-raspberry-pi).
 
 Alternatively you can also manually install Snips on Debian system
-(it could be installed on phisical or virtual machine).
+(it can be installed on phisical or virtual machine).
 
 Here is quick step-by-step guide for Snips installation on a fresh Debian 9:
 
@@ -95,7 +95,7 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9:
    # apt install snips-platform-voice snips-tts snips-watch
    ```
 
-6. Download and install Snipek assistant file.
+6. Download and install Snipek assistant file (skip this step and install your own assistant if you don't want to use [Snipek built-in skills](#snipek-built-in-skills)).
 
    ```
    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
