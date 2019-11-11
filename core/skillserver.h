@@ -31,22 +31,17 @@ public:
 
 public:
     SkillItem(QObject *parent = nullptr): ListItem(parent) {}
-    explicit SkillItem(const QString &name,
-                       const QString &friendlyName,
-                       const QString &description,
+    explicit SkillItem(const Skill *skill,
                        QObject *parent = nullptr);
     QVariant data(int role) const;
     QHash<int, QByteArray> roleNames() const;
-    inline QString id() const { return m_name; }
-    inline QString name() const { return m_name; }
-    inline QString friendlyName() const { return m_friendlyName; }
-    inline QString description() const { return m_description; }
+    inline QString id() const { return skill->name(); }
+    inline QString name() const { return skill->name(); }
+    inline QString friendlyName() const { return skill->friendlyName(); }
+    inline QString description() const { return skill->description(); }
 
 private:
-    QString m_id;
-    QString m_name;
-    QString m_friendlyName;
-    QString m_description;
+    const Skill* skill;
 };
 
 class SkillServer : public ListModel
@@ -80,7 +75,7 @@ private:
     void handleSessionEnded(const QString& sessionId);
     void parseIntent(const QByteArray& data);
     void handleIntent(const Intent& intent);
-    void registerSkill(Skill* skill);
+    void registerSkill(Skill *skill);
 };
 
 #endif // SKILLSERVER_H

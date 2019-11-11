@@ -19,9 +19,10 @@ class DateTimeSkill : public Skill
     Q_DECLARE_TR_FUNCTIONS(DateTimeSkill)
 
 public:
-    QStringList intentsNames();
-    QString name();
-    QString friendlyName();
+    QStringList intentsNames() const;
+    QString name() const;
+    QString friendlyName() const;
+    QString description() const;
     void handleIntent(const Intent& intent);
 };
 

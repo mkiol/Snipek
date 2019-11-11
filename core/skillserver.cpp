@@ -19,15 +19,10 @@
 #include "callhistoryskill.h"
 #endif
 
-SkillItem::SkillItem(const QString &name,
-                     const QString &friendlyName,
-                     const QString &description,
+SkillItem::SkillItem(const Skill *skill,
                      QObject *parent) :
     ListItem(parent),
-    m_id(name),
-    m_name(name),
-    m_friendlyName(friendlyName),
-    m_description(description)
+    skill(skill)
 {}
 
 QHash<int, QByteArray> SkillItem::roleNames() const
@@ -43,11 +38,11 @@ QVariant SkillItem::data(int role) const
 {
     switch(role) {
     case NameRole:
-        return m_name;
+        return skill->name();
     case FriendlyNameRole:
-        return m_friendlyName;
+        return skill->friendlyName();
     case DescriptionRole:
-        return m_description;
+        return skill->description();
     default:
         return QVariant();
     }
@@ -99,7 +94,7 @@ void SkillServer::registerSkill(Skill* skill)
 {
     for (auto name : skill->intentsNames())
         intentNameToSkills.insert(name, skill);
-    appendRow(new SkillItem(skill->name(), skill->friendlyName(), QString()));
+    appendRow(new SkillItem(skill));
 }
 
 void SkillServer::processMessage(const Message &msg)

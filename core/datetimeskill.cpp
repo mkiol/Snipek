@@ -15,19 +15,24 @@
 #include "skillserver.h"
 #include "settings.h"
 
-QStringList DateTimeSkill::intentsNames()
+QStringList DateTimeSkill::intentsNames() const
 {
     return {"muki:getTime", "muki:getDate"};
 }
 
-QString DateTimeSkill::name()
+QString DateTimeSkill::name() const
 {
     return tr("datetime");
 }
 
-QString DateTimeSkill::friendlyName()
+QString DateTimeSkill::friendlyName() const
 {
     return tr("Date and Time");
+}
+
+QString DateTimeSkill::description() const
+{
+    return tr("Reads current time or date.");
 }
 
 void DateTimeSkill::handleIntent(const Intent& intent)

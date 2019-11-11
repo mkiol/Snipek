@@ -8,17 +8,22 @@
 #include "skill.h"
 #include "skillserver.h"
 
-QStringList Skill::intentsNames()
+QStringList Skill::intentsNames() const
 {
     return QStringList();
 }
 
-QString Skill::name()
+QString Skill::name() const
 {
     return QString();
 }
 
-QString Skill::friendlyName()
+QString Skill::friendlyName() const
+{
+    return QString();
+}
+
+QString Skill::description() const
 {
     return QString();
 }

@@ -160,6 +160,7 @@ Page {
                 model: skills
                 delegate: TextSwitch {
                     text: model.friendlyName
+                    description: model.description
                     checked: settings.isSkillEnabled(model.name)
                     onCheckedChanged: {
                         settings.setSkillEnabled(model.name, checked)

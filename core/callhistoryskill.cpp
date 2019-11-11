@@ -16,19 +16,24 @@
 #include "skillserver.h"
 #include "settings.h"
 
-QStringList CallHistorySkill::intentsNames()
+QStringList CallHistorySkill::intentsNames() const
 {
     return {"muki:getCalls", "muki:getMissedCalls"};
 }
 
-QString CallHistorySkill::name()
+QString CallHistorySkill::name() const
 {
     return tr("callhistory");
 }
 
-QString CallHistorySkill::friendlyName()
+QString CallHistorySkill::friendlyName() const
 {
     return tr("Call history");
+}
+
+QString CallHistorySkill::description() const
+{
+    return tr("Reads events from call history e.g. all missed calls.");
 }
 
 void CallHistorySkill::printEvent(const Event &event)
