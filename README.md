@@ -46,10 +46,10 @@ More skills are under implementation...
 
 ## Snipek assistant installation
 
-Snipek assistant provides Intents for [Snipek built-in skills](#snipek-built-in-skills).
+Snipek assistant provides intents for [Snipek built-in skills](#snipek-built-in-skills).
 Intents are defined for particular language. Currently only English is supported.
 
-There are two ways to install Snipek assistant:
+There are two ways to install Snipek intents:
 
 1. Download Snipek assistant file and unpack it on Snips server.
    To download and install on Debian/Raspbian, execute following commands:
@@ -60,8 +60,9 @@ There are two ways to install Snipek assistant:
    # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
    ```
 
-2. Create your own assistant with [Snips console](https://console.snips.ai) and add Snipek intents.
-   Snipek intents published under my [console account](https://console.snips.ai/user/user_wm5pno63qoqd).
+2. Create your own assistant with [Snips console](https://console.snips.ai)
+   and add Snipek intents from the store.
+   Snipek intents are published [here](https://console.snips.ai/store/en/skill_4YMgn1YavPo).
 
 ## Snips server installation
 
@@ -101,7 +102,8 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9:
    # apt install snips-platform-voice snips-tts snips-watch
    ```
 
-6. Download and install Snipek assistant file (skip this step and install your own assistant if you don't want to use [Snipek built-in skills](#snipek-built-in-skills)).
+6. Download and install Snipek assistant file (skip this step and install your own
+   assistant if you don't want to use [Snipek built-in skills](#snipek-built-in-skills)).
 
    ```
    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
