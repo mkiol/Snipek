@@ -164,8 +164,8 @@ Page {
             TextField {
                 width: parent.width
                 inputMethodHints: Qt.ImhLatinOnly | Qt.ImhLowercaseOnly | Qt.ImhNoPredictiveText
-                placeholderText: qsTr("Enter intents namespace for built-in skills (default is \"%1\")").arg("muki")
-                label: qsTr("Intents namespace for built-in skills")
+                placeholderText: qsTr("Enter namespace for built-in skills (default is \"%1\")").arg("muki")
+                label: qsTr("Namespace for built-in skills")
 
                 onTextChanged: {
                     settings.intentNs = text

@@ -67,14 +67,22 @@ signals:
     void intentNsChanged();
 
 private:
+#ifdef SAILFISH
+    static constexpr char* HW_RELEASE_FILE = "/etc/hw-release";
+#endif
     QSettings settings;
     bool noTranslation = false;
     static Settings* inst;
+    QString hwName;
 
     explicit Settings(QObject* parent = nullptr);
     QString getRandId();
+    QString getNewSiteId();
     QString randString(int len = 4);
     bool checkIntentNs(const QString& ns);
+#ifdef SAILFISH
+    QString readHwInfo();
+#endif
 };
 
 #endif // SETTINGS_H

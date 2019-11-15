@@ -9,6 +9,11 @@
 #include <QTime>
 #include <QStringList>
 #include <QLocale>
+#include <QSysInfo>
+#ifdef SAILFISH
+#include <QRegExp>
+#include <QFile>
+#endif
 
 #include "settings.h"
 
@@ -38,8 +43,12 @@ Settings::Settings(QObject* parent) :
     QObject(parent),
     settings(parent)
 {
-    // Seed init, needed for rand
-    //qsrand(QTime::currentTime().msec());
+#ifdef SAILFISH
+    hwName = readHwInfo();
+#else
+    hwName = QSysInfo::machineHostName();
+#endif
+    qDebug() << "HW name:" << hwName;
 }
 
 Settings* Settings::instance(QObject* parent)
@@ -56,11 +65,17 @@ QString Settings::getRandId()
     return "snipek-" + randString();
 }
 
+QString Settings::getNewSiteId()
+{
+    auto id = hwName.replace(QRegExp("[^a-zA-Z0-9]"), "_");
+    return id.isEmpty() ? getRandId() : ("snipek-" + id);
+}
+
 QString Settings::getSite()
 {
     QString v = settings.value("site").toString().trimmed();
     if (v.isEmpty()) {
-        v = getRandId();
+        v = getNewSiteId();
         settings.setValue("site", v);
     }
 
@@ -70,9 +85,12 @@ QString Settings::getSite()
 void Settings::setSite(const QString &value)
 {
     QString v = value.trimmed();
+    if (v.isEmpty()) {
+        qWarning() << "Resetting siteId";
+        v = getNewSiteId();
+    }
+
     if (getSite() != v) {
-        if (v.isEmpty())
-            v = getRandId();
         settings.setValue("site", v);
         emit siteChanged();
     }
@@ -281,3 +299,23 @@ void Settings::setIntentNs(const QString& value)
         emit intentNsChanged();
     }
 }
+
+#ifdef SAILFISH
+QString Settings::readHwInfo()
+{
+    QFile f(HW_RELEASE_FILE);
+    if (f.open(QIODevice::ReadOnly)) {
+        auto d = f.readAll();
+        f.close();
+        auto data = QString::fromUtf8(d);
+        QRegExp rx("\nNAME=\"([^\"]*)\"", Qt::CaseInsensitive);
+        if (rx.indexIn(data) != -1)
+            return rx.cap(1);
+    } else {
+        qWarning() << "Cannot open file" << f.fileName() <<
+                      "for reading (" + f.errorString() + ")";
+    }
+
+    return QString();
+}
+#endif
