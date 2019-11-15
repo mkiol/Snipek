@@ -51,7 +51,8 @@ Intents are defined for particular language. Currently only English is supported
 
 There are two ways to install Snipek intents:
 
-1. Download Snipek assistant file and unpack it on Snips server.
+1. Download already created [Snipek assistant file](https://github.com/mkiol/Snipek/tree/master/assistant)
+   and unpack it on the machine where Snips is installed. This assistant only contains intents for built-in skills.
    To download and install on Debian/Raspbian, execute following commands:
 
    ```
@@ -60,9 +61,12 @@ There are two ways to install Snipek intents:
    # unzip assistant_proj_BAYAr2l4k5z.zip -d /usr/share/snips
    ```
 
-2. Create your own assistant with [Snips console](https://console.snips.ai)
+2. Alternatively, create your own assistant with [Snips console](https://console.snips.ai)
    and add Snipek intents from the store.
    Snipek intents are published [here](https://console.snips.ai/store/en/skill_4YMgn1YavPo).
+   If you decide to fork Snipek intents, most likely namespace will change
+   (e.g. `muki:getTime` to `user1:getTime`). You can update the namespace to
+   new one on Snipek app settings page.
 
 ## Snips server installation
 
@@ -103,7 +107,8 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9:
    ```
 
 6. Download and install Snipek assistant file (skip this step and install your own
-   assistant if you don't want to use [Snipek built-in skills](#snipek-built-in-skills)).
+   assistant if you don't want to use [Snipek built-in skills](#snipek-built-in-skills) or
+   want to [create the assistant with Snipek Intents from the console](#snipek-assistant-installation)).
 
    ```
    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
@@ -138,14 +143,14 @@ Snips supports following languages:
 When Snipek is used only as remote mic/speaker, it's language-agnostic.
 It just forwards and receives audio samples to/from Snips server.
 
-When Snipek is used for [voice commands](#snipek-built-in-skills)
-that let you control your phone, language matters.
+When Snipek is used for [voice commands that let you control your phone](#snipek-built-in-skills),
+language matters.
 Currently built-in skills and Snipek assistant support only English language.
 
 ## Downloads
 
 Binary packages for Sailfish OS can be downloaded from
-[OpenRepos](https://openrepos.net/content/mkiol/snipek) and from official Jolla Store app.
+[OpenRepos](https://openrepos.net/content/mkiol/snipek) and from the official Jolla Store app.
 
 ## License
 
