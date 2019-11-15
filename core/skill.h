@@ -24,7 +24,7 @@ struct Intent
 class Skill
 {
 public:
-    virtual QStringList intentsNames() const;
+    virtual QStringList intentsNames() const; // without namespace
     virtual QString name() const;
     virtual QString friendlyName() const;
     virtual QString description() const;

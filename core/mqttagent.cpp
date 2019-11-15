@@ -88,7 +88,8 @@ bool MqttAgent::init()
 
 void MqttAgent::subscribe(const QString& topic)
 {
-    subscribeQueue.push(topic);
+    if (!shutdown)
+        subscribeQueue.push(topic);
 }
 
 void MqttAgent::subscribeAll()
@@ -108,7 +109,8 @@ void MqttAgent::subscribeAll()
 
 void MqttAgent::unsubscribe(const QString& topic)
 {
-    unsubscribeQueue.push(topic);
+    if (!shutdown)
+        unsubscribeQueue.push(topic);
 }
 
 void MqttAgent::unsubscribeAll()
@@ -164,7 +166,7 @@ bool MqttAgent::isConnected()
 
 bool MqttAgent::checkConnected()
 {
-    if (client && shutdown) {
+    if (client && shutdown && unsubscribeQueue.empty()) {
         qDebug() << "Deinitng MQTT agent";
         MQTTClient_disconnect(client, 10000);
         MQTTClient_destroy(&client);
@@ -198,9 +200,11 @@ void MqttAgent::deInit()
 
 void MqttAgent::publish(const Message &msg)
 {
-    if (!msg.topic.endsWith("audioFrame"))
-        qDebug() << "Adding to publish queue:" << msg.topic << msg.payload;
-    msgQueue.push(msg);
+    if (!shutdown) {
+        if (!msg.topic.endsWith("audioFrame"))
+            qDebug() << "Adding to publish queue:" << msg.topic << msg.payload;
+        msgQueue.push(msg);
+    }
 }
 
 void MqttAgent::publishAll()
@@ -236,6 +240,9 @@ void MqttAgent::publishAll()
 
 void MqttAgent::receive()
 {
+    if (shutdown)
+        return;
+
     char* topic;
     int topicLen;
     MQTTClient_message* mqttMsg = nullptr;

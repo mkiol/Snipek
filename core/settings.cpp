@@ -250,3 +250,34 @@ void Settings::setSkillEnabled(const QString &name, bool value)
         emit skillEnabledChanged();
     }
 }
+
+bool Settings::checkIntentNs(const QString& ns)
+{
+    if (ns.isEmpty())
+        return false;
+
+    for (const auto& c : ns)
+        if (!c.isLetterOrNumber())
+            return false;
+
+    return true;
+}
+
+QString Settings::getIntentNs()
+{
+    return settings.value("intentns", "muki").toString();
+}
+
+void Settings::setIntentNs(const QString& value)
+{
+    auto ns = value.trimmed().toLower();
+    if (!checkIntentNs(ns)) {
+        qWarning() << "Namespace for intents is invalid";
+        ns = "muki";
+    }
+
+    if (getIntentNs() != ns) {
+        settings.setValue("intentns", ns);
+        emit intentNsChanged();
+    }
+}

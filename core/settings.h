@@ -22,6 +22,7 @@ class Settings: public QObject
     Q_PROPERTY (QString inAudio READ getInAudio WRITE setInAudio NOTIFY audioChanged)
     Q_PROPERTY (QString outAudio READ getOutAudio WRITE setOutAudio NOTIFY audioChanged)
     Q_PROPERTY (QString lang READ getLang WRITE setLang NOTIFY langChanged)
+    Q_PROPERTY (QString intentNs READ getIntentNs WRITE setIntentNs NOTIFY intentNsChanged)
     Q_PROPERTY (int mqttPort READ getMqttPort WRITE setMqttPort NOTIFY mqttChanged)
     Q_PROPERTY (bool audioFeedback READ getAudioFeedback WRITE setAudioFeedback NOTIFY audioFeedbackChanged)
     Q_PROPERTY (int sessionStart READ getSessionStart WRITE setSessionStart NOTIFY sessionStartChanged)
@@ -52,6 +53,8 @@ public:
     void setSessionStart(int value);
     Q_INVOKABLE bool isSkillEnabled(const QString& name);
     Q_INVOKABLE void setSkillEnabled(const QString& name, bool value);
+    QString getIntentNs();
+    void setIntentNs(const QString& value);
 
 signals:
     void siteChanged();
@@ -61,6 +64,7 @@ signals:
     void langChanged();
     void sessionStartChanged();
     void skillEnabledChanged();
+    void intentNsChanged();
 
 private:
     QSettings settings;
@@ -70,6 +74,7 @@ private:
     explicit Settings(QObject* parent = nullptr);
     QString getRandId();
     QString randString(int len = 4);
+    bool checkIntentNs(const QString& ns);
 };
 
 #endif // SETTINGS_H

@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include <QTextStream>
 #include <QRegExp>
+#include <QTimer>
 
 #include "skillserver.h"
 #include "settings.h"
@@ -61,6 +62,10 @@ SkillServer* SkillServer::instance(QObject* parent)
 
 SkillServer::SkillServer(QObject *parent) : ListModel(new SkillItem, parent)
 {
+    // namespace
+    auto s = Settings::instance();
+    ns = s->getIntentNs();
+
     // skills
     registerSkill(new DateTimeSkill());
 #ifdef SAILFISH
@@ -77,17 +82,38 @@ SkillServer::SkillServer(QObject *parent) : ListModel(new SkillItem, parent)
             this, &SkillServer::mqttConnectedHandler);
     mqttConnectedHandler();
 
-    // settings
-    auto s = Settings::instance();
+    // settings events
     connect(s, &Settings::skillEnabledChanged,
-            this, &SkillServer::handleSettingsChange);
+            this, &SkillServer::handleSkillsChange);
+    connect(s, &Settings::intentNsChanged,
+            this, &SkillServer::handleNsChange);
 }
 
-void SkillServer::handleSettingsChange()
+QString SkillServer::addNs(const QString& name)
 {
-    if (MqttAgent::instance()->isConnected()) {
+    return ns + ":" + name;
+}
+
+QString SkillServer::removeNs(const QString& name)
+{
+    return name.contains(':') ? name.split(':').last() : name;
+}
+
+void SkillServer::handleSkillsChange()
+{
+    if (MqttAgent::instance()->isConnected())
         subscribe();
+}
+
+void SkillServer::handleNsChange()
+{
+    auto mqtt = MqttAgent::instance();
+    if (mqtt->isConnected()) {
+        unsubscribe();
+        mqtt->deInit();
     }
+
+    ns = Settings::instance()->getIntentNs();
 }
 
 void SkillServer::registerSkill(Skill* skill)
@@ -123,15 +149,32 @@ void SkillServer::subscribe()
 
     QString tmpl = "hermes/intent/%1";
 
-    mqtt->subscribe(tmpl.arg("muki:confirmation")); // confirmation intent
+    mqtt->subscribe(tmpl.arg(addNs("confirmation"))); // confirmation intent
 
     QHashIterator<QString, Skill*> i(intentNameToSkills);
     while (i.hasNext()) {
         i.next();
         if (s->isSkillEnabled(i.value()->name()))
-            mqtt->subscribe(tmpl.arg(i.key()));
+            mqtt->subscribe(tmpl.arg(addNs(i.key())));
         else
-            mqtt->unsubscribe(tmpl.arg(i.key()));
+            mqtt->unsubscribe(tmpl.arg(addNs(i.key())));
+    }
+}
+
+void SkillServer::unsubscribe()
+{
+    auto mqtt = MqttAgent::instance();
+    auto s = Settings::instance();
+
+    QString tmpl = "hermes/intent/%1";
+
+    mqtt->unsubscribe(tmpl.arg(addNs("confirmation"))); // confirmation intent
+
+    QHashIterator<QString, Skill*> i(intentNameToSkills);
+    while (i.hasNext()) {
+        i.next();
+        if (s->isSkillEnabled(i.value()->name()))
+            mqtt->unsubscribe(tmpl.arg(addNs(i.key())));
     }
 }
 
@@ -173,7 +216,7 @@ void SkillServer::continueSession(const QString& sessionId,
                     .arg(sessionId).arg(text).toUtf8();
         } else {
             QStringList list(intentFilters);
-            list.replaceInStrings(QRegExp("^(.*)$"), "\"\\1\"");
+            list.replaceInStrings(QRegExp("^(.*)$"), "\"" + ss->addNs("\\1\""));
             msg.payload = QString("{\"sessionId\":\"%1\",\"text\":\"%2\",\"intentFilter\":[%3]}")
                             .arg(sessionId).arg(text).arg(list.join(',')).toUtf8();
         }
@@ -187,7 +230,7 @@ void SkillServer::continueSession(const QString& sessionId,
 
 void SkillServer::askForConfirmation(const QString& sessionId, const QString& text)
 {
-    continueSession(sessionId, text, {"muki:confirmation"});
+    continueSession(sessionId, text, {"confirmation"});
 }
 
 void SkillServer::parseSessionEnded(const QByteArray& data)
@@ -247,7 +290,7 @@ void SkillServer::parseIntent(const QByteArray& data)
     Intent intent;
     intent.siteId = obj.value("siteId").toString();
     intent.sessionId = obj.value("sessionId").toString();
-    intent.name = obj.value("intent").toObject().value("intentName").toString();
+    intent.name = removeNs(obj.value("intent").toObject().value("intentName").toString());
 
     if (intent.sessionId.isEmpty()) {
         qWarning() << "SessionId is empty";

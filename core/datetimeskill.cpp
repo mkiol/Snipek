@@ -17,7 +17,7 @@
 
 QStringList DateTimeSkill::intentsNames() const
 {
-    return {"muki:getTime", "muki:getDate"};
+    return {"getTime", "getDate"};
 }
 
 QString DateTimeSkill::name() const
@@ -42,10 +42,10 @@ void DateTimeSkill::handleIntent(const Intent& intent)
 
     auto locale = Settings::instance()->locale();
 
-    if (intent.name == "muki:getTime") {
+    if (intent.name == "getTime") {
         auto time = locale.toString(QTime::currentTime(), QLocale::ShortFormat);
         out << tr("It is %1.").arg(time);
-    } else if (intent.name == "muki:getDate") {
+    } else if (intent.name == "getDate") {
         auto date = locale.toString(QDateTime::currentDateTime().date(),
                                     QLocale::LongFormat);
         out << tr("It is %1.").arg(date);

@@ -62,15 +62,20 @@ public slots:
 
 private slots:
     void mqttConnectedHandler();
-    void handleSettingsChange();
+    void handleSkillsChange();
+    void handleNsChange();
 
 private:
     static SkillServer* inst;
     explicit SkillServer(QObject *parent = nullptr);
     QHash<QString, Skill*> intentNameToSkills;
     QHash<QString, Skill*> sessionIdToSkills;
+    QString ns;
 
+    QString addNs(const QString &name);
+    QString removeNs(const QString &name);
     void subscribe();
+    void unsubscribe();
     void parseSessionEnded(const QByteArray& data);
     void handleSessionEnded(const QString& sessionId);
     void parseIntent(const QByteArray& data);

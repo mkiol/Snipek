@@ -18,7 +18,7 @@
 
 QStringList CallHistorySkill::intentsNames() const
 {
-    return {"muki:getCalls", "muki:getMissedCalls"};
+    return {"getCalls", "getMissedCalls"};
 }
 
 QString CallHistorySkill::name() const
@@ -147,7 +147,7 @@ void CallHistorySkill::handleIntent(const Intent& intent)
     QString text;
     QTextStream out(&text);
 
-    if (intent.name.contains("confirmation") && sessions.contains(intent.sessionId)) {
+    if (intent.name == "confirmation" && sessions.contains(intent.sessionId)) {
         qDebug() << "Confirmation intent received:" << intent.slotList.value("answer");
         if (intent.slotList.value("answer") == "yes") {
             if (readNextCalls(sessions[intent.sessionId], out, 1)) {
@@ -159,8 +159,8 @@ void CallHistorySkill::handleIntent(const Intent& intent)
                 out << " " << tr("That was the last call event.");
             }
         }
-    } else if (intent.name.contains("getCalls") ||
-               intent.name.contains("getMissedCalls")) {
+    } else if (intent.name == "getCalls" ||
+               intent.name == "getMissedCalls") {
         QDateTime refTime;
         bool todayTime = false;
         if (intent.slotList.contains("refTime"))
