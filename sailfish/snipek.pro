@@ -49,7 +49,6 @@ TRANSLATION_SOURCE_DIRS += $$PROJECTDIR/core
 CONFIG += sailfishapp_i18n_include_obsolete
 TRANSLATIONS += \
     translations/snipek-en.ts \
-    translations/snipek-pl.ts \
     translations/snipek-ru.ts \
     translations/snipek-de.ts \
     translations/snipek-es.ts
