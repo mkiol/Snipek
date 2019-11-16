@@ -89,7 +89,7 @@ QList<CallHistorySkill::Call> CallHistorySkill::getCalls(bool onlyMissed,
 
     for (int i = 0; i < model.rowCount() && i < 25; i++) {
         Event e = model.event(model.index(i, 0));
-        printEvent(e);
+        //printEvent(e);
         list.push_back(makeCall(e));
     }
 

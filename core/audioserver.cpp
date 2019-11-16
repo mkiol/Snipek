@@ -295,7 +295,7 @@ AudioServer::AudioServer(QObject* parent) :
 
 void AudioServer::run()
 {
-    qDebug() << "Starting audio server";
+    qDebug() << "Starting audio server:" << QThread::currentThreadId();
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, [this](){
         processor->setActive(false);
@@ -432,7 +432,7 @@ void AudioServer::deInit()
 
 void AudioServer::init()
 {
-    qDebug() << "Initing audio server";
+    qDebug() << "Initing audio server:" << QThread::currentThreadId();
 
     connect(this, &AudioServer::processorInited, this, &AudioServer::startListening);
 
@@ -515,7 +515,6 @@ void AudioServer::setFeedback()
     msg.topic = enabled ? AudioServer::mqttFeedbackOnTopic.toUtf8() :
                           AudioServer::mqttFeedbackOffTopic.toUtf8();
     msg.payload = QString("{\"siteId\":\"%1\"}").arg(siteId).toUtf8();
-    qDebug() << "data:" << msg.payload;
 
     auto mqtt = MqttAgent::instance();
     mqtt->publish(msg);
@@ -528,7 +527,6 @@ void AudioServer::loaded()
     Message msg;
     msg.topic = AudioServer::mqttLoadedTopic.arg(siteId).toUtf8();
     msg.payload = QString("{\"id\":null,\"reloaded\":false,\"siteId\":\"%1\"}").arg(siteId).toUtf8();
-    qDebug() << "data:" << msg.payload;
 
     auto mqtt = MqttAgent::instance();
     mqtt->publish(msg);
@@ -536,7 +534,7 @@ void AudioServer::loaded()
 
 void AudioServer::handleAudioOutputStateChanged(QAudio::State newState)
 {
-    qDebug() << "Audio output state changed";
+    qDebug() << "Audio output state changed:" << newState;
 
     switch (newState) {
     case QAudio::SuspendedState:
@@ -545,10 +543,10 @@ void AudioServer::handleAudioOutputStateChanged(QAudio::State newState)
         qDebug() << "State: idle, suspended or stopped";
         if (isPlayingFinished()) {
             setPlaying(false);
-            playFinishedHandler();
             output.reset();
             buffer = nullptr;
             clearTimer.stop();
+            playFinishedHandler();
         } else if (!writeTimer.isActive()){
             qDebug() << "Audio write is needed";
             writeTimer.start();
@@ -599,7 +597,7 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
 
 void AudioServer::playNext()
 {
-    qDebug() << "Play next";
+    qDebug() << "Play next:" << QThread::currentThreadId();
 
     if (playQueue.empty()) {
         qWarning() << "Out queue is empty";
@@ -626,6 +624,7 @@ void AudioServer::playNext()
     //output->setBufferSize(50000);
     connect(output.get(), &QAudioOutput::stateChanged,
             this, &AudioServer::handleAudioOutputStateChanged);
+    buffer = nullptr;
     buffer = output->start();
 }
 
@@ -687,7 +686,10 @@ void AudioServer::writeAudio()
             clearTimer.start();
         }
     } else {
-        qWarning() << "Unknown id, so ignoring";
+        if (buffer)
+            qWarning() << "Unknown id, so ignoring";
+        else
+            qWarning() << "Buffer is null, so ignoring";
         writeTimer.stop();
     }
 }
