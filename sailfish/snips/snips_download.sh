@@ -2,6 +2,60 @@
 
 # Script that automates Snips binaries download to Sailfish OS
 # Copyright (c) Michal Kosciesza <michal@mkiol.net>
+# 
+# Project website: https://github.com/mkiol/Snipek
+# 
+# Usage:
+#
+# Download Snips on SFOS to default dir:
+# $ ./snips_download.sh
+#
+# Download Snips to specific dir (can be executed on SFOS or any other machine):
+# $ ./snips_download.sh -d <dir>
+#
+# Check is all needed files exist in specific dir:
+# $ ./snips_download.sh -c -d <dir>
+#
+# Display usage help:
+# $ ./snips_download.sh -h
+#
+# This stript downloads only binaries for ARM CPU.
+# Jolla Tablet and any other non-ARM based devices are not
+# supported right now.
+#
+# Following files are downloaded:
+#
+# from https://raspbian.snips.ai/stretch:
+#  libsnips_kaldi.so
+#  snips-asr
+#  snips-dialogue
+#  snips-hotword
+#  snips-nlu
+#  snips-tts
+#
+# from http://ftp.debian.org/debian:
+#  libgfortran.so.3
+#  mosquitto
+#  libstdc++.so.6
+#  libwrap.so.0
+#  libcrypto.so.1.1
+#  libssl.so.1.1
+#  libwebsockets.so.8
+#  libnsl.so.1
+#  libev.so.4
+#  libuv.so.1
+#  libatlas.so.3
+#  libcblas.so.3
+#  libf77blas.so.3
+#  liblapack_atlas.so.3
+#  bspatch
+#  libbz2.so.1.0
+#  libttspico.so.0
+#  pico2wave
+#
+# from https://github.com/mkiol:
+#  assistant_proj_BAYAr2l4k5z.zip
+#
 
 VERSION=1.0.0
 
@@ -18,13 +72,14 @@ REUSE_DEB_FILES=0
 ARCH=armhf # Snips provides only binaries for armhf and amd64
 
 SNIPS_DIR_DEFAULT=/home/nemo/.cache/harbour-snipek/harbour-snipek/snips
-#SNIPS_REPO_ROOT=https://debian.snips.ai/stretch
 SNIPS_REPO_ROOT=https://raspbian.snips.ai/stretch
 SNIPS_DIST=stable
 DEBIAN_REPO_ROOT=http://ftp.debian.org/debian
 DEBIAN_DIST=stretch
 SNIPEK_ASSISTANT=https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
 
+# Binary path for pico2wave. It changes dir where pico2wave expects
+# lang files (/usr/share/pico/lang/ => ./pico/lang/)
 PICO2WAVE_PATCH="\
 QlNESUZGNDA/AAAAAAAAAC4AAAAAAAAAgCYAAAAAAABCWmg5MUFZJlNZh5qAJwAAGWhAeTEAAkhA\
 QAAgACGmoZkjQgGgCXNOnSAEMwiAb7rZ8sCv4u5IpwoSEPNQBOBCWmg5MUFZJlNZuZq0BwAAE0Ag\
@@ -52,10 +107,10 @@ usage() {
   print ""
   print "Options:"
   print "  -d <DIR>     directory where files should be downloaded to (default is $SNIPS_DIR_DEFAULT)"
-  #print "  -a <ARCH>    define cpu architecture (armhf, i386 or amd64)"
   print "  -c           instead new download, check if all needed files are present"
-  print "  -k           keep deb files"
-  print "  -r           instead download use existing deb packages"
+  print "  -a           download only assistant"
+  print "  -k           keep deb packages and assistant archive file"
+  print "  -r           instead download use existing deb packages and assistant archive file"
   print "  -h           display this help and exit"
   print "  -V           output version information and exit"
 }
@@ -78,7 +133,7 @@ download_and_extract_assistant() {
   local assistant_archive="$SNIPS_DIR/assistant.zip"
   local assistant_dir="$SNIPS_DIR/assistant"
 
-  if [ -f "$assistant_archive" ]; then
+  if [ $REUSE_DEB_FILES -eq 1 ] && [ -f "$assistant_archive" ]; then
     print "No need to download assistant file because it exists."
   else
     wget --output-document="$assistant_archive" "$SNIPEK_ASSISTANT"
@@ -89,9 +144,7 @@ download_and_extract_assistant() {
     fi
   fi
   
-  unzip -o "$assistant_archive" -d "$SNIPS_DIR"
-  
-  if [ $? -ne 0 ] || [ ! -d "$assistant_dir" ]; then
+  if ! unzip -o "$assistant_archive" -d "$SNIPS_DIR" || [ ! -d "$assistant_dir" ]; then
     print_error "Error: Cannot extract assistant file."
     
     if [ $KEEP_ASSISTANT -eq 0 ] && [ -f "$assistant_archive" ]; then
@@ -109,8 +162,8 @@ download_and_extract_assistant() {
 }
 
 download_and_extract_pkgs() {
-  local repo_root=($1)
-  local package_file_url=($2)
+  local repo_root="$1"
+  local package_file_url="$2"
   
   if [ ${#pkgs_to_install_names[*]} -eq 0 ]; then
     print_error "No packages to install."
@@ -124,16 +177,12 @@ download_and_extract_pkgs() {
   local packages_archive="$SNIPS_DIR/Packages.gz"
   local packages_file="$SNIPS_DIR/Packages"
   
-  wget --output-document="$packages_archive" $package_file_url
-
-  if ! [ -f "$packages_archive" ]; then
+  if ! wget --output-document="$packages_archive" "$package_file_url" || ! [ -f "$packages_archive" ]; then
     print_error "Error: Cannot download repo Packages file."
     return 1
   fi
   
-  gzip -d -f "$packages_archive"
-  
-  if [ $? -ne 0 ] || [ ! -f "$packages_file" ]; then
+  if ! gzip -d -f "$packages_archive" || [ ! -f "$packages_file" ]; then
     print_error "Error: Cannot extract Packages file."
     return 1
   fi
@@ -169,8 +218,8 @@ download_and_extract_pkgs() {
     for (( i=0; i<=$(( ${#pkg_names[*]} -1 )); i++ ))
     do
       if [ "${pkg_names[$i]}" == "$needed_name" ] && [[ "${pkg_vers[$i]}" == "$needed_ver"* ]]; then
-          found_pkg_names+=(${pkg_names[$i]})
-          found_pkg_idx+=($i)
+          found_pkg_names+=("${pkg_names[$i]}")
+          found_pkg_idx+=("$i")
           break
       fi
     done
@@ -214,8 +263,7 @@ download_and_extract_pkgs() {
       print "No need to download package $name because it exists."
     else
       print "Downloading package $name from $url."
-      wget --output-document="$file" "$url"
-      if [ $? -ne 0 ]; then
+      if ! wget --output-document="$file" "$url"; then
         print_error "Error: Cannot download package $name from $url."
         return 1
       fi
@@ -287,7 +335,7 @@ check_files() {
 
 # parse options
 
-while getopts ":Vkhrca:d:" options; do
+while getopts ":Vkhrcad:" options; do
 case "${options}" in
   h)
     usage
@@ -300,14 +348,19 @@ case "${options}" in
   d)
     SNIPS_DIR="${OPTARG}"
     ;;
-  a)
-    ARCH=${OPTARG}
-    ;;
   c)
     CHECK_ONLY=1
     ;;
+  a)
+    INSTALL_SNIPS=0
+    INSTALL_DEBIAN_MAIN=0
+    INSTALL_DEBIAN_NONFREE=0
+    INSTALL_ASSISTANT=1
+    PATCH_PICO2WAVE=0
+    ;;
   k)
     KEEP_DEBS=1
+    KEEP_ASSISTANT=1
     ;;
   r)
     REUSE_DEB_FILES=1
@@ -327,8 +380,12 @@ needed_commands=( wget sed ar tar gzip uname basename readlink dirname base64 )
 error=0
 for cmd in "${needed_commands[@]}"
 do
-  if ! [ -x "$(command -v $cmd)" ]; then
-    print_error "Error: $cmd is required but not installed."
+  if ! [ -x "$(command -v "$cmd")" ]; then
+    if [ $cmd == "ar" ]; then
+      print_error "Error: $cmd is required but missing. Install binutils package."
+    else
+      print_error "Error: $cmd is required but not installed."
+    fi
     error=1
   fi
 done
@@ -346,28 +403,6 @@ else
   sfos_arm=0
 fi
 
-# check arch and autodetect if not provided, valid arch is 'armhf', 'i386' or 'amd64'
-
-if [ "$ARCH" != "armhf" ] && [ "$ARCH" != "i386" ] && [ "$ARCH" != "amd64" ]; then
-  case "$cpu_arch" in
-    "aarch64")
-      ARCH="armhf"
-      ;;
-    "i686")
-      ARCH="i386"
-      ;;
-    "x86_64")
-      ARCH="amd64"
-      ;;
-    *)
-      if [ -z "$ARCH" ]; then
-        exit_abnormal "Error: Unknown architecture." 1
-      else
-        exit_abnormal "Error: Unknown architecture $ARCH." 1
-      fi
-  esac
-fi
-
 # check user dir, if not provided default to <snipek cache>/snips
 
 if [ -z "$SNIPS_DIR" ] && [ $sfos_arm -eq 1 ]; then
@@ -377,8 +412,7 @@ if [ -z "$SNIPS_DIR" ] && [ $sfos_arm -eq 1 ]; then
       exit_abnormal "Error: Directory $SNIPS_DIR_DEFAULT does not exist." 1
     fi
     print "Creating $SNIPS_DIR_DEFAULT dir."
-    mkdir -p "$SNIPS_DIR_DEFAULT"
-    if [ $? -ne 0 ]; then
+    if ! mkdir -p "$SNIPS_DIR_DEFAULT"; then
       exit_abnormal "Error: Cannot create $SNIPS_DIR_DEFAULT dir."
     fi
   fi
@@ -435,13 +469,16 @@ if [ $CHECK_ONLY -eq 1 ]; then
   files_to_install+=("$SNIPS_DIR/libttspico.so.0")
   files_to_install+=("$SNIPS_DIR/pico2wave")
   
-  check_files
-  if [ $? -ne 0 ]; then
+  if ! check_files; then
     exit_abnormal "Error: Some binaries are missing."
   fi
   
   if [ ! -f "$SNIPS_DIR/pico/lang/en-US_ta.bin" ]; then
     exit_abnormal "Error: File $SNIPS_DIR/pico/lang/en-US_ta.bin does not exist."
+  fi
+  
+  if [ ! -f "$SNIPS_DIR/assistant/assistant.json" ]; then
+    exit_abnormal "Error: File $SNIPS_DIR/assistant/assistant.json does not exist."
   fi
   
   files_to_install=()
@@ -470,8 +507,8 @@ if [ $INSTALL_SNIPS -ne 0 ]; then  # Snips installation
   pkgs_to_install_vers+=("0.26.1")
   
   packages_url=$SNIPS_REPO_ROOT/dists/$SNIPS_DIST/main/binary-$ARCH/Packages.gz
-  download_and_extract_pkgs $SNIPS_REPO_ROOT $packages_url
-  if [ $? -ne 0 ]; then
+  
+  if ! download_and_extract_pkgs $SNIPS_REPO_ROOT $packages_url; then
     exit_abnormal
   fi
   
@@ -487,10 +524,11 @@ if [ $INSTALL_SNIPS -ne 0 ]; then  # Snips installation
   done
   
   clean_pkgs
-  check_files
-  if [ $? -ne 0 ]; then
+  
+  if ! check_files; then
     exit_abnormal "Error: Some binaries are missing."
   fi
+  
   files_to_install=()
 fi
 
@@ -525,8 +563,8 @@ if [ $INSTALL_DEBIAN_MAIN -ne 0 ]; then  # Debian main installation
   fi
   
   packages_url=$DEBIAN_REPO_ROOT/dists/$DEBIAN_DIST/main/binary-$ARCH/Packages.gz
-  download_and_extract_pkgs $DEBIAN_REPO_ROOT $packages_url
-  if [ $? -ne 0 ]; then
+  
+  if ! download_and_extract_pkgs $DEBIAN_REPO_ROOT $packages_url; then
     exit_abnormal
   fi
 
@@ -555,10 +593,11 @@ if [ $INSTALL_DEBIAN_MAIN -ne 0 ]; then  # Debian main installation
   done
 
   clean_pkgs
-  check_files
-  if [ $? -ne 0 ]; then
+  
+  if ! check_files; then
     exit_abnormal "Error: Some binaries are missing."
   fi
+  
   files_to_install=()
 fi
 
@@ -573,8 +612,8 @@ if [ $INSTALL_DEBIAN_NONFREE -ne 0 ]; then  # Debian non-free installation
   pkgs_to_install_vers+=("1.0")
 
   packages_url=$DEBIAN_REPO_ROOT/dists/$DEBIAN_DIST/non-free/binary-$ARCH/Packages.gz
-  download_and_extract_pkgs $DEBIAN_REPO_ROOT $packages_url
-  if [ $? -ne 0 ]; then
+  
+  if ! download_and_extract_pkgs $DEBIAN_REPO_ROOT $packages_url; then
     exit_abnormal
   fi
 
@@ -584,11 +623,11 @@ if [ $INSTALL_DEBIAN_NONFREE -ne 0 ]; then  # Debian non-free installation
   do
     cp --dereference "$file" "$SNIPS_DIR/"
   done
-  cp -R $SNIPS_DIR/deb-libttspico-data/usr/share/pico $SNIPS_DIR/
+  cp -R "$SNIPS_DIR/deb-libttspico-data/usr/share/pico" "$SNIPS_DIR/"
   
   clean_pkgs
-  check_files
-  if [ $? -ne 0 ]; then
+  
+  if ! check_files; then
     exit_abnormal "Error: Some binaries are missing."
   fi
   if [ ! -f "$SNIPS_DIR/pico/lang/en-US_ta.bin" ]; then
@@ -599,8 +638,7 @@ fi
 
 if [ $INSTALL_ASSISTANT -ne 0 ]; then  # Assistant installation
   print "Downloading assistant file..."
-  download_and_extract_assistant
-  if [ $? -ne 0 ]; then
+  if ! download_and_extract_assistant; then
     exit_abnormal
   fi
 fi
@@ -622,8 +660,7 @@ if [ $PATCH_PICO2WAVE -eq 1 ] && [ $ARCH == "armhf" ]; then
     fi
   fi
   
-  echo "$PICO2WAVE_PATCH" | base64 -d -- > $pico2wave_patch_file
-  if [ $? -ne 0 ]; then
+  if ! echo "$PICO2WAVE_PATCH" | base64 -d -- > "$pico2wave_patch_file"; then
     exit_abnormal "Error: Cannot create pico2wave patch file."
   fi
   
@@ -631,9 +668,9 @@ if [ $PATCH_PICO2WAVE -eq 1 ] && [ $ARCH == "armhf" ]; then
     export LD_LIBRARY_PATH=$SNIPS_DIR
   fi
   
-  $bspatch_cmd $pico2wave_file $pico2wave_patched $pico2wave_patch_file
-  if [ $? -ne 0 ]; then
-    rm $pico2wave_patch_file
+  
+  if ! "$bspatch_cmd" "$pico2wave_file" "$pico2wave_patched" "$pico2wave_patch_file"; then
+    rm "$pico2wave_patch_file"
     exit_abnormal "Error: Cannot apply patch on pico2wave."
   fi
   
@@ -641,11 +678,16 @@ if [ $PATCH_PICO2WAVE -eq 1 ] && [ $ARCH == "armhf" ]; then
     export -n LD_LIBRARY_PATH
   fi
 
-  rm $pico2wave_patch_file
-  rm $pico2wave_file
-  mv $pico2wave_patched $pico2wave_file
-  chmod a+x $pico2wave_file
-  if [ $? -ne 0 ] || [ ! -f $pico2wave_file ]; then
+  rm "$pico2wave_patch_file"
+  rm "$pico2wave_file"
+  
+  if ! mv "$pico2wave_patched" "$pico2wave_file"; then
+    exit_abnormal "Error: Cannot apply patch on pico2wave."
+  fi
+  
+  chmod a+x "$pico2wave_file"
+  
+  if [ ! -f "$pico2wave_file" ]; then
     exit_abnormal "Error: Cannot apply patch on pico2wave."
   fi
   

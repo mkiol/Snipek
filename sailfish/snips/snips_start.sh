@@ -2,6 +2,26 @@
 
 # Script that starts essential Snips components on Sailfish OS
 # Copyright (c) Michal Kosciesza <michal@mkiol.net>
+#
+# Project website: https://github.com/mkiol/Snipek
+#
+# Usage:
+#
+# Start Snips that is downloaded to default dir:
+# $ ./snips_start.sh
+#
+# Start Snips that is downloaded to specific dir:
+# $ ./snips_start.sh -d <dir>
+#
+# Stop Snips:
+# $ ./snips_start.sh -k
+#
+# Check if Snips is running:
+# $ ./snips_start.sh -c
+#
+# Display usage help:
+# $ ./snips_start.sh -h
+#
 
 VERSION=1.0.0
 
@@ -72,8 +92,7 @@ check_processes() {
 kill_processes() {
   for process in "${snips_processes[@]}"
   do
-    killall -9 "$process"
-    if [ $? -eq 0 ]; then
+    if killall -9 "$process"; then
       print "Process $process stopped."
     fi
   done
@@ -120,6 +139,10 @@ check_all_files() {
     error=1
   fi
   
+  if [ ! -f "$SNIPS_DIR/assistant/assistant.json" ]; then
+    exit_abnormal "Error: File $SNIPS_DIR/assistant/assistant.json does not exist."
+  fi
+  
   return $error
 }
 
@@ -162,7 +185,7 @@ needed_commands=( killall readlink )
 error=0
 for cmd in "${needed_commands[@]}"
 do
-  if ! [ -x "$(command -v $cmd)" ]; then
+  if ! [ -x "$(command -v "$cmd")" ]; then
     print_error "Error: $cmd is required but not installed."
     error=1
   fi
@@ -194,8 +217,7 @@ snips_processes+=("mosquitto")
 
 if [ $CHECK_RUNNING -eq 1 ]; then
   print "Check if all Snips processes are running."
-  check_processes
-  if [ $? -ne 0 ]; then
+  if ! check_processes; then
     exit_abnormal "Error: Some Snips processes are stopped."
   fi
   print "Done. All Snips processes are running."
@@ -214,39 +236,38 @@ kill_processes
 
 if [ $STOP -eq 0 ]; then
   print "Check if all needed files are present in $SNIPS_DIR directory."
-  check_all_files
-  if [ $? -ne 0 ]; then
+  
+  if ! check_all_files; then
     exit_abnormal "Error: Some needed files are missing."
   fi
 
   print "Starting Snips..."
   
-  $SNIPS_DIR/mosquitto -d
-  if [ $? -ne 0 ]; then
+  if ! "$SNIPS_DIR/mosquitto" -d; then
     exit_abnormal "Error: Cannot start MQTT."
   fi
   
-  assistant_dir=$SNIPS_DIR/assistant
-  pushd $SNIPS_DIR
+  assistant_dir="$SNIPS_DIR/assistant"
+  pushd "$SNIPS_DIR"
   if [ $VERBOSE -eq 1 ]; then
     opts="-v"
-    $SNIPS_DIR/snips-hotword $opts --assistant $assistant_dir --user-dir $SNIPS_DIR &
-    $SNIPS_DIR/snips-nlu $opts --assistant $assistant_dir --user-dir $SNIPS_DIR &
-    $SNIPS_DIR/snips-dialogue $opts --assistant $assistant_dir --user-dir $SNIPS_DIR &
-    $SNIPS_DIR/snips-tts $opts --assistant $assistant_dir --user-dir $SNIPS_DIR --provider picotts &
-    $SNIPS_DIR/snips-asr $opts --assistant $assistant_dir --user-dir $SNIPS_DIR &
+    "$SNIPS_DIR/snips-hotword" $opts --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" &
+    "$SNIPS_DIR/snips-nlu" $opts --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" &
+    "$SNIPS_DIR/snips-dialogue" $opts --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" &
+    "$SNIPS_DIR/snips-tts" $opts --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" --provider picotts &
+    "$SNIPS_DIR/snips-asr" $opts --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" &
   else
-    $SNIPS_DIR/snips-hotword --assistant $assistant_dir --user-dir $SNIPS_DIR > /dev/null 2>&1 &
-    $SNIPS_DIR/snips-nlu --assistant $assistant_dir --user-dir $SNIPS_DIR > /dev/null 2>&1 &
-    $SNIPS_DIR/snips-dialogue --assistant $assistant_dir --user-dir $SNIPS_DIR > /dev/null 2>&1 &
-    $SNIPS_DIR/snips-tts --assistant $assistant_dir --user-dir $SNIPS_DIR --provider picotts > /dev/null 2>&1 &
-    $SNIPS_DIR/snips-asr --assistant $assistant_dir --user-dir $SNIPS_DIR > /dev/null 2>&1 &
+    "$SNIPS_DIR/snips-hotword" --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" > /dev/null 2>&1 &
+    "$SNIPS_DIR/snips-nlu" --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" > /dev/null 2>&1 &
+    "$SNIPS_DIR/snips-dialogue" --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" > /dev/null 2>&1 &
+    "$SNIPS_DIR/snips-tts" --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" --provider picotts > /dev/null 2>&1 &
+    "$SNIPS_DIR/snips-asr" --assistant "$assistant_dir" --user-dir "$SNIPS_DIR" > /dev/null 2>&1 &
   fi
   popd
   
   print "Check if all Snips processes are running."
-  check_processes
-  if [ $? -ne 0 ]; then
+  
+  if ! check_processes; then
     print_error "Error: Snips cannot be started."
     kill_processes
     exit_abnormal
