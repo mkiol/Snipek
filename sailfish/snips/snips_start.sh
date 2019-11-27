@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
-
-# Script that starts essential Snips components on Sailfish OS
+#
+# Script that starts Snips software on Sailfish OS
 # Copyright (c) Michal Kosciesza <michal@mkiol.net>
 #
-# Project website: https://github.com/mkiol/Snipek
+# ---------------------- Important notice --------------------------
+# Keep in mind that Snips is not an open source software. The use of
+# Snips is is governed by Snips Terms of Use: https://docs.snips.ai/
+# additional-resources/legal-and-privacy/website-terms-of-use
+# ------------------------------------------------------------------
 #
-# Usage:
+# Example usages:
 #
-# Start Snips that is downloaded to default dir:
+# Start Snips downloaded to default dir:
 # $ ./snips_start.sh
 #
-# Start Snips that is downloaded to specific dir:
+# Start Snips downloaded to specific dir:
 # $ ./snips_start.sh -d <dir>
 #
 # Stop Snips:
@@ -27,12 +31,11 @@ VERSION=1.0.0
 
 SNIPS_DIR_DEFAULT=/home/nemo/.cache/harbour-snipek/harbour-snipek/snips
 SNIPS_DIR=$SNIPS_DIR_DEFAULT
-
-########################
-
 STOP=0
 VERBOSE=0
 CHECK_RUNNING=0
+
+# ------------------------------------------------------------------
 
 print() {
   echo "$1"
@@ -62,6 +65,9 @@ exit_abnormal() {
     print_error "$1"
   fi
   if [ -n "$show_usage" ]; then
+    if [ -n "$txt" ]; then
+      print
+    fi
     usage
   fi
   exit 1
@@ -181,7 +187,7 @@ done
 
 # check needed shell commands
 
-needed_commands=( killall readlink )
+needed_commands=( killall readlink sed ps basename )
 error=0
 for cmd in "${needed_commands[@]}"
 do

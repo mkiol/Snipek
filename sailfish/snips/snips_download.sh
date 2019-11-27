@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-
-# Script that automates Snips binaries download to Sailfish OS
+#
+# Script that automates Snips software download to Sailfish OS
 # Copyright (c) Michal Kosciesza <michal@mkiol.net>
 # 
-# Project website: https://github.com/mkiol/Snipek
-# 
-# Usage:
+# ---------------------- Important notice --------------------------
+# Keep in mind that Snips is not an open source software. The use of
+# Snips is is governed by Snips Terms of Use: https://docs.snips.ai/
+# additional-resources/legal-and-privacy/website-terms-of-use
+# ------------------------------------------------------------------
+#
+# Example usages:
 #
 # Download Snips on SFOS to default dir:
 # $ ./snips_download.sh
@@ -19,11 +23,14 @@
 # Display usage help:
 # $ ./snips_download.sh -h
 #
-# This stript downloads only binaries for ARM CPU.
-# Jolla Tablet and any other non-ARM based devices are not
-# supported right now.
+# ------------------------------------------------------------------
 #
-# Following files are downloaded:
+# Only binaries for ARM CPU can be downloade. Jolla Tablet and any
+# other non-ARM based devices are not supported right now.
+#
+# ------------------------------------------------------------------
+#
+# Script downloads following files:
 #
 # from https://raspbian.snips.ai/stretch:
 #  libsnips_kaldi.so
@@ -86,7 +93,7 @@ QAAgACGmoZkjQgGgCXNOnSAEMwiAb7rZ8sCv4u5IpwoSEPNQBOBCWmg5MUFZJlNZuZq0BwAAE0Ag\
 wAAACAAIIAAwzAUpplGxUeLuSKcKEhczVoDgQlpoOTFBWSZTWWLU0qEAAALQAFAAAAEgACEmQZiQ\
 uLuSKcKEgxamlQg="
 
-########################
+# ------------------------------------------------------------------
 
 work_dir=$(pwd) # current working dir
 declare -a pkgs_to_install_names
@@ -102,7 +109,7 @@ print_error() {
 }
 
 usage() {
-  print "Usage: $0 [OPTION]..."
+  print "Usage: $(basename "$0") [OPTION]..."
   print "Download essential Snips binaries."
   print ""
   print "Options:"
@@ -122,9 +129,25 @@ exit_abnormal() {
     print_error "$1"
   fi
   if [ -n "$show_usage" ]; then
+    if [ -n "$txt" ]; then
+      print
+    fi
     usage
   fi
+  cd "$work_dir"
   exit 1
+}
+
+download() {
+  local url=$1
+  local file="$2"
+  
+  if ! curl -L --retry 1 -o "$file" "$url"; then
+    return 1
+  fi
+  if [ ! -f "$file" ]; then
+    return 1
+  fi
 }
 
 download_and_extract_assistant() {
@@ -136,9 +159,7 @@ download_and_extract_assistant() {
   if [ $REUSE_DEB_FILES -eq 1 ] && [ -f "$assistant_archive" ]; then
     print "No need to download assistant file because it exists."
   else
-    wget --output-document="$assistant_archive" "$SNIPEK_ASSISTANT"
-
-    if ! [ -f "$assistant_archive" ]; then
+    if ! download "$SNIPEK_ASSISTANT" "$assistant_archive"; then
       print_error "Error: Cannot download assistant file."
       return 1
     fi
@@ -177,7 +198,7 @@ download_and_extract_pkgs() {
   local packages_archive="$SNIPS_DIR/Packages.gz"
   local packages_file="$SNIPS_DIR/Packages"
   
-  if ! wget --output-document="$packages_archive" "$package_file_url" || ! [ -f "$packages_archive" ]; then
+  if ! download "$package_file_url" "$packages_archive"; then
     print_error "Error: Cannot download repo Packages file."
     return 1
   fi
@@ -214,12 +235,12 @@ download_and_extract_pkgs() {
     local needed_name="${pkgs_to_install_names[$idx]}"
     local needed_ver="${pkgs_to_install_vers[$idx]}"
     print "Searching for $needed_name ($needed_ver)..."
-  
-    for (( i=0; i<=$(( ${#pkg_names[*]} -1 )); i++ ))
+    
+    for idx in ${!pkg_names[@]}
     do
-      if [ "${pkg_names[$i]}" == "$needed_name" ] && [[ "${pkg_vers[$i]}" == "$needed_ver"* ]]; then
-          found_pkg_names+=("${pkg_names[$i]}")
-          found_pkg_idx+=("$i")
+      if [ "${pkg_names[$idx]}" == "$needed_name" ] && [[ "${pkg_vers[$idx]}" == "$needed_ver"* ]]; then
+          found_pkg_names+=("${pkg_names[$idx]}")
+          found_pkg_idx+=("$idx")
           break
       fi
     done
@@ -263,7 +284,7 @@ download_and_extract_pkgs() {
       print "No need to download package $name because it exists."
     else
       print "Downloading package $name from $url."
-      if ! wget --output-document="$file" "$url"; then
+      if ! download "$url" "$file"; then
         print_error "Error: Cannot download package $name from $url."
         return 1
       fi
@@ -278,27 +299,42 @@ download_and_extract_pkgs() {
   do
     local deb_file="$SNIPS_DIR/$name.deb"
     local dir="$SNIPS_DIR/deb-$name"
+    
     print "Extracting $deb_file to $dir dir."
-    set -e
-    mkdir -p "$dir"
+    
+    if ! mkdir -p "$dir"; then
+      print_error "Error: Cannot make $dir."
+      return 1
+    fi
+    
     cd "$dir"
-    set +e
-    ar x "$deb_file"
-    local error=$?
+    
+    if ! ar x "$deb_file"; then
+      print_error "Error: Cannot ar $deb_file."
+      cd "$work_dir"
+      return 1
+    fi
+    
+    local data_file_xz="$dir/data.tar.xz"
+    local data_file_tar="$dir/data.tar"
+    
+    print "Extracting $data_file_xz to $dir dir."
+    
+    if ! xz -f -d "$data_file_xz"; then
+      print_error "Error: Cannot extract $data_file_xz."
+      cd "$work_dir"
+      return 1
+    fi
+    
+    if ! tar -xf "$data_file_tar" --directory "$dir"; then
+      print_error "Error: Cannot extract $data_file_tar."
+      cd "$work_dir"
+      return 1
+    fi
+    
     cd "$work_dir"
-    if [ $error -ne 0 ]; then
-      print_error "Error: Cannot extract $deb_file."
-      return 1
-    fi
-    local data_file="$dir/data.tar.xz"
-    print "Extracting $data_file to $dir dir."
-    tar -xf "$data_file" --directory "$dir"
-    if [ $error -ne 0 ]; then
-      print_error "Error: Cannot extract $data_file."
-      return 1
-    fi
   done
-
+  
   print "All deb packages were extracted."
 }
 
@@ -374,15 +410,32 @@ case "${options}" in
   esac
 done
 
+# check if script is executed on SFOS ARM device
+
+cpu_arch=$(uname -p) # machine cpu arch
+print "CPU arch is $cpu_arch."
+
+if [ $cpu_arch == "aarch64" ] || [[ $cpu_arch == *arm* ]]; then
+  sfos_arm=1
+else
+  sfos_arm=0
+fi
+
 # check needed shell commands
 
-needed_commands=( wget sed ar tar gzip uname basename readlink dirname base64 )
+needed_commands=( curl sed ar tar gzip basename readlink dirname base64 xz )
+if [ $sfos_arm -ne 1 ]; then
+  needed_commands+=( bspatch )
+fi
+
 error=0
 for cmd in "${needed_commands[@]}"
 do
   if ! [ -x "$(command -v "$cmd")" ]; then
     if [ $cmd == "ar" ]; then
       print_error "Error: $cmd is required but missing. Install binutils package."
+    elif [ $cmd == "curl" ]; then
+      print_error "Error: $cmd is required but missing. Install curl package."
     else
       print_error "Error: $cmd is required but not installed."
     fi
@@ -391,16 +444,6 @@ do
 done
 if [ $error -ne 0 ]; then
   exit_abnormal
-fi
-
-# check if script is executed on SFOS ARM device
-
-cpu_arch=$(uname -p) # machine cpu arch
-
-if [ $cpu_arch == "aarch64" ]; then
-  sfos_arm=1
-else
-  sfos_arm=0
 fi
 
 # check user dir, if not provided default to <snipek cache>/snips
@@ -667,7 +710,6 @@ if [ $PATCH_PICO2WAVE -eq 1 ] && [ $ARCH == "armhf" ]; then
   if [ $sfos_arm -eq 1 ]; then
     export LD_LIBRARY_PATH=$SNIPS_DIR
   fi
-  
   
   if ! "$bspatch_cmd" "$pico2wave_file" "$pico2wave_patched" "$pico2wave_patch_file"; then
     rm "$pico2wave_patch_file"
