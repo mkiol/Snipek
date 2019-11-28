@@ -12,16 +12,16 @@
 # Example usages:
 #
 # Download Snips on SFOS to default dir:
-# $ ./snips_download.sh
+# $ snips_download.sh
 #
 # Download Snips to specific dir (can be executed on SFOS or any other machine):
-# $ ./snips_download.sh -d <dir>
+# $ snips_download.sh -d <dir>
 #
 # Check is all needed files exist in specific dir:
-# $ ./snips_download.sh -c -d <dir>
+# $ snips_download.sh -c -d <dir>
 #
 # Display usage help:
-# $ ./snips_download.sh -h
+# $ snips_download.sh -h
 #
 # ------------------------------------------------------------------
 #
@@ -83,7 +83,7 @@ SNIPS_REPO_ROOT=https://raspbian.snips.ai/stretch
 SNIPS_DIST=stable
 DEBIAN_REPO_ROOT=http://ftp.debian.org/debian
 DEBIAN_DIST=stretch
-SNIPEK_ASSISTANT=https://github.com/mkiol/Snipek/raw/master/assistant/assistant_proj_BAYAr2l4k5z.zip
+SNIPEK_ASSISTANT=https://github.com/mkiol/Snipek/raw/master/assistant/assistant_en.zip
 
 # Binary path for pico2wave. It changes dir where pico2wave expects
 # lang files (/usr/share/pico/lang/ => ./pico/lang/)
@@ -225,7 +225,7 @@ download_and_extract_pkgs() {
   print "Needed packages:"
   for idx in "${!pkgs_to_install_names[@]}"
   do
-    echo " ${pkgs_to_install_names[$idx]} (${pkgs_to_install_vers[$idx]})"
+    print " ${pkgs_to_install_names[$idx]} (${pkgs_to_install_vers[$idx]})"
   done
 
   print "Finding needed packages in the repo."
@@ -234,8 +234,8 @@ download_and_extract_pkgs() {
   do
     local needed_name="${pkgs_to_install_names[$idx]}"
     local needed_ver="${pkgs_to_install_vers[$idx]}"
-    print "Searching for $needed_name ($needed_ver)..."
-    
+    echo -n "Searching for $needed_name ($needed_ver)..."
+    local count=0
     for idx in ${!pkg_names[@]}
     do
       if [ "${pkg_names[$idx]}" == "$needed_name" ] && [[ "${pkg_vers[$idx]}" == "$needed_ver"* ]]; then
@@ -243,7 +243,13 @@ download_and_extract_pkgs() {
           found_pkg_idx+=("$idx")
           break
       fi
+      if [ $count -ge 500 ]; then
+        echo -n "."
+        local count=0
+      fi
+      local count=$(($count + 1))
     done
+    echo
   done
 
   # check if all packages found
@@ -413,7 +419,7 @@ done
 # check if script is executed on SFOS ARM device
 
 cpu_arch=$(uname -p) # machine cpu arch
-print "CPU arch is $cpu_arch."
+print "Info: Machine CPU arch is $cpu_arch."
 
 if [ $cpu_arch == "aarch64" ] || [[ $cpu_arch == *arm* ]]; then
   sfos_arm=1
@@ -470,7 +476,7 @@ else
   SNIPS_DIR="$(readlink -f "$SNIPS_DIR")"
 fi
 
-# download binaries
+# global vars
 
 if [ $ARCH == "armhf" ]; then
   lib_dir="arm-linux-gnueabihf"
@@ -481,6 +487,8 @@ elif [ $ARCH == "amd64" ]; then
 else
   exit_abnormal "Error: Unknown architecture."
 fi
+
+install_done_file="$SNIPS_DIR/install_done"
 
 # check only option
 
@@ -512,8 +520,10 @@ if [ $CHECK_ONLY -eq 1 ]; then
   files_to_install+=("$SNIPS_DIR/libttspico.so.0")
   files_to_install+=("$SNIPS_DIR/pico2wave")
   
+  files_to_install+=("$install_done_file")
+  
   if ! check_files; then
-    exit_abnormal "Error: Some binaries are missing."
+    exit_abnormal "Error: Snips is not properly installed. Some files are missing."
   fi
   
   if [ ! -f "$SNIPS_DIR/pico/lang/en-US_ta.bin" ]; then
@@ -525,9 +535,20 @@ if [ $CHECK_ONLY -eq 1 ]; then
   fi
   
   files_to_install=()
-  print "Done. All needed files are present in $SNIPS_DIR dir."
+  
+  curr_ver=$(<"$install_done_file")
+  print "Current installation version is $curr_ver and this script version is $VERSION."
+  if [ $curr_ver != $VERSION ]; then
+    print_error "Error: All needed files are present but it appears that\
+ the files were downloaded with different script. You should re-download."
+    exit 2
+  fi
+  
+  print "Done. Snips is properly installed. All needed files are present in $SNIPS_DIR."
   exit 0
 fi
+
+# download binaries
 
 print "Ready to start download for $ARCH cpu arch to $SNIPS_DIR directory."
 
@@ -734,6 +755,12 @@ if [ $PATCH_PICO2WAVE -eq 1 ] && [ $ARCH == "armhf" ]; then
   fi
   
   print "Pico2wave patched successfully."
+fi
+
+# write installation version
+
+if ! echo "$VERSION" > "$install_done_file"; then
+    exit_abnormal "Error: Cannot create $install_done_file file."
 fi
 
 print "Done. All files were successfully downloaded to $SNIPS_DIR."

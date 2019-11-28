@@ -9,22 +9,22 @@
 # additional-resources/legal-and-privacy/website-terms-of-use
 # ------------------------------------------------------------------
 #
-# Example usages:
+# Example usages (must be executed on SFOS device):
 #
 # Start Snips downloaded to default dir:
-# $ ./snips_start.sh
+# $ snips_start.sh
 #
 # Start Snips downloaded to specific dir:
-# $ ./snips_start.sh -d <dir>
+# $ snips_start.sh -d <dir>
 #
 # Stop Snips:
-# $ ./snips_start.sh -k
+# $ snips_start.sh -k
 #
 # Check if Snips is running:
-# $ ./snips_start.sh -c
+# $ snips_start.sh -c
 #
 # Display usage help:
-# $ ./snips_start.sh -h
+# $ snips_start.sh -h
 #
 
 VERSION=1.0.0
@@ -141,12 +141,24 @@ check_all_files() {
   done
   
   if [ ! -f "$SNIPS_DIR/pico/lang/en-US_ta.bin" ]; then
-    print_error "Error: File $SNIPS_DIR/pico/lang/en-US_ta.bin does not exist."
-    error=1
+    exit_abnormal "Error: File $SNIPS_DIR/pico/lang/en-US_ta.bin does not exist."
   fi
   
   if [ ! -f "$SNIPS_DIR/assistant/assistant.json" ]; then
     exit_abnormal "Error: File $SNIPS_DIR/assistant/assistant.json does not exist."
+  fi
+  
+  local install_done_file="$SNIPS_DIR/install_done"
+  if [ ! -f "$install_done_file" ]; then
+    exit_abnormal "Error: File $install_done_file does not exist."
+  fi
+  
+  local curr_ver=$(<"$install_done_file")
+  print "Current installation version is $curr_ver and this script version is $VERSION."
+  if [ $curr_ver != $VERSION ]; then
+    print_error "Error: All needed files are present but it appears that\
+ the files were downloaded with different script. You should re-download."
+    exit 2
   fi
   
   return $error
