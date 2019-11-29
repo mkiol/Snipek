@@ -11,21 +11,24 @@
 #
 # Example usages:
 #
-# Download Snips on SFOS to default dir:
+# Display usage help:
+# $ snips_download.sh -h
+#
+# Download Snips on SFOS to default dir (SNIPS_DIR_DEFAULT):
 # $ snips_download.sh
 #
-# Download Snips to specific dir (can be executed on SFOS or any other machine):
+# Download Snips to specific dir (can be executed on SFOS or any other Linux machine):
 # $ snips_download.sh -d <dir>
+#
+# Download only Snipek assistant:
+# $ snips_download.sh -a
 #
 # Check is all needed files exist in specific dir:
 # $ snips_download.sh -c -d <dir>
 #
-# Display usage help:
-# $ snips_download.sh -h
-#
 # ------------------------------------------------------------------
 #
-# Only binaries for ARM CPU can be downloade. Jolla Tablet and any
+# Only binaries for ARM CPU can be downloaded. Jolla Tablet and any
 # other non-ARM based devices are not supported right now.
 #
 # ------------------------------------------------------------------
@@ -61,7 +64,7 @@
 #  pico2wave
 #
 # from https://github.com/mkiol:
-#  assistant_proj_BAYAr2l4k5z.zip
+#  assistant_en.zip
 #
 
 VERSION=1.0.0
@@ -83,7 +86,9 @@ SNIPS_REPO_ROOT=https://raspbian.snips.ai/stretch
 SNIPS_DIST=stable
 DEBIAN_REPO_ROOT=http://ftp.debian.org/debian
 DEBIAN_DIST=stretch
-SNIPEK_ASSISTANT=https://github.com/mkiol/Snipek/raw/master/assistant/assistant_en.zip
+
+SNIPEK_ASSISTANT_LANG=en
+SNIPEK_ASSISTANT="https://github.com/mkiol/Snipek/raw/master/assistant/assistant_$SNIPEK_ASSISTANT_LANG.zip"
 
 # Binary path for pico2wave. It changes dir where pico2wave expects
 # lang files (/usr/share/pico/lang/ => ./pico/lang/)

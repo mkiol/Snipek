@@ -11,7 +11,10 @@
 #
 # Example usages (must be executed on SFOS device):
 #
-# Start Snips downloaded to default dir:
+# Display usage help:
+# $ snips_start.sh -h
+#
+# Start Snips downloaded to default dir (SNIPS_DIR_DEFAULT):
 # $ snips_start.sh
 #
 # Start Snips downloaded to specific dir:
@@ -22,9 +25,6 @@
 #
 # Check if Snips is running:
 # $ snips_start.sh -c
-#
-# Display usage help:
-# $ snips_start.sh -h
 #
 
 VERSION=1.0.0

@@ -70,4 +70,6 @@ desktop-file-install --delete-original       \
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 # >> files
+%defattr(755,root,root,-)
+%{_datadir}/%{name}/snips/*.sh
 # << files

@@ -58,4 +58,8 @@ images.files = images/*
 images.path = /usr/share/$${TARGET}/images
 INSTALLS += images
 
+snips.files = snips/*.sh
+snips.path = /usr/share/$${TARGET}/snips
+INSTALLS += snips
+
 DEPENDPATH += $$INCLUDEPATH
