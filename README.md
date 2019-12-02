@@ -63,9 +63,11 @@ following platforms:
 - Raspberry Pi,
 - Debian 9 (stretch).
 
-Bare in mind that Snips is not an open source software. The source code is not
-publicly available - only binaries for ARM and x86_64.
-Luckily with some hack, installation on Sailfish OS (ARM only) is possible as well!
+Bare in mind that **Snips is not an open source software**. The use of Snips is is governed by
+[Snips Terms of Use](https://docs.snips.ai/additional-resources/legal-and-privacy/website-terms-of-use).
+The source code is not publicly available. Snips publishes only binaries for ARM and x86_64.
+
+Luckily with some hack, installation on Sailfish OS (ARM only) is possible.
 
 ### Snips installation on Raspberry Pi
 
@@ -137,12 +139,12 @@ and any other non-ARM Sailfish OS devices is not possible.
 To make Snips installation process as easy as possible, Snipek app provides two bash scripts:
 
 - `snips_download.sh` - downloads all needed binaries from Snips/Raspbian/Debian reposotories
-and Snipek assistant (script can be executed on SFOS directly or on any Linux machine)
+and downloads Snipek assistant (script can be executed on SFOS directly or on any Linux machine)
 - `snips_start.sh` - starts/stops Snips components (script must be executed on SFOS directly)
 
 After Snipek app installation, both scripts are in `/usr/share/harbour-snipek/snips`.
 
-Here is few example usages:
+Here are few example usages:
 
 ```
 # Display usage help for snips_download.sh:
@@ -176,9 +178,6 @@ $ snips_start.sh -c
 Installation (`snips_download.sh`) has to be executed mannually from terminal
 but starting/stopping (`snips_start.sh`) can be managed via Snipek app.
 
-Keep in mind that **Snips is not an open source software**. The use of Snips is is governed by
-[Snips Terms of Use](https://docs.snips.ai/additional-resources/legal-and-privacy/website-terms-of-use).
-
 ## Snipek assistant installation
 
 Snipek assistant provides intents for [Snipek built-in skills](#snipek-built-in-skills).
@@ -189,12 +188,20 @@ There are two ways to install Snipek intents:
 1. Download already created [Snipek assistant file](https://github.com/mkiol/Snipek/tree/master/assistant)
    and unpack it on the computer where Snips is installed. This assistant only contains intents
    for built-in skills.
+
    To download and install on Debian/Raspbian, execute following commands:
 
    ```
    $ wget https://github.com/mkiol/Snipek/raw/master/assistant/assistant_en.zip
    # mkdir -p /usr/share/snips
    # unzip assistant_en.zip -d /usr/share/snips
+   ```
+
+   To download and install on Sailfish OS use `snips_download.sh` script:
+
+   ```
+   $ cd /usr/share/harbour-snipek/snips
+   $ ./snips_download.sh -a
    ```
 
 2. Alternatively, create your own assistant with [Snips console](https://console.snips.ai)

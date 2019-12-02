@@ -10,6 +10,8 @@
 #include <QStringList>
 #include <QLocale>
 #include <QSysInfo>
+#include <QStandardPaths>
+#include <QDir>
 #ifdef SAILFISH
 #include <QRegExp>
 #include <QFile>
@@ -109,6 +111,8 @@ QString Settings::getMqttId()
 
 QString Settings::getMqttAddress()
 {
+    if (getSnipsLocal())
+        return "127.1.0.0";
     return settings.value("mqttaddress", "").toString();
 }
 
@@ -123,6 +127,8 @@ void Settings::setMqttAddress(const QString& value)
 
 int Settings::getMqttPort()
 {
+    if (getSnipsLocal())
+        return 1883;
     return settings.value("mqttport", 1883).toInt();
 }
 
@@ -297,6 +303,36 @@ void Settings::setIntentNs(const QString& value)
     if (getIntentNs() != ns) {
         settings.setValue("intentns", ns);
         emit intentNsChanged();
+    }
+}
+
+bool Settings::getSnipsLocal()
+{
+    return settings.value("snipslocal", false).toBool();
+}
+
+void Settings::setSnipsLocal(bool value)
+{
+    if (getSnipsLocal() != value) {
+        settings.setValue("snipslocal", value);
+        emit snipsLocalChanged();
+    }
+}
+
+QString Settings::getSnipsLocalDir()
+{
+    auto defaultDir = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation))
+            .absoluteFilePath("snips");
+    auto dir = settings.value("snipslocaldir", defaultDir).toString();
+    qDebug() << "Local snips dir:" << dir;
+    return dir.isEmpty() ? defaultDir : dir;
+}
+
+void Settings::setSnipsLocalDir(const QString& value)
+{
+    if (getSnipsLocalDir() != value) {
+        settings.setValue("snipslocaldir", value);
+        emit snipsLocalChanged();
     }
 }
 

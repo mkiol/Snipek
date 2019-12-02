@@ -32,11 +32,21 @@ MqttAgent::MqttAgent(QObject *parent) :
     auto settings = Settings::instance();
     connect(settings, &Settings::mqttChanged, this, &MqttAgent::deInit);
     connect(settings, &Settings::siteChanged, this, &MqttAgent::deInit);
+    connect(settings, &Settings::snipsLocalChanged, this, &MqttAgent::deInit);
 
     reconTimer.setSingleShot(true);
     reconTimer.setTimerType(Qt::VeryCoarseTimer);
     connect(&reconTimer, &QTimer::timeout, this, &MqttAgent::reconnect);
     connect(this, &MqttAgent::doReconnect, this, &MqttAgent::reconnect);
+}
+
+void MqttAgent::initWithReconnect()
+{
+    if (!init()) {
+        reconCounter = 0;
+        reconTimer.setInterval(1000);
+        reconTimer.start();
+    }
 }
 
 bool MqttAgent::init()

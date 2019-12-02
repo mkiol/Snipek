@@ -30,18 +30,22 @@ DISTFILES += \
     qml/Mic.qml \
     qml/CoverPage.qml \
     qml/ChangelogPage.qml \
-    qml/LogItem.qml
+    qml/LogItem.qml \
+    qml/DirPage.qml \
+    qml/SimpleListItem.qml
 
 OTHER_FILES += \
-    ../paho.mqtt.c/src/*.h \
-    ../paho.mqtt.c/src/*.c
+    $$PROJECTDIR/paho.mqtt.c/src/*.h \
+    $$PROJECTDIR/paho.mqtt.c/src/*.c \
+    $$PROJECTDIR/README.md
 
 OTHER_FILES += \
     harbour-snipek.desktop \
     rpm/$${TARGET}.yaml \
     rpm/$${TARGET}.changes.in \
-    rpm/$${TARGET}.spec
+    rpm/$${TARGET}.spec \
     translations/*.ts
+
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172 256x256
 

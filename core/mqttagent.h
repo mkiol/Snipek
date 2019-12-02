@@ -36,6 +36,7 @@ public:
 
 public slots:
     bool init();
+    void initWithReconnect();
     void deInit();
 
 signals:

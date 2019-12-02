@@ -10,7 +10,9 @@ SOURCES += \
     $$CORE_DIR/datetimeskill.cpp \
     $$CORE_DIR/skill.cpp \
     $$CORE_DIR/skillserver.cpp \
-    $$CORE_DIR/listmodel.cpp
+    $$CORE_DIR/listmodel.cpp \
+    $$CORE_DIR/dirmodel.cpp \
+    $$CORE_DIR/itemmodel.cpp
 
 HEADERS += \
     $$CORE_DIR/audioserver.h \
@@ -21,16 +23,20 @@ HEADERS += \
     $$CORE_DIR/datetimeskill.h \
     $$CORE_DIR/skill.h \
     $$CORE_DIR/skillserver.h \
-    $$CORE_DIR/listmodel.h
+    $$CORE_DIR/listmodel.h \
+    $$CORE_DIR/dirmodel.h \
+    $$CORE_DIR/itemmodel.h
 
 sailfish {
     HEADERS += \
         $$CORE_DIR/iconprovider.h \
-        $$CORE_DIR/callhistoryskill.h
+        $$CORE_DIR/callhistoryskill.h \
+        $$CORE_DIR/snipslocalagent.h
 
     SOURCES += \
         $$CORE_DIR/iconprovider.cpp \
-        $$CORE_DIR/callhistoryskill.cpp
+        $$CORE_DIR/callhistoryskill.cpp \
+        $$CORE_DIR/snipslocalagent.cpp
 }
 
 x86_64 {

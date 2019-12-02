@@ -7,11 +7,17 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.snipek.Snips 1.0
 
 Page {
     id: root
 
     allowedOrientations: Orientation.All
+
+    Component.onCompleted: {
+        if (settings.snipsLocal)
+            snips.checkSnips()
+    }
 
     SilicaFlickable {
         id: flick
@@ -26,16 +32,6 @@ Page {
 
             PageHeader {
                 title: qsTr("Settings")
-            }
-
-            TextSwitch {
-                automaticCheck: false
-                checked: settings.audioFeedback
-                text: qsTr("Audio feedback")
-                description: qsTr("Enables notification sound when voice assistant is activated (e.g. a wake word is detected).")
-                onClicked: {
-                    settings.audioFeedback = !settings.audioFeedback
-                }
             }
 
             ComboBox {
@@ -55,10 +51,20 @@ Page {
                 }
             }
 
+            TextSwitch {
+                automaticCheck: false
+                checked: settings.audioFeedback
+                text: qsTr("Audio feedback")
+                description: qsTr("Enables sound notification when voice assistant is activated.")
+                onClicked: {
+                    settings.audioFeedback = !settings.audioFeedback
+                }
+            }
+
             ComboBox {
                 width: parent.width
                 label: qsTr("Language")
-                description: qsTr("Language used for UI and built-in skills. Remember to install Snips assistant that supports selected language as well.")
+                description: qsTr("Language used for UI and built-in skills. Snips assistant that supports selected language has to be installed.")
                 currentIndex: {
                     if (settings.snipsLang === "de")
                         return 1;
@@ -114,7 +120,69 @@ Page {
                 text: qsTr("Snips configuration")
             }
 
+            ComboBox {
+                width: parent.width
+                label: qsTr("Snips installation option")
+                description: qsTr("Snips can be installed on this device (Local) or on another device in your home network (Remote).")
+                currentIndex: settings.snipsLocal ? 0 : 1
+
+                menu: ContextMenu {
+                    MenuItem { text: qsTr("Local") }
+                    MenuItem { text: qsTr("Remote") }
+                }
+
+                onCurrentIndexChanged: {
+                    settings.snipsLocal = currentIndex == 0
+                }
+            }
+
+            ListItem {
+                visible: settings.snipsLocal
+                contentHeight: visible ? recflow.height + 2 * Theme.paddingLarge : 0
+
+                Flow {
+                    id: recflow
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left; right: parent.right
+                        leftMargin: Theme.paddingLarge
+                        rightMargin: Theme.paddingLarge
+                    }
+                    spacing: Theme.paddingMedium
+
+                    Label {
+                        text: qsTr("Install directory")
+                    }
+
+                    Label {
+                        color: Theme.highlightColor
+                        text: settings.snipsLocalDir.replace(/^.*[\\\/]/, '')
+                    }
+                }
+
+                onClicked: openMenu()
+
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Change")
+                        onClicked: {
+                            var obj = pageStack.push(Qt.resolvedUrl("DirPage.qml"));
+                            obj.accepted.connect(function() {
+                                settings.snipsLocalDir = obj.selectedPath
+                            })
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Set default")
+                        onClicked: {
+                            settings.snipsLocalDir = ""
+                        }
+                    }
+                }
+            }
+
             TextField {
+                visible: !settings.snipsLocal
                 width: parent.width
                 inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
                 placeholderText: qsTr("Enter MQTT IP address (e.g. 192.168.1.5)")
@@ -131,6 +199,7 @@ Page {
             }
 
             TextField {
+                visible: !settings.snipsLocal
                 width: parent.width
                 inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
                 placeholderText: qsTr("Enter MQTT port number (e.g. 1883)")
@@ -147,6 +216,7 @@ Page {
             }
 
             TextField {
+                visible: !settings.snipsLocal
                 width: parent.width
                 inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
                 placeholderText: qsTr("Enter unique site ID")
@@ -161,18 +231,68 @@ Page {
                 }
             }
 
-            TextField {
-                width: parent.width
-                inputMethodHints: Qt.ImhLatinOnly | Qt.ImhLowercaseOnly | Qt.ImhNoPredictiveText
-                placeholderText: qsTr("Enter namespace for built-in skills (default is \"%1\")").arg("muki")
-                label: qsTr("Namespace for built-in skills")
+            ListItem {
+                visible: settings.snipsLocal
+                contentHeight: visible ? snipsLabel.height + 2 * Theme.paddingLarge : 0
 
-                onTextChanged: {
-                    settings.intentNs = text
+                Rectangle {
+                    anchors.fill: parent
+                    color: {
+                        switch(snips.snipsStatus) {
+                        case Snips.SnipsStopped:
+                            return Theme.rgba("red", 0.2)
+                        case Snips.SnipsStarted:
+                            return Theme.rgba("green", 0.2)
+                        case Snips.SnipsNotInstalled:
+                        case Snips.SnipsOutdated:
+                        default:
+                            return Theme.rgba("grey", 0.2)
+                        }
+                    }
                 }
 
-                Component.onCompleted: {
-                    text = settings.intentNs
+                Label {
+                    id: snipsLabel
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left; right: parent.right
+                        leftMargin: Theme.paddingLarge
+                        rightMargin: Theme.paddingLarge
+                    }
+                    horizontalAlignment: Text.AlignHCenter
+                    text: {
+                        switch(snips.snipsStatus) {
+                        case Snips.SnipsNotInstalled:
+                            return "Snips is not installed"
+                        case Snips.SnipsOutdated:
+                            return "Snips is outdated"
+                        case Snips.SnipsStopped:
+                            return "Snips is not running"
+                        case Snips.SnipsStarted:
+                            return "Snips is running"
+                        default:
+                            return "Snips status is unknown"
+                        }
+                    }
+                }
+
+                onClicked: openMenu()
+
+                menu: ContextMenu {
+                    MenuItem {
+                        visible: snips.snipsStatus === Snips.SnipsStopped
+                        text: qsTr("Start")
+                        onClicked: snips.startSnips()
+                    }
+                    MenuItem {
+                        visible: snips.snipsStatus === Snips.SnipsStarted
+                        text: qsTr("Stop")
+                        onClicked: snips.stopSnips()
+                    }
+                    MenuItem {
+                        text: qsTr("Refresh status")
+                        onClicked: snips.checkSnips()
+                    }
                 }
             }
 
@@ -192,9 +312,24 @@ Page {
                 }
             }
 
-            /*SectionHeader {
-                text: qsTr("Experimental features")
-            }*/
+            SectionHeader {
+                text: qsTr("Developer options")
+            }
+
+            TextField {
+                width: parent.width
+                inputMethodHints: Qt.ImhLatinOnly | Qt.ImhLowercaseOnly | Qt.ImhNoPredictiveText
+                placeholderText: qsTr("Enter namespace for built-in skills (default is \"%1\")").arg("muki")
+                label: qsTr("Namespace for built-in skills")
+
+                onTextChanged: {
+                    settings.intentNs = text
+                }
+
+                Component.onCompleted: {
+                    text = settings.intentNs
+                }
+            }
 
             Spacer {}
         }

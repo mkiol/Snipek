@@ -28,6 +28,8 @@
 #include "settings.h"
 #include "mqttagent.h"
 #include "skillserver.h"
+#include "dirmodel.h"
+#include "snipslocalagent.h"
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +40,9 @@ int main(int argc, char *argv[])
     auto engine = view->engine();
     engine->addImageProvider(QLatin1String("icons"), new IconProvider);
     //QObject::connect(engine, &QQmlEngine::quit, app, &QCoreApplication::quit);
+    qmlRegisterType<DirModel>("harbour.snipek.DirModel", 1, 0, "DirModel");
+    qmlRegisterUncreatableType<SnipsLocalAgent>("harbour.snipek.Snips",
+         1, 0, "Snips", "Not creatable as it is an enum type");
 #else
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     auto app = new QGuiApplication(argc, argv);
@@ -74,11 +79,14 @@ int main(int argc, char *argv[])
         }
     }
     app->installTranslator(&translator);
+
+    auto snips = SnipsLocalAgent::instance();
+    context->setContextProperty("snips", snips);
 #endif
 
     auto mqtt = MqttAgent::instance();
     context->setContextProperty("mqtt", mqtt);
-    mqtt->init();
+    mqtt->initWithReconnect();
 
     auto aserver = AudioServer::instance();
     context->setContextProperty("aserver", aserver);
@@ -96,5 +104,8 @@ int main(int argc, char *argv[])
         return -1;
 #endif
 
-    return app->exec();
+    int ret = app->exec();
+
+    snips->shutdown();
+    return ret;
 }

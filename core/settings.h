@@ -23,9 +23,11 @@ class Settings: public QObject
     Q_PROPERTY (QString outAudio READ getOutAudio WRITE setOutAudio NOTIFY audioChanged)
     Q_PROPERTY (QString lang READ getLang WRITE setLang NOTIFY langChanged)
     Q_PROPERTY (QString intentNs READ getIntentNs WRITE setIntentNs NOTIFY intentNsChanged)
+    Q_PROPERTY (QString snipsLocalDir READ getSnipsLocalDir WRITE setSnipsLocalDir NOTIFY snipsLocalChanged)
     Q_PROPERTY (int mqttPort READ getMqttPort WRITE setMqttPort NOTIFY mqttChanged)
     Q_PROPERTY (bool audioFeedback READ getAudioFeedback WRITE setAudioFeedback NOTIFY audioFeedbackChanged)
     Q_PROPERTY (int sessionStart READ getSessionStart WRITE setSessionStart NOTIFY sessionStartChanged)
+    Q_PROPERTY (bool snipsLocal READ getSnipsLocal WRITE setSnipsLocal NOTIFY snipsLocalChanged)
 
 public:
     static Settings* instance(QObject* parent = nullptr);
@@ -55,6 +57,10 @@ public:
     Q_INVOKABLE void setSkillEnabled(const QString& name, bool value);
     QString getIntentNs();
     void setIntentNs(const QString& value);
+    bool getSnipsLocal();
+    void setSnipsLocal(bool value);
+    QString getSnipsLocalDir();
+    void setSnipsLocalDir(const QString& value);
 
 signals:
     void siteChanged();
@@ -65,10 +71,11 @@ signals:
     void sessionStartChanged();
     void skillEnabledChanged();
     void intentNsChanged();
+    void snipsLocalChanged();
 
 private:
 #ifdef SAILFISH
-    static constexpr char* HW_RELEASE_FILE = "/etc/hw-release";
+    static constexpr char const * HW_RELEASE_FILE = "/etc/hw-release";
 #endif
     QSettings settings;
     bool noTranslation = false;
