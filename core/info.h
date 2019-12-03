@@ -15,6 +15,7 @@ static const char* AUTHOR = "Michal Kosciesza";
 static const char* COPYRIGHT_YEAR = "2018-2019";
 static const char* SUPPORT_EMAIL = "snipek@mkiol.net";
 static const char* PAGE = "https://github.com/mkiol/Snipek";
+static const char* PAGE_SNIPS_INSTALL = "https://github.com/mkiol/Snipek#snips-installation";
 static const char* LICENSE = "Mozilla Public License 2.0";
 static const char* LICENSE_URL = "http://mozilla.org/MPL/2.0/";
 }

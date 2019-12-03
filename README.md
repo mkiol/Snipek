@@ -60,14 +60,16 @@ More skills will be added in the future...
 According [Snips documentation](https://docs.snips.ai/), Snips officially supports
 following platforms:
 
-- Raspberry Pi,
-- Debian 9 (stretch).
+- [Raspberry Pi](#snips-installation-on-raspberry-pi)
+- [Debian 9 (stretch)](#snips-installation-on-debian)
+
+and unofficially (with some hack):
+
+- [Sailfish OS (ARM only)](#snips-installation-on-sailfish-os)
 
 Bare in mind that **Snips is not an open source software**. The use of Snips is is governed by
 [Snips Terms of Use](https://docs.snips.ai/additional-resources/legal-and-privacy/website-terms-of-use).
 The source code is not publicly available. Snips publishes only binaries for ARM and x86_64.
-
-Luckily with some hack, installation on Sailfish OS (ARM only) is possible.
 
 ### Snips installation on Raspberry Pi
 
@@ -132,19 +134,40 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9 (str
 
 ### Snips installation on Sailfish OS
 
-Snips is not an open source software. Only binaries for ARM and x86_64 are available.
+Snips is not an open source software and only binaries for ARM and x86_64 are available.
 There is no x86 build (32 bit) therefore (at least right now) installation on Jolla Tablet
 and any other non-ARM Sailfish OS devices is not possible.
 
-To make Snips installation process as easy as possible, Snipek app provides two bash scripts:
+To make Snips setup process as easy as possible, Snipek app provides two bash scripts:
 
 - `snips_download.sh` - downloads all needed binaries from Snips/Raspbian/Debian reposotories
-and downloads Snipek assistant (script can be executed on SFOS directly or on any Linux machine)
-- `snips_start.sh` - starts/stops Snips components (script must be executed on SFOS directly)
+and downloads Snipek assistant
+- `snips_start.sh` - starts/stops Snips components
 
 After Snipek app installation, both scripts are in `/usr/share/harbour-snipek/snips`.
 
-Here are few example usages:
+Download (`snips_download.sh`) must be executed mannually from terminal on SFOS device.
+Starting/stopping (`snips_start.sh`) is managed via Snipek app,
+so there is no need to use that script mannually.
+
+To install Snips software and Snipek assistant in the default directory (recommended),
+run following command from terminal on SFOS device:
+
+```
+$ /usr/share/harbour-snipek/snips/snips_download.sh
+```
+
+Script might prompt you that `ar` or/and `curl` are missing. If these commands are not installed already,
+you should install them and run the `snips_download.sh` once again:
+
+```
+$ devel-su
+# pkcon install curl binutils
+# exit
+$ /usr/share/harbour-snipek/snips/snips_download.sh
+```
+
+Here are other example usages:
 
 ```
 # Display usage help for snips_download.sh:
@@ -174,9 +197,6 @@ $ snips_start.sh -k
 # Check if Snips is running:
 $ snips_start.sh -c
 ```
-
-Installation (`snips_download.sh`) has to be executed mannually from terminal
-but starting/stopping (`snips_start.sh`) can be managed via Snipek app.
 
 ## Snipek assistant installation
 

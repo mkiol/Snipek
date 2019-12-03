@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
     context->setContextProperty("AUTHOR", Snipek::AUTHOR);
     context->setContextProperty("SUPPORT_EMAIL", Snipek::SUPPORT_EMAIL);
     context->setContextProperty("PAGE", Snipek::PAGE);
+    context->setContextProperty("PAGE_SNIPS_INSTALL", Snipek::PAGE_SNIPS_INSTALL);
     context->setContextProperty("LICENSE", Snipek::LICENSE);
     context->setContextProperty("LICENSE_URL", Snipek::LICENSE_URL);
 

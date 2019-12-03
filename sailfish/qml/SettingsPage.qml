@@ -122,7 +122,7 @@ Page {
 
             ComboBox {
                 width: parent.width
-                label: qsTr("Snips installation option")
+                label: qsTr("Setup option")
                 description: qsTr("Snips can be installed on this device (Local) or on another device in your home network (Remote).")
                 currentIndex: settings.snipsLocal ? 0 : 1
 
@@ -240,13 +240,13 @@ Page {
                     color: {
                         switch(snips.snipsStatus) {
                         case Snips.SnipsStopped:
-                            return Theme.rgba("red", 0.2)
+                            return Theme.rgba("red", 0.3)
                         case Snips.SnipsStarted:
-                            return Theme.rgba("green", 0.2)
+                            return Theme.rgba("green", 0.3)
                         case Snips.SnipsNotInstalled:
                         case Snips.SnipsOutdated:
                         default:
-                            return Theme.rgba("grey", 0.2)
+                            return Theme.rgba("grey", 0.3)
                         }
                     }
                 }
@@ -263,15 +263,15 @@ Page {
                     text: {
                         switch(snips.snipsStatus) {
                         case Snips.SnipsNotInstalled:
-                            return "Snips is not installed"
+                            return qsTr("Snips is not installed")
                         case Snips.SnipsOutdated:
-                            return "Snips is outdated"
+                            return qsTr("Snips is outdated")
                         case Snips.SnipsStopped:
-                            return "Snips is not running"
+                            return qsTr("Snips is not running")
                         case Snips.SnipsStarted:
-                            return "Snips is running"
+                            return qsTr("Snips is running")
                         default:
-                            return "Snips status is unknown"
+                            return qsTr("Snips status is unknown")
                         }
                     }
                 }
@@ -296,6 +296,20 @@ Page {
                 }
             }
 
+            PaddedLabel {
+                visible: settings.snipsLocal && snips.snipsStatus === Snips.SnipsNotInstalled
+                text: qsTr("To make %1 works, Snips has to be installed. " +
+                           "Use <a href=\"%2\">this</a> guide to download and set up Snips.")
+                            .arg(APP_NAME).arg(PAGE_SNIPS_INSTALL)
+            }
+
+            PaddedLabel {
+                visible: settings.snipsLocal && snips.snipsStatus === Snips.SnipsOutdated
+                text: qsTr("Snips has to be re-installed. " +
+                           "Use <a href=\"%2\">this</a> guide to download and set up Snips.")
+                            .arg(APP_NAME).arg(PAGE_SNIPS_INSTALL)
+            }
+
             SectionHeader {
                 text: qsTr("Skills")
             }
@@ -313,7 +327,7 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Developer options")
+                text: qsTr("Advanced options")
             }
 
             TextField {
