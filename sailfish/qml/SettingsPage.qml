@@ -64,7 +64,7 @@ Page {
             ComboBox {
                 width: parent.width
                 label: qsTr("Language")
-                description: qsTr("Language used for UI and built-in skills. Snips assistant that supports selected language has to be installed.")
+                description: qsTr("Language used for UI and built-in skills. Snips assistant that supports selected language has to be installed as well.")
                 currentIndex: {
                     if (settings.snipsLang === "de")
                         return 1;
@@ -122,7 +122,7 @@ Page {
 
             ComboBox {
                 width: parent.width
-                label: qsTr("Setup option")
+                label: qsTr("Installation option")
                 description: qsTr("Snips can be installed on this device (Local) or on another device in your home network (Remote).")
                 currentIndex: settings.snipsLocal ? 0 : 1
 
@@ -151,7 +151,7 @@ Page {
                     spacing: Theme.paddingMedium
 
                     Label {
-                        text: qsTr("Install directory")
+                        text: qsTr("Installation directory")
                     }
 
                     Label {
@@ -306,8 +306,8 @@ Page {
             PaddedLabel {
                 visible: settings.snipsLocal && snips.snipsStatus === Snips.SnipsOutdated
                 text: qsTr("Snips has to be re-installed. " +
-                           "Use <a href=\"%2\">this</a> guide to download and set up Snips.")
-                            .arg(APP_NAME).arg(PAGE_SNIPS_INSTALL)
+                           "Use <a href=\"%1\">this</a> guide to download and set up Snips.")
+                            .arg(PAGE_SNIPS_INSTALL)
             }
 
             SectionHeader {

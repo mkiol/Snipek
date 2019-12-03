@@ -33,30 +33,43 @@ Page {
             }
 
             LogItem {
+                title: "Support for local Snips installation"
+                description: "To make Snipek works you have to separately install " +
+                             "Snips software. This release provides support for " +
+                             "Snips installation directly on Sailfish OS phone. " +
+                             "When Snipek and Snips are running on the same device, " +
+                             "no network connectivity is required. Your phone can " +
+                             "be in airplane mode and voice assistant sill works. " +
+                             "Installation options (Local or Remote) can be configured " +
+                             "in the Settings. To install Snips on Sailfish OS follow " +
+                             "<a href=\"https://github.com/mkiol/Snipek" +
+                             "#snips-installation-on-sailfish-os\">this guide</a>. " +
+                             "Keep in mind that Snips is not an " +
+                             "open source software. The source code is not publicly " +
+                             "available. The use of Snips is is governed by " +
+                             "<a href=\"https://docs.snips.ai/additional-resources" +
+                             "/legal-and-privacy/website-terms-of-use\">" +
+                             "Snips Terms of Use</a>."
+            }
+
+            LogItem {
                 title: "Built-in skills: Date and Time, Call history"
-                description: "Snipek can be used as a remote mic/speaker but now it also " +
-                             "provides skills for Snips assistant: " +
-                             "(1) Date and Time skill that reads current date or time, " +
-                             "(2) Call history skill that reads events from call history. " +
-                             "To use these skills, Snipek assistant file has to be " +
-                             "installed on Snips server. More information can " +
-                             "be found on Snipek project website."
+                description: "Snipek can be used as a remote mic/speaker but it also " +
+                             "provides skills that let you control your phone. " +
+                             "Skills are the capabilities of " +
+                             "voice assistant i.e. the things that assistant " +
+                             "can do with a voice command. Following skills are " +
+                             "currently supported: Date and Time and Call history. " +
+                             "More information are <a href=\"https://github.com/" +
+                             "mkiol/Snipek#snipek-built-in-skills\">here</a>."
             }
 
             LogItem {
                 title: "Tap wake-up method"
-                description: "Next to wake word, now voice assistant can be " +
-                             "activated with tap gesture. When Wake-up " +
-                             "method is set to Tap gesture only, Snipek doesn't send " +
-                             "any audio data to Snips server instance before " +
-                             "assistant is activated."
-            }
-
-            LogItem {
-                title: "Streaming a sound"
-                description: "Latest Snips release introduced option to stream " +
-                             "the sound to play instead of sending it all on one go. " +
-                             "Support for this option was added in Snipek."
+                description: "Wake word (\"Hey Snips\" - default) is a primary " +
+                             "way of voice assistant activation. Additionally, " +
+                             "assistant can be activated with tap gesture. " +
+                             "What method is enabled can be configured in the Settings."
             }
 
             Spacer {}

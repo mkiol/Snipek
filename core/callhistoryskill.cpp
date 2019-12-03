@@ -154,7 +154,7 @@ void CallHistorySkill::handleIntent(const Intent& intent)
         if (intent.slotList.value("answer") == "yes") {
             if (readNextCalls(sessions[intent.sessionId], out, 1)) {
                 qDebug() << "Next confirmation is required";
-                out << " " << tr("Continue?");
+                out << " " << tr("Read next event?");
                 SkillServer::askForConfirmation(intent.sessionId, text);
                 return;
             } else {
@@ -216,7 +216,7 @@ void CallHistorySkill::handleIntent(const Intent& intent)
 
             if (readNextCalls(session, out, 1)) {
                 qDebug() << "Confirmation is required";
-                out << " " << tr("Continue?");
+                out << " " << tr("Read next event?");
                 SkillServer::askForConfirmation(intent.sessionId, text);
                 return;
             }

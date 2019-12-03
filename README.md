@@ -67,7 +67,7 @@ and unofficially (with some hack):
 
 - [Sailfish OS (ARM only)](#snips-installation-on-sailfish-os)
 
-Bare in mind that **Snips is not an open source software**. The use of Snips is is governed by
+Keep in mind that **Snips is not an open source software**. The use of Snips is is governed by
 [Snips Terms of Use](https://docs.snips.ai/additional-resources/legal-and-privacy/website-terms-of-use).
 The source code is not publicly available. Snips publishes only binaries for ARM and x86_64.
 
