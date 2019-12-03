@@ -33,7 +33,9 @@ QString CallHistorySkill::friendlyName() const
 
 QString CallHistorySkill::description() const
 {
-    return tr("Reads events from call history e.g. all missed calls.");
+    return tr("Reads events from call history. To trigger say: \"List my missed calls.\", "
+              "\"List all my calls since last Monday.\", "
+              "\"List my missed calls since yesterday.\"");
 }
 
 void CallHistorySkill::printEvent(const Event &event)

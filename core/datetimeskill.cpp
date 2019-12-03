@@ -32,7 +32,7 @@ QString DateTimeSkill::friendlyName() const
 
 QString DateTimeSkill::description() const
 {
-    return tr("Reads current time or date.");
+    return tr("Reads current time or date. To trigger say: \"What's time now?\", \"What's the date?\"");
 }
 
 void DateTimeSkill::handleIntent(const Intent& intent)
