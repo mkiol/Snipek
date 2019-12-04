@@ -1,4 +1,4 @@
-/* Copyright (C) 2018 Michal Kosciesza <michal@mkiol.net>
+/* Copyright (C) 2018-2019 Michal Kosciesza <michal@mkiol.net>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,6 +11,7 @@
 
 #include "mqttagent.h"
 #include "settings.h"
+#include "snipslocalagent.h"
 
 MqttAgent* MqttAgent::inst = nullptr;
 
@@ -32,7 +33,16 @@ MqttAgent::MqttAgent(QObject *parent) :
     auto settings = Settings::instance();
     connect(settings, &Settings::mqttChanged, this, &MqttAgent::deInit);
     connect(settings, &Settings::siteChanged, this, &MqttAgent::deInit);
-    connect(settings, &Settings::snipsLocalChanged, this, &MqttAgent::deInit);
+    connect(settings, &Settings::snipsLocalChanged, [this, settings]{
+        if (!settings->getSnipsLocal())
+            init();
+    });
+
+    auto snips = SnipsLocalAgent::instance();
+    connect(snips, &SnipsLocalAgent::snipsChanged, [this, snips]{
+        if (snips->getSnipsStatus() == SnipsLocalAgent::SnipsStarted)
+            initWithReconnect();
+    });
 
     reconTimer.setSingleShot(true);
     reconTimer.setTimerType(Qt::VeryCoarseTimer);
@@ -163,7 +173,7 @@ void MqttAgent::reconnect()
                 reconTimer.start();
             } else {
                 qDebug() << "Reconnect attempts limit reached";
-                reconCounter == 0;
+                reconCounter = 0;
             }
         }
     }
@@ -206,6 +216,7 @@ bool MqttAgent::checkConnected()
 void MqttAgent::deInit()
 {
     shutdown = true;
+    wait();
 }
 
 void MqttAgent::publish(const Message &msg)

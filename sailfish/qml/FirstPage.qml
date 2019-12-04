@@ -25,7 +25,7 @@ Page {
             }
 
             MenuItem {
-                text: app.configured ? qsTr("Settings") : qsTr("Configure")
+                text: app.configured ? qsTr("Settings") : qsTr("Configure Snips")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
 
@@ -64,7 +64,7 @@ Page {
 
         ViewPlaceholder {
             enabled: !app.configured
-            text: qsTr("Not configured")
+            text: qsTr("Snips is not configured")
         }
     }
 

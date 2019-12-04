@@ -7,12 +7,20 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.snipek.Snips 1.0
 
 ApplicationWindow
 {
     id: app
 
-    property bool configured: settings.mqttAddress.length > 0
+    property bool configured: {
+        if (settings.snipsLocal) {
+            return snips.snipsStatus === Snips.SnipsStarted ||
+                    snips.snipsStatus === Snips.SnipsStopped
+        } else {
+            return settings.mqttAddress.length > 0
+        }
+    }
 
     allowedOrientations: Orientation.All
 
