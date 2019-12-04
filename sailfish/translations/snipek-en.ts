@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.1" language="en">
 <context>
     <name>AboutPage</name>
     <message>
         <location filename="../qml/AboutPage.qml" line="28"/>
         <source>About</source>
-        <translation>Acerca de</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="44"/>
         <source>Version %1</source>
-        <translation>Versión %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="48"/>
@@ -21,22 +21,22 @@
     <message>
         <location filename="../qml/AboutPage.qml" line="54"/>
         <source>Project website</source>
-        <translation>Fuente</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="60"/>
         <source>Authors</source>
-        <translation>Autores</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="74"/>
         <source>%1 is developed as an open source project under %2.</source>
-        <translation>%1 es desarrollado como un proyecto de código abierto bajo %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/AboutPage.qml" line="80"/>
         <source>Libraries</source>
-        <translation>Librerías</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -84,25 +84,25 @@
     <message numerus="yes">
         <location filename="../../core/callhistoryskill.cpp" line="212"/>
         <source>You had %n call(s) today.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>You had %n call.</numerusform>
+            <numerusform>You had %n calls.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../../core/callhistoryskill.cpp" line="214"/>
         <source>You had %n call(s) since %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>You had %n call since %1.</numerusform>
+            <numerusform>You had %n calls since %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../../core/callhistoryskill.cpp" line="207"/>
         <source>You had %n missed call(s) today.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>You had %n missed call today.</numerusform>
+            <numerusform>You had %n missed calls today.</numerusform>
         </translation>
     </message>
     <message>
@@ -119,9 +119,9 @@
     <message numerus="yes">
         <location filename="../../core/callhistoryskill.cpp" line="209"/>
         <source>You had %n missed call(s) since %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>You had %n missed call since %1.</numerusform>
+            <numerusform>You had %n missed calls since %1.</numerusform>
         </translation>
     </message>
     <message>
@@ -144,6 +144,20 @@
         <source>Outgoing call to %2.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>You had %n call(s) since %1</source>
+        <translation type="vanished">
+            <numerusform>You had %n call since %1.</numerusform>
+            <numerusform>You had %n calls since %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You have %n call(s).</source>
+        <translation type="vanished">
+            <numerusform>You have %n call.</numerusform>
+            <numerusform>You have %n calls.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>ChangelogPage</name>
@@ -155,7 +169,7 @@
     <message>
         <location filename="../qml/ChangelogPage.qml" line="32"/>
         <source>Version %1</source>
-        <translation type="unfinished">Versión %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -210,16 +224,12 @@
     <message>
         <location filename="../qml/FirstPage.qml" line="23"/>
         <source>About</source>
-        <translation>Acerca de</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="28"/>
         <source>Settings</source>
-        <translation>Ajustes</translation>
-    </message>
-    <message>
-        <source>Configure</source>
-        <translation type="vanished">Configurar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="28"/>
@@ -229,31 +239,21 @@
     <message>
         <location filename="../qml/FirstPage.qml" line="34"/>
         <source>Disconnect</source>
-        <translation>Desconectar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="34"/>
         <source>Connect</source>
-        <translation>Conectar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="58"/>
         <source>Listening</source>
-        <translation>Escuchando</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="59"/>
         <source>Say wake word or tap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/FirstPage.qml" line="61"/>
-        <source>Say wake word</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/FirstPage.qml" line="67"/>
-        <source>Snips is not configured</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -262,17 +262,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Idle</source>
-        <translation type="vanished">Inactivo</translation>
+        <location filename="../qml/FirstPage.qml" line="61"/>
+        <source>Say wake word</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/FirstPage.qml" line="62"/>
         <source>Disconnected</source>
-        <translation>Desconectado</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not configured</source>
-        <translation type="vanished">No configurado</translation>
+        <location filename="../qml/FirstPage.qml" line="67"/>
+        <source>Snips is not configured</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -280,32 +282,32 @@
     <message>
         <location filename="../qml/SettingsPage.qml" line="34"/>
         <source>Settings</source>
-        <translation>Ajustes</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter Snips MQTT broker IP address</source>
-        <translation type="vanished">Entrar dirección IP del agente MQTT de Snips</translation>
+        <location filename="../qml/SettingsPage.qml" line="58"/>
+        <source>Enables sound notification when voice assistant is activated.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Snips MQTT broker address</source>
-        <translation type="vanished">Dirección del agente Snips MQTT</translation>
+        <location filename="../qml/SettingsPage.qml" line="126"/>
+        <source>Snips can be installed on this device (Local) or on another device in your home network (Remote).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter Snips MQTT broker port number</source>
-        <translation type="vanished">Entrar el puerto del agente Snips MQTT</translation>
+        <location filename="../qml/SettingsPage.qml" line="130"/>
+        <source>Local</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Snips MQTT broker port</source>
-        <translation type="vanished">Puerto del agente Snips MQTT</translation>
-    </message>
-    <message>
-        <source>Enter site ID</source>
-        <translation type="vanished">Entrar identificación del sitio</translation>
+        <location filename="../qml/SettingsPage.qml" line="131"/>
+        <source>Remote</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="223"/>
         <source>Site ID</source>
-        <translation>Identificación del sitio</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="57"/>
@@ -343,43 +345,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="126"/>
-        <source>Snips can be installed on this device (Local) or on another device in your home network (Remote).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="130"/>
-        <source>Local</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="131"/>
-        <source>Remote</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="301"/>
-        <source>To make %1 works, Snips has to be installed. Use &lt;a href=&quot;%2&quot;&gt;this&lt;/a&gt; guide to download and set up Snips.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="330"/>
-        <source>Advanced options</source>
+        <location filename="../qml/SettingsPage.qml" line="67"/>
+        <source>Language used for UI and built-in skills. Snips assistant that supports selected language has to be installed as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="87"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="58"/>
-        <source>Enables sound notification when voice assistant is activated.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="67"/>
-        <source>Language used for UI and built-in skills. Snips assistant that supports selected language has to be installed as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -463,6 +435,16 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../qml/SettingsPage.qml" line="301"/>
+        <source>To make %1 works, Snips has to be installed. Use &lt;a href=&quot;%2&quot;&gt;this&lt;/a&gt; guide to download and set up Snips.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="330"/>
+        <source>Advanced options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../qml/SettingsPage.qml" line="284"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
@@ -498,17 +480,17 @@
     <message>
         <location filename="../qml/main.qml" line="42"/>
         <source>Cannot connect because Snips MQTT broker IP address is not defined</source>
-        <translation>No se puede conectar porque la dirección IP del agente MQTT de Snips no está hecha</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/main.qml" line="45"/>
         <source>Connection problem</source>
-        <translation>Problema de conexión</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/main.qml" line="48"/>
         <source>Whoops, something went wrong</source>
-        <translation>Vaya, algo salió mal</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

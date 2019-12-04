@@ -21,15 +21,15 @@
 
 Settings* Settings::inst = nullptr;
 
-/* languages supported by Snips:
-        German
-        English
-        Spanish
-        French
-        Italian
-        Japanese
-        Portuguese (Brazil)
-*/
+/* Languages supported by Snips:
+de (German)
+en (English)
+es (Spanish)
+fr (French)
+it (Italian)
+ja (Japanese)
+pt_BR (Brazilian Portuguese) */
+
 QStringList Settings::snipsLangs = {
     "auto",
     "de",
