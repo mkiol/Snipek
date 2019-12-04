@@ -319,13 +319,16 @@ void Settings::setSnipsLocal(bool value)
     }
 }
 
+QString Settings::getSnipsLocalDirDefault()
+{
+    return QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation))
+            .absoluteFilePath("snips");
+}
+
 QString Settings::getSnipsLocalDir()
 {
-    auto defaultDir = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation))
-            .absoluteFilePath("snips");
-    auto dir = settings.value("snipslocaldir", defaultDir).toString();
-    //qDebug() << "Local snips dir:" << dir;
-    return dir.isEmpty() ? defaultDir : dir;
+    auto dir = settings.value("snipslocaldir", QString()).toString();
+    return dir.isEmpty() ? getSnipsLocalDirDefault() : dir;
 }
 
 void Settings::setSnipsLocalDir(const QString& value)

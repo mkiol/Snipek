@@ -61,7 +61,7 @@ public:
     void setSnipsLocal(bool value);
     QString getSnipsLocalDir();
     void setSnipsLocalDir(const QString& value);
-
+    QString getSnipsLocalDirDefault();
 signals:
     void siteChanged();
     void mqttChanged();

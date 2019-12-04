@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QFileInfo>
 #include "dirmodel.h"
+#include "settings.h"
 
 DirModel::DirModel(QObject *parent) :
     ItemModel(new DirItem, parent),
@@ -19,7 +20,7 @@ QList<ListItem*> DirModel::makeItems()
 {
     QList<ListItem*> items;
 
-    auto dirs = m_dir.entryInfoList(QDir::Dirs|QDir::NoDot);
+    auto dirs = m_dir.entryInfoList(QDir::Dirs|QDir::NoDot|QDir::Hidden);
     for (auto& dir : dirs) {
         if (!m_dir.isRoot() || dir.fileName() != "..") {
             items << new DirItem(
@@ -45,6 +46,12 @@ void DirModel::changeToRemovable()
 void DirModel::changeToHome()
 {
     setCurrentPath(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
+}
+
+void DirModel::changeToDefault()
+{
+    auto s = Settings::instance();
+    setCurrentPath(s->getSnipsLocalDirDefault());
 }
 
 void DirModel::setCurrentPath(const QString &path)

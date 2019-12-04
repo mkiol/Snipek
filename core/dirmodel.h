@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE bool isCurrentWritable();
     Q_INVOKABLE void changeToRemovable();
     Q_INVOKABLE void changeToHome();
+    Q_INVOKABLE void changeToDefault();
 
 signals:
     void currentDirChanged();

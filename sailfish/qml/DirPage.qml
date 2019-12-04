@@ -58,6 +58,11 @@ Dialog {
 
         PullDownMenu {
             MenuItem {
+                text: qsTr("Default")
+                onClicked: itemModel.changeToDefault()
+            }
+
+            MenuItem {
                 text: qsTr("SD Card")
                 onClicked: itemModel.changeToRemovable()
             }
