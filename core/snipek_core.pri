@@ -40,12 +40,15 @@ sailfish {
 }
 
 x86_64 {
+    DEFINES += ARCH_X86_64
     LIBS += -L$$PROJECTDIR/libs/paho.mqtt.c/build/ -lpaho-mqtt3c-static-x86_64
 }
 x86 {
+    DEFINES += ARCH_X86
     LIBS += -L$$PROJECTDIR/libs/paho.mqtt.c/build/ -lpaho-mqtt3c-static-i486
 }
 arm {
+    DEFINES += ARCH_ARM
     LIBS += -L$$PROJECTDIR/libs/paho.mqtt.c/build/ -lpaho-mqtt3c-static-armv7hl
 }
 

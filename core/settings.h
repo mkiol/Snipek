@@ -62,6 +62,8 @@ public:
     QString getSnipsLocalDir();
     void setSnipsLocalDir(const QString& value);
     QString getSnipsLocalDirDefault();
+    Q_INVOKABLE bool isArm();
+
 signals:
     void siteChanged();
     void mqttChanged();

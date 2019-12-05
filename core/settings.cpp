@@ -308,35 +308,60 @@ void Settings::setIntentNs(const QString& value)
 
 bool Settings::getSnipsLocal()
 {
+#ifdef ARCH_ARM
     return settings.value("snipslocal", false).toBool();
+#else
+    return false;
+#endif
 }
 
 void Settings::setSnipsLocal(bool value)
 {
+#ifdef ARCH_ARM
     if (getSnipsLocal() != value) {
         settings.setValue("snipslocal", value);
         emit snipsLocalChanged();
     }
+#endif
 }
 
 QString Settings::getSnipsLocalDirDefault()
 {
+#ifdef ARCH_ARM
     return QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation))
             .absoluteFilePath("snips");
+#else
+    return QString();
+#endif
 }
 
 QString Settings::getSnipsLocalDir()
 {
+#ifdef ARCH_ARM
     auto dir = settings.value("snipslocaldir", QString()).toString();
     return dir.isEmpty() ? getSnipsLocalDirDefault() : dir;
+#else
+    return QString();
+#endif
 }
 
 void Settings::setSnipsLocalDir(const QString& value)
 {
+#ifdef ARCH_ARM
     if (getSnipsLocalDir() != value) {
         settings.setValue("snipslocaldir", value);
         emit snipsLocalChanged();
     }
+#endif
+}
+
+bool Settings::isArm()
+{
+#ifdef ARCH_ARM
+    return true;
+#else
+    return false;
+#endif
 }
 
 #ifdef SAILFISH

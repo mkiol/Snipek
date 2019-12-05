@@ -121,6 +121,7 @@ Page {
             }
 
             ComboBox {
+                visible: settings.isArm()
                 width: parent.width
                 label: qsTr("Installation option")
                 description: qsTr("Snips can be installed on this device (Local) or on another device in your home network (Remote).")
