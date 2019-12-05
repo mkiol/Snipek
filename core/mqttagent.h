@@ -12,6 +12,8 @@
 #include <QObject>
 #include <QThread>
 #include <QTimer>
+#include <QString>
+#include <QByteArray>
 #include <queue>
 
 #include "MQTTClient.h"
@@ -61,6 +63,7 @@ private:
     std::queue<QString> unsubscribeQueue;
     int reconCounter = 0;
     QTimer reconTimer;
+    QByteArray url;
 
     bool checkConnected();
     void publishAll();
@@ -69,6 +72,7 @@ private:
     void receive();
     MqttAgent(QObject* parent = nullptr);
     void run();
+    QByteArray makeUrl();
 
 private slots:
     void reconnect();

@@ -6,7 +6,6 @@
  */
 
 #include <QThread>
-#include <QByteArray>
 #include <QCoreApplication>
 
 #include "mqttagent.h"
@@ -52,35 +51,48 @@ MqttAgent::MqttAgent(QObject *parent) :
 
 void MqttAgent::initWithReconnect()
 {
-    if (!init()) {
-        reconCounter = 0;
-        reconTimer.setInterval(1000);
-        reconTimer.start();
-    }
+    qDebug() << "MQTT init with reconnect";
+
+    if (!init())
+        reconnect();
+}
+
+QByteArray MqttAgent::makeUrl()
+{
+    auto s = Settings::instance();
+    bool local = s->getSnipsLocal();
+
+    auto addr = local ? "127.1.0.0" : s->getMqttAddress();
+    int port = local ? 1883 : s->getMqttPort();
+
+    return addr.isEmpty() || port < 1 ?
+                QByteArray() :
+                QString("tcp://%1:%2").arg(addr).arg(port).toLatin1();
 }
 
 bool MqttAgent::init()
 {
+    qDebug() << "MQTT init:" << connected << shutdown;
+
+    auto newUrl = makeUrl();
+    qDebug() << "MQTT new URL:" << newUrl << "current URL:" << url;
+    if (connected && url == newUrl) {
+        qDebug() << "No need to init MQTT because it is already inited with the same URL";
+        return true;
+    }
+
+    url = newUrl;
     deInit();
 
-    qDebug() << "MQTT init";
-
-    auto settings = Settings::instance();
-
-    QString addr = settings->getMqttAddress();
-    int port = settings->getMqttPort();
-
-    if (addr.isEmpty() || port < 1) {
+    if (url.isEmpty()) {
         qWarning() << "No MQTT addres or port defined";
         emit error(E_NoAddr);
         return false;
     }
 
-    QByteArray url = QString("tcp://%1:%2").arg(addr).arg(port).toLatin1();
-
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
 
-    QByteArray id = settings->getMqttId().toUtf8();
+    QByteArray id = Settings::instance()->getMqttId().toUtf8();
     qDebug() << "MQTT ID:" << id;
 
     MQTTClient_create(&client, url.data(), id.data(),
@@ -160,7 +172,7 @@ void MqttAgent::run()
 
 void MqttAgent::reconnect()
 {
-    qDebug() << "Reconnecting";
+    qDebug() << "Reconnecting attempt:" << reconCounter;
     if (!connected) {
         if (reconCounter == 0) {
             reconCounter++;
@@ -215,6 +227,7 @@ bool MqttAgent::checkConnected()
 
 void MqttAgent::deInit()
 {
+    qDebug() << "MQTT deInit";
     shutdown = true;
     wait();
 }
