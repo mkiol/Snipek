@@ -346,6 +346,17 @@ Page {
                 }
             }
 
+            TextSwitch {
+                automaticCheck: false
+                checked: settings.logToFile
+                text: qsTr("Enable logging")
+                description: qsTr("Needed for troubleshooting purposes. " +
+                                  "The log data is stored in /home/nemo/snipek.log file.")
+                onClicked: {
+                    settings.logToFile = !settings.logToFile
+                }
+            }
+
             Spacer {}
         }
 

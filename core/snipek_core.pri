@@ -12,7 +12,8 @@ SOURCES += \
     $$CORE_DIR/skillserver.cpp \
     $$CORE_DIR/listmodel.cpp \
     $$CORE_DIR/dirmodel.cpp \
-    $$CORE_DIR/itemmodel.cpp
+    $$CORE_DIR/itemmodel.cpp \
+    $$CORE_DIR/log.cpp
 
 HEADERS += \
     $$CORE_DIR/audioserver.h \
@@ -25,7 +26,8 @@ HEADERS += \
     $$CORE_DIR/skillserver.h \
     $$CORE_DIR/listmodel.h \
     $$CORE_DIR/dirmodel.h \
-    $$CORE_DIR/itemmodel.h
+    $$CORE_DIR/itemmodel.h \
+    $$CORE_DIR/log.h
 
 sailfish {
     HEADERS += \

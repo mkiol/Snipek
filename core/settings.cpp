@@ -18,6 +18,7 @@
 #endif
 
 #include "settings.h"
+#include "log.h"
 
 Settings* Settings::inst = nullptr;
 
@@ -45,6 +46,9 @@ Settings::Settings(QObject* parent) :
     QObject(parent),
     settings(parent)
 {
+    if (getLogToFile())
+        qInstallMessageHandler(qtLog);
+
 #ifdef SAILFISH
     hwName = readHwInfo();
 #else
@@ -111,8 +115,6 @@ QString Settings::getMqttId()
 
 QString Settings::getMqttAddress()
 {
-    if (getSnipsLocal())
-        return "127.1.0.0";
     return settings.value("mqttaddress", "").toString();
 }
 
@@ -127,8 +129,6 @@ void Settings::setMqttAddress(const QString& value)
 
 int Settings::getMqttPort()
 {
-    if (getSnipsLocal())
-        return 1883;
     return settings.value("mqttport", 1883).toInt();
 }
 
@@ -385,3 +385,25 @@ QString Settings::readHwInfo()
     return QString();
 }
 #endif
+
+void Settings::setLogToFile(bool value)
+{
+    if (getLogToFile() != value) {
+        settings.setValue("logtofile", value);
+        if (value) {
+            qDebug() << "Logging to file enabled";
+            qInstallMessageHandler(qtLog);
+            qDebug() << "Logging to file enabled";
+        } else {
+            qDebug() << "Logging to file disabled";
+            qInstallMessageHandler(0);
+            qDebug() << "Logging to file disabled";
+        }
+        emit logToFileChanged();
+    }
+}
+
+bool Settings::getLogToFile()
+{
+    return settings.value("logtofile", false).toBool();
+}

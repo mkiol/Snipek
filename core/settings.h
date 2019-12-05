@@ -28,6 +28,7 @@ class Settings: public QObject
     Q_PROPERTY (bool audioFeedback READ getAudioFeedback WRITE setAudioFeedback NOTIFY audioFeedbackChanged)
     Q_PROPERTY (int sessionStart READ getSessionStart WRITE setSessionStart NOTIFY sessionStartChanged)
     Q_PROPERTY (bool snipsLocal READ getSnipsLocal WRITE setSnipsLocal NOTIFY snipsLocalChanged)
+    Q_PROPERTY (bool logToFile READ getLogToFile WRITE setLogToFile NOTIFY logToFileChanged)
 
 public:
     static Settings* instance(QObject* parent = nullptr);
@@ -63,6 +64,8 @@ public:
     void setSnipsLocalDir(const QString& value);
     QString getSnipsLocalDirDefault();
     Q_INVOKABLE bool isArm();
+    void setLogToFile(bool value);
+    bool getLogToFile();
 
 signals:
     void siteChanged();
@@ -74,6 +77,7 @@ signals:
     void skillEnabledChanged();
     void intentNsChanged();
     void snipsLocalChanged();
+    void logToFileChanged();
 
 private:
 #ifdef SAILFISH
