@@ -39,28 +39,34 @@ Page {
                              "Snips installation directly on Sailfish OS phone. " +
                              "When Snipek and Snips are running on the same device, " +
                              "no network connectivity is required. Your phone can " +
-                             "be in airplane mode and voice assistant sill works. " +
+                             "be in off-line mode and the voice assistant sill works. " +
                              "Installation options (Local or Remote) can be configured " +
                              "in the Settings. To install Snips on Sailfish OS follow " +
                              "<a href=\"https://github.com/mkiol/Snipek" +
                              "#snips-installation-on-sailfish-os\">this guide</a>. " +
                              "Keep in mind that Snips is not an " +
                              "open source software. The source code is not publicly " +
-                             "available. The use of Snips is is governed by " +
+                             "available and the use of Snips is governed by " +
                              "<a href=\"https://docs.snips.ai/additional-resources" +
                              "/legal-and-privacy/website-terms-of-use\">" +
-                             "Snips Terms of Use</a>."
+                             "Snips Terms of Use</a>. Snips does not provide binaries " +
+                             "for x86 (32-bit) CPU architecture, therefore " +
+                             "(at least right now) local installation on " +
+                             "Jolla Tablet and any other non-ARM Sailfish OS " +
+                             "device is not possible."
             }
 
             LogItem {
                 title: "Built-in skills: Date and Time, Call history"
-                description: "Snipek can be used as a remote mic/speaker but it also " +
-                             "provides skills that let you control your phone. " +
-                             "Skills are the capabilities of " +
+                description: "Snipek can be used as a remote mic/speaker for Snips " +
+                             "but it also provides skills that let you control " +
+                             "your phone. Skills are the capabilities of " +
                              "voice assistant i.e. the things that assistant " +
                              "can do with a voice command. Following skills are " +
-                             "currently supported: Date and Time and Call history. " +
-                             "More information are <a href=\"https://github.com/" +
+                             "supported: Date and Time (reads current date/time) " +
+                             "and Call history (reads last events from call events log). " +
+                             "More information about supported skills are " +
+                             "<a href=\"https://github.com/" +
                              "mkiol/Snipek#snipek-built-in-skills\">here</a>."
             }
 

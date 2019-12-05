@@ -37,7 +37,7 @@ Page {
             ComboBox {
                 width: parent.width
                 label: qsTr("Wake-up method")
-                description: qsTr("The way you can activate the voice assistant.")
+                description: qsTr("The way you can activate the voice assistant. The default wake word is \"Hey Snips\".")
                 currentIndex: settings.sessionStart
 
                 menu: ContextMenu {
@@ -64,7 +64,7 @@ Page {
             ComboBox {
                 width: parent.width
                 label: qsTr("Language")
-                description: qsTr("Language used for UI and built-in skills. Snips assistant that supports selected language has to be installed as well.")
+                description: qsTr("Language used for UI and built-in skills. Assistant that supports selected language has to be installed as well.")
                 currentIndex: {
                     if (settings.snipsLang === "de")
                         return 1;
