@@ -150,7 +150,8 @@ Download (`snips_download.sh`) must be executed mannually from terminal on SFOS 
 Starting/stopping (`snips_start.sh`) is managed via Snipek app,
 so there is no need to use that script mannually.
 
-To install Snips software and Snipek assistant in the default directory (recommended),
+To install Snips software and Snipek assistant in the default directory
+(`/home/nemo/.cache/harbour-snipek/harbour-snipek/snips`),
 run following command from terminal on SFOS device:
 
 ```
@@ -167,7 +168,7 @@ $ devel-su
 $ /usr/share/harbour-snipek/snips/snips_download.sh
 ```
 
-Here are other example usages:
+Here are other examples how scripts can be used:
 
 ```
 # Display usage help for snips_download.sh:
@@ -179,7 +180,7 @@ $ snips_download.sh
 # Download Snips to specific dir (can be executed on SFOS or any Linux machine):
 $ snips_download.sh -d <dir>
 
-# Check is all needed files exist in specific dir:
+# Check if all needed files exist in specific dir:
 $ snips_download.sh -c -d <dir>
 
 # Display usage help for snips_start.sh:
@@ -231,6 +232,10 @@ There are two ways to install Snipek intents:
    (e.g. `muki:getTime` to `userX:getTime`). You can update the namespace to
    new one on Snipek app settings page.
 
+On Sailfish OS, assistant is by default installed in
+`/home/nemo/.cache/harbour-snipek/harbour-snipek/snips` directory.
+You can change default dir in Snipek app settings.
+
 ## Languages support
 
 Snips supports following languages:
@@ -243,12 +248,24 @@ Snips supports following languages:
 - Japanese
 - Portuguese (Brazil)
 
-When Snipek is used only as remote mic/speaker, it's language-agnostic.
+When Snipek is used only as remote mic/speaker (without built-in skills), it's language-agnostic.
 It just forwards and receives audio samples to/from Snips.
 
 When Snipek is used for [voice commands that let you control your phone](#snipek-built-in-skills),
 language matters.
-Currently built-in skills and Snipek assistant support only English language.
+Currently built-in skills and Snipek assistant support only English language. Another languages might
+be supported in the future with the help of community.
+
+To create new language support following steps have to be taken:
+
+1. Using [Snips console](https://console.snips.ai), new assistant has to be created.
+2. All [Snipek intents](https://console.snips.ai/store/en/skill_4YMgn1YavPo) have to be forked and
+   translated to new language.
+3. Using standard Qt tools,
+   [Snipek UI and built-in skills](https://github.com/mkiol/Snipek/tree/master/sailfish/translations)
+   have to be translated.
+
+Only translations for languages supported by Snips can be enabled.
 
 ## Downloads
 
