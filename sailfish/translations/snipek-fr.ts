@@ -460,6 +460,16 @@
         <source>Namespace for built-in skills</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="352"/>
+        <source>Enable logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="353"/>
+        <source>Needed for troubleshooting purposes. The log data is stored in /home/nemo/snipek.log file.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>main</name>
