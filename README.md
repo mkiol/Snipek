@@ -1,13 +1,13 @@
 # Snipek
 
-Remote microphone and speaker for Snips voice assistant system on Sailfish OS
+Voice assistant for Sailfish OS based on Snips software
 
 ## Description
 
 Snipek is a [Sailfish OS](https://sailfishos.org/) app that provides remote
-microphone and speaker capability for [Snips voice assistant system](https://snips.ai/).
+microphone and speaker capability for [Snips voice system](https://snips.ai/).
 
-Snips is a voice assistant system that doesn’t require external cloud service.
+Snips is a voice platform that doesn’t require external cloud service.
 All processing (including voice) is entirely done locally, on a device where
 Snips is installed. To make Snipek app works you have to separately install Snips
 on your Sailfish OS phone or on any another device in your local network.
