@@ -32,7 +32,7 @@ BuildRequires:  pkgconfig(commhistory-qt5)
 BuildRequires:  desktop-file-utils
 
 %description
-Remote microphone and speaker for Snips voice assistant
+Voice assistant for Sailfish OS based on Snips software
 
 
 %prep

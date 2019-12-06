@@ -12,7 +12,7 @@ License: MPLv2.0
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  Remote microphone and speaker for Snips voice assistant
+  Voice assistant for Sailfish OS based on Snips software
 Configure: none
 # The qtc5 builder inserts macros to allow QtCreator to have fine
 # control over qmake/make execution
