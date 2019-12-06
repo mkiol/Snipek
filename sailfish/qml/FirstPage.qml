@@ -32,7 +32,7 @@ Page {
             MenuItem {
                 visible: app.configured
                 text: mqtt.connected ? qsTr("Disconnect") : qsTr("Connect")
-                onClicked: mqtt.connected ? mqtt.deInit() : mqtt.init()
+                onClicked: mqtt.connected ? mqtt.deInit() : mqtt.initWithReconnect()
             }
         }
 

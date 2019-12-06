@@ -34,7 +34,7 @@ MqttAgent::MqttAgent(QObject *parent) :
     connect(settings, &Settings::siteChanged, this, &MqttAgent::deInit);
     connect(settings, &Settings::snipsLocalChanged, [this, settings]{
         if (!settings->getSnipsLocal())
-            init();
+            initWithReconnect();
     });
 
     auto snips = SnipsLocalAgent::instance();
@@ -52,9 +52,7 @@ MqttAgent::MqttAgent(QObject *parent) :
 void MqttAgent::initWithReconnect()
 {
     qDebug() << "MQTT init with reconnect";
-
-    if (!init())
-        reconnect();
+    emit doReconnect();
 }
 
 QByteArray MqttAgent::makeUrl()
@@ -72,9 +70,18 @@ QByteArray MqttAgent::makeUrl()
 
 bool MqttAgent::init()
 {
-    qDebug() << "MQTT init:" << connected << shutdown;
+    qDebug() << "MQTT init"
+             << "connected:" << connected
+             << "shutdown:" << shutdowning
+             << "tid:" << QThread::currentThreadId();
+
+    if (shutdowning) {
+        qDebug() << "Shutdown already requested, so ignoring init request";
+        return true;
+    }
 
     auto newUrl = makeUrl();
+
     qDebug() << "MQTT new URL:" << newUrl << "current URL:" << url;
     if (connected && url == newUrl) {
         qDebug() << "No need to init MQTT because it is already inited with the same URL";
@@ -111,7 +118,6 @@ bool MqttAgent::init()
         return false;
     }
 
-    shutdown = false;
     start(QThread::HighPriority);
 
     reconCounter = 0;
@@ -120,7 +126,7 @@ bool MqttAgent::init()
 
 void MqttAgent::subscribe(const QString& topic)
 {
-    if (!shutdown)
+    if (!shutdowning)
         subscribeQueue.push(topic);
 }
 
@@ -141,7 +147,7 @@ void MqttAgent::subscribeAll()
 
 void MqttAgent::unsubscribe(const QString& topic)
 {
-    if (!shutdown)
+    if (!shutdowning)
         unsubscribeQueue.push(topic);
 }
 
@@ -173,20 +179,19 @@ void MqttAgent::run()
 void MqttAgent::reconnect()
 {
     qDebug() << "Reconnecting attempt:" << reconCounter;
-    if (!connected) {
-        if (reconCounter == 0) {
+
+    if (reconCounter == 0) {
+        reconCounter++;
+        reconTimer.setInterval(100);
+        reconTimer.start();
+    } else if (!init()) {
+        if (reconCounter < 5) {
             reconCounter++;
-            reconTimer.setInterval(100);
+            reconTimer.setInterval(1000);
             reconTimer.start();
-        } else if (!init()) {
-            if (reconCounter < 10) {
-                reconCounter++;
-                reconTimer.setInterval(1000);
-                reconTimer.start();
-            } else {
-                qDebug() << "Reconnect attempts limit reached";
-                reconCounter = 0;
-            }
+        } else {
+            qDebug() << "Reconnect attempts limit reached";
+            reconCounter = 0;
         }
     }
 }
@@ -198,15 +203,15 @@ bool MqttAgent::isConnected()
 
 bool MqttAgent::checkConnected()
 {
-    if (client && shutdown && unsubscribeQueue.empty()) {
-        qDebug() << "Deinitng MQTT agent";
+    if (client && shutdowning && unsubscribeQueue.empty()) {
+        qDebug() << "Shutdown MQTT agent";
         MQTTClient_disconnect(client, 10000);
         MQTTClient_destroy(&client);
         client = nullptr;
         std::queue<Message>().swap(msgQueue);
         std::queue<QString>().swap(subscribeQueue);
         std::queue<QString>().swap(unsubscribeQueue);
-        shutdown = false;
+        shutdowning = false;
         connected = false;
         emit connectedChanged();
         return true;
@@ -227,14 +232,16 @@ bool MqttAgent::checkConnected()
 
 void MqttAgent::deInit()
 {
-    qDebug() << "MQTT deInit";
-    shutdown = true;
+    qDebug() << "MQTT shutdown start";
+    shutdowning = true;
     wait();
+    shutdowning = false;
+    qDebug() << "MQTT shutdown end";
 }
 
 void MqttAgent::publish(const Message &msg)
 {
-    if (!shutdown) {
+    if (!shutdowning) {
         if (!msg.topic.endsWith("audioFrame"))
             qDebug() << "Adding to publish queue:" << msg.topic << msg.payload;
         msgQueue.push(msg);
@@ -274,7 +281,7 @@ void MqttAgent::publishAll()
 
 void MqttAgent::receive()
 {
-    if (shutdown)
+    if (shutdowning)
         return;
 
     char* topic;

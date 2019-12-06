@@ -37,7 +37,6 @@ public:
     void unsubscribe(const QString &topic);
 
 public slots:
-    bool init();
     void initWithReconnect();
     void deInit();
 
@@ -57,7 +56,7 @@ private:
     MQTTClient client = nullptr;
     int id = 0;
     bool connected = false;
-    bool shutdown = false;
+    bool shutdowning = false;
     std::queue<Message> msgQueue;
     std::queue<QString> subscribeQueue;
     std::queue<QString> unsubscribeQueue;
@@ -65,6 +64,7 @@ private:
     QTimer reconTimer;
     QByteArray url;
 
+    bool init();
     bool checkConnected();
     void publishAll();
     void subscribeAll();

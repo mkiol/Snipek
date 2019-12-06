@@ -28,7 +28,7 @@ CoverBackground {
                     if (!aserver.insession)
                         aserver.startSession()
                 } else {
-                    mqtt.init();
+                    mqtt.initWithReconnect()
                 }
             }
         }
