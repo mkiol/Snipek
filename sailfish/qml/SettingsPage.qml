@@ -61,61 +61,6 @@ Page {
                 }
             }
 
-            ComboBox {
-                width: parent.width
-                label: qsTr("Language")
-                description: qsTr("Language used for UI and built-in skills. Assistant that supports selected language has to be installed as well.")
-                currentIndex: {
-                    if (settings.snipsLang === "de")
-                        return 1;
-                    if (settings.snipsLang === "en")
-                        return 2;
-                    if (settings.snipsLang === "es")
-                        return 3;
-                    if (settings.snipsLang === "fr")
-                        return 4;
-                    if (settings.snipsLang === "it")
-                        return 5;
-                    if (settings.snipsLang === "ja")
-                        return 6;
-                    if (settings.snipsLang === "pt_br")
-                        return 7;
-                    return 0;
-                }
-
-                menu: ContextMenu {
-                    MenuItem { text: qsTr("Auto") }
-                    MenuItem { text: "Deutsch" }
-                    MenuItem { text: "English" }
-                    MenuItem { text: "Español" }
-                    MenuItem { text: "Français" }
-                    MenuItem { text: "Italiano" }
-                    MenuItem { text: "日本語" }
-                    MenuItem { text: "Português (do Brasil)" }
-                }
-
-                onCurrentIndexChanged: {
-                    switch (currentIndex) {
-                    case 1:
-                        settings.lang = "de"; break
-                    case 2:
-                        settings.lang = "en"; break
-                    case 3:
-                        settings.lang = "es"; break
-                    case 4:
-                        settings.lang = "fr"; break
-                    case 5:
-                        settings.lang = "it"; break
-                    case 6:
-                        settings.lang = "ja"; break
-                    case 7:
-                        settings.lang = "pt_br"; break
-                    default:
-                        settings.lang = "auto"
-                    }
-                }
-            }
-
             SectionHeader {
                 text: qsTr("Snips configuration")
             }
@@ -331,6 +276,61 @@ Page {
                 text: qsTr("Advanced options")
             }
 
+            ComboBox {
+                width: parent.width
+                label: qsTr("Language")
+                description: qsTr("Language used for UI and built-in skills. Assistant that supports selected language has to be installed as well.")
+                currentIndex: {
+                    if (settings.snipsLang === "de")
+                        return 1;
+                    if (settings.snipsLang === "en")
+                        return 2;
+                    if (settings.snipsLang === "es")
+                        return 3;
+                    if (settings.snipsLang === "fr")
+                        return 4;
+                    if (settings.snipsLang === "it")
+                        return 5;
+                    if (settings.snipsLang === "ja")
+                        return 6;
+                    if (settings.snipsLang === "pt_br")
+                        return 7;
+                    return 0;
+                }
+
+                menu: ContextMenu {
+                    MenuItem { text: qsTr("Auto") }
+                    MenuItem { text: "Deutsch" }
+                    MenuItem { text: "English" }
+                    MenuItem { text: "Español" }
+                    MenuItem { text: "Français" }
+                    MenuItem { text: "Italiano" }
+                    MenuItem { text: "日本語" }
+                    MenuItem { text: "Português (do Brasil)" }
+                }
+
+                onCurrentIndexChanged: {
+                    switch (currentIndex) {
+                    case 1:
+                        settings.lang = "de"; break
+                    case 2:
+                        settings.lang = "en"; break
+                    case 3:
+                        settings.lang = "es"; break
+                    case 4:
+                        settings.lang = "fr"; break
+                    case 5:
+                        settings.lang = "it"; break
+                    case 6:
+                        settings.lang = "ja"; break
+                    case 7:
+                        settings.lang = "pt_br"; break
+                    default:
+                        settings.lang = "auto"
+                    }
+                }
+            }
+
             TextField {
                 width: parent.width
                 inputMethodHints: Qt.ImhLatinOnly | Qt.ImhLowercaseOnly | Qt.ImhNoPredictiveText
@@ -351,7 +351,7 @@ Page {
                 checked: settings.logToFile
                 text: qsTr("Enable logging")
                 description: qsTr("Needed for troubleshooting purposes. " +
-                                  "The log data is stored in /home/nemo/snipek.log file.")
+                                  "The log data is stored in %1 file.").arg("/home/nemo/snipek.log")
                 onClicked: {
                     settings.logToFile = !settings.logToFile
                 }

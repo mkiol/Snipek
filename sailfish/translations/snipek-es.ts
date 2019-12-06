@@ -303,7 +303,7 @@
         <translation type="vanished">Entrar identificación del sitio</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="224"/>
+        <location filename="../qml/SettingsPage.qml" line="169"/>
         <source>Site ID</source>
         <translation>Identificación del sitio</translation>
     </message>
@@ -333,42 +333,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="66"/>
+        <location filename="../qml/SettingsPage.qml" line="281"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="67"/>
+        <location filename="../qml/SettingsPage.qml" line="282"/>
         <source>Language used for UI and built-in skills. Assistant that supports selected language has to be installed as well.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="127"/>
+        <location filename="../qml/SettingsPage.qml" line="72"/>
         <source>Snips can be installed on this device (Local) or on another device in your home network (Remote).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="131"/>
+        <location filename="../qml/SettingsPage.qml" line="76"/>
         <source>Local</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="132"/>
+        <location filename="../qml/SettingsPage.qml" line="77"/>
         <source>Remote</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="302"/>
+        <location filename="../qml/SettingsPage.qml" line="247"/>
         <source>To make %1 works, Snips has to be installed. Use &lt;a href=&quot;%2&quot;&gt;this&lt;/a&gt; guide to download and set up Snips.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="331"/>
+        <location filename="../qml/SettingsPage.qml" line="276"/>
         <source>Advanced options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="87"/>
+        <location filename="../qml/SettingsPage.qml" line="302"/>
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
@@ -378,82 +378,82 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="120"/>
+        <location filename="../qml/SettingsPage.qml" line="65"/>
         <source>Snips configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="126"/>
+        <location filename="../qml/SettingsPage.qml" line="71"/>
         <source>Installation option</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="155"/>
+        <location filename="../qml/SettingsPage.qml" line="100"/>
         <source>Installation directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="168"/>
+        <location filename="../qml/SettingsPage.qml" line="113"/>
         <source>Change</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="177"/>
+        <location filename="../qml/SettingsPage.qml" line="122"/>
         <source>Set default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="189"/>
+        <location filename="../qml/SettingsPage.qml" line="134"/>
         <source>Enter MQTT IP address (e.g. 192.168.1.5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="190"/>
+        <location filename="../qml/SettingsPage.qml" line="135"/>
         <source>IP address for MQTT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="206"/>
+        <location filename="../qml/SettingsPage.qml" line="151"/>
         <source>Enter MQTT port number (e.g. 1883)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="207"/>
+        <location filename="../qml/SettingsPage.qml" line="152"/>
         <source>MQTT port number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="223"/>
+        <location filename="../qml/SettingsPage.qml" line="168"/>
         <source>Enter unique site ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="267"/>
+        <location filename="../qml/SettingsPage.qml" line="212"/>
         <source>Snips is not installed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="269"/>
+        <location filename="../qml/SettingsPage.qml" line="214"/>
         <source>Snips is outdated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="271"/>
+        <location filename="../qml/SettingsPage.qml" line="216"/>
         <source>Snips is not running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="273"/>
+        <location filename="../qml/SettingsPage.qml" line="218"/>
         <source>Snips is running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="275"/>
+        <location filename="../qml/SettingsPage.qml" line="220"/>
         <source>Snips status is unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="294"/>
+        <location filename="../qml/SettingsPage.qml" line="239"/>
         <source>Refresh status</source>
         <translation type="unfinished"></translation>
     </message>
@@ -464,11 +464,11 @@
     </message>
     <message>
         <location filename="../qml/SettingsPage.qml" line="353"/>
-        <source>Needed for troubleshooting purposes. The log data is stored in /home/nemo/snipek.log file.</source>
+        <source>Needed for troubleshooting purposes. The log data is stored in %1 file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="285"/>
+        <location filename="../qml/SettingsPage.qml" line="230"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
@@ -478,12 +478,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="290"/>
+        <location filename="../qml/SettingsPage.qml" line="235"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="309"/>
+        <location filename="../qml/SettingsPage.qml" line="254"/>
         <source>Snips has to be re-installed. Use &lt;a href=&quot;%1&quot;&gt;this&lt;/a&gt; guide to download and set up Snips.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -498,7 +498,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="315"/>
+        <location filename="../qml/SettingsPage.qml" line="260"/>
         <source>Skills</source>
         <translation type="unfinished"></translation>
     </message>
