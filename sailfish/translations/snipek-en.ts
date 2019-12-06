@@ -52,11 +52,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="61"/>
-        <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../core/callhistoryskill.cpp" line="124"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
@@ -104,6 +99,11 @@
             <numerusform>You had %n missed call today.</numerusform>
             <numerusform>You had %n missed calls today.</numerusform>
         </translation>
+    </message>
+    <message>
+        <location filename="../../core/callhistoryskill.cpp" line="61"/>
+        <source>Unknown number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../core/callhistoryskill.cpp" line="157"/>

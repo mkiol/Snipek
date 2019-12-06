@@ -58,7 +58,7 @@ CallHistorySkill::Call CallHistorySkill::makeCall(const Event &event)
 
     QString contact = event.contactName();
     if (contact.isEmpty()) {
-        contact = tr("Unknown");
+        contact = tr("Unknown number");
     }
 
     return {event.startTime(), type, contact};

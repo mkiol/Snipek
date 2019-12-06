@@ -58,7 +58,7 @@
     </message>
     <message>
         <location filename="../../core/callhistoryskill.cpp" line="61"/>
-        <source>Unknown</source>
+        <source>Unknown number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
