@@ -7,6 +7,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.snipek.Mqtt 1.0
 
 Page {
     id: root
@@ -31,8 +32,9 @@ Page {
 
             MenuItem {
                 visible: app.configured
-                text: mqtt.connected ? qsTr("Disconnect") : qsTr("Connect")
-                onClicked: mqtt.connected ? mqtt.deInit() : mqtt.initWithReconnect()
+                enabled: mqtt.state == Mqtt.MqttConnected || mqtt.state == Mqtt.MqttDisconnected
+                text: mqtt.state == Mqtt.MqttConnected ? qsTr("Disconnect") : qsTr("Connect")
+                onClicked: mqtt.state == Mqtt.MqttConnected ? mqtt.shutdown() : mqtt.init()
             }
         }
 

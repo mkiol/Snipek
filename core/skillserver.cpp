@@ -78,9 +78,9 @@ SkillServer::SkillServer(QObject *parent) : ListModel(new SkillItem, parent)
             this, &SkillServer::processMessage);
     connect(mqtt, &MqttAgent::dialogueManagerMessage,
             this, &SkillServer::processMessage);
-    connect(mqtt, &MqttAgent::connectedChanged,
-            this, &SkillServer::mqttConnectedHandler);
-    mqttConnectedHandler();
+    connect(mqtt, &MqttAgent::stateChanged,
+            this, &SkillServer::handleMqttStateChange);
+    handleMqttStateChange();
 
     // settings events
     connect(s, &Settings::skillEnabledChanged,
@@ -101,16 +101,16 @@ QString SkillServer::removeNs(const QString& name)
 
 void SkillServer::handleSkillsChange()
 {
-    if (MqttAgent::instance()->isConnected())
+    if (MqttAgent::instance()->getState() == MqttAgent::MqttConnected)
         subscribe();
 }
 
 void SkillServer::handleNsChange()
 {
     auto mqtt = MqttAgent::instance();
-    if (mqtt->isConnected()) {
+    if (mqtt->getState() == MqttAgent::MqttConnected) {
         unsubscribe();
-        mqtt->deInit();
+        mqtt->shutdown();
     }
 
     ns = Settings::instance()->getIntentNs();
@@ -178,10 +178,12 @@ void SkillServer::unsubscribe()
     }
 }
 
-void SkillServer::mqttConnectedHandler()
+void SkillServer::handleMqttStateChange()
 {
-    if (MqttAgent::instance()->isConnected()) {
+    if (MqttAgent::instance()->getState() == MqttAgent::MqttConnected) {
         subscribe();
+    } else {
+        // TODO reset skills
     }
 }
 

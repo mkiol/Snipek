@@ -7,6 +7,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.snipek.Mqtt 1.0
 
 CoverBackground {
     id: root
@@ -28,7 +29,10 @@ CoverBackground {
                     if (!aserver.insession)
                         aserver.startSession()
                 } else {
-                    mqtt.initWithReconnect()
+                    if (mqtt.state === Mqtt.MqttConnected ||
+                            mqtt.state === Mqtt.MqttDisconnected) {
+                        mqtt.init()
+                    }
                 }
             }
         }

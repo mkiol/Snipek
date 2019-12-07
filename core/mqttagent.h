@@ -22,8 +22,17 @@
 class MqttAgent : public QThread
 {
     Q_OBJECT
-    Q_PROPERTY (bool connected READ isConnected NOTIFY connectedChanged)
+    Q_PROPERTY (MqttState state READ getState NOTIFY stateChanged)
 public:
+    enum MqttState {
+        MqttUnknown = 0,
+        MqttDisconnected,
+        MqttConnecting,
+        MqttConnected,
+        MqttShutdowning
+    };
+    Q_ENUM(MqttState)
+
     enum ErrorType {
         E_Unknown = 0,
         E_NoAddr,
@@ -31,14 +40,14 @@ public:
     };
 
     static MqttAgent* instance(QObject* parent = nullptr);
-    bool isConnected();
+    MqttState getState();
     void publish(const Message &msg);
     void subscribe(const QString &topic);
     void unsubscribe(const QString &topic);
 
 public slots:
-    void initWithReconnect();
-    void deInit();
+    void init();
+    void shutdown();
 
 signals:
     void message(const Message &msg);
@@ -47,16 +56,28 @@ signals:
     void ttsMessage(const Message &msg);
     void asrMessage(const Message &msg);
     void intentMessage(const Message &msg);
-    void connectedChanged();
+    void stateChanged();
     void error(ErrorType error);
-    void doReconnect();
+    void doReconnectLater();
 
 private:
+    struct Action {
+        enum Type {
+            Unknown = 0,
+            Connect,
+            Shutdown
+        };
+        Type type = Unknown;
+        QByteArray url;
+        Action(Type type, QByteArray url = QByteArray()) :
+            type(type), url(url) {}
+    };
+
     static MqttAgent* inst;
     MQTTClient client = nullptr;
     int id = 0;
-    bool connected = false;
-    bool shutdowning = false;
+    MqttState state = MqttDisconnected;
+    std::queue<Action> actionQueue;
     std::queue<Message> msgQueue;
     std::queue<QString> subscribeQueue;
     std::queue<QString> unsubscribeQueue;
@@ -64,8 +85,7 @@ private:
     QTimer reconTimer;
     QByteArray url;
 
-    bool init();
-    bool checkConnected();
+    void checkActions();
     void publishAll();
     void subscribeAll();
     void unsubscribeAll();
@@ -76,6 +96,7 @@ private:
 
 private slots:
     void reconnect();
+    void reconnectLater();
 };
 
 #endif // MQTTAGENT_H

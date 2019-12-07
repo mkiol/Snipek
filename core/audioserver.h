@@ -191,7 +191,7 @@ private:
 private slots:
     void playFinishedHandler();
     void handleAudioOutputStateChanged(QAudio::State newState);
-    void handleMqttConnected();
+    void handleMqttStateChanged();
     void writeAudio();
     void clearAudio();
 };

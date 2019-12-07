@@ -61,7 +61,7 @@ public slots:
     void processMessage(const Message& msg);
 
 private slots:
-    void mqttConnectedHandler();
+    void handleMqttStateChange();
     void handleSkillsChange();
     void handleNsChange();
 

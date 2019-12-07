@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<DirModel>("harbour.snipek.DirModel", 1, 0, "DirModel");
     qmlRegisterUncreatableType<SnipsLocalAgent>("harbour.snipek.Snips",
          1, 0, "Snips", "Not creatable as it is an enum type");
+    qmlRegisterUncreatableType<MqttAgent>("harbour.snipek.Mqtt",
+         1, 0, "Mqtt", "Not creatable as it is an enum type");
 #else
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     auto app = new QGuiApplication(argc, argv);
@@ -87,7 +89,7 @@ int main(int argc, char *argv[])
 
     auto mqtt = MqttAgent::instance();
     context->setContextProperty("mqtt", mqtt);
-    mqtt->initWithReconnect();
+    mqtt->init();
 
     auto aserver = AudioServer::instance();
     context->setContextProperty("aserver", aserver);

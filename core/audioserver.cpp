@@ -311,7 +311,7 @@ void AudioServer::run()
     qDebug() << "Start listening";
     input->start(processor.get());
 
-    handleMqttConnected();
+    handleMqttStateChanged();
 
     QThread::exec();
     qDebug() << "Event loop exit, thread:" << QThread::currentThreadId();
@@ -392,9 +392,9 @@ void AudioServer::startSession()
     mqtt->publish(msg);
 }
 
-void AudioServer::handleMqttConnected()
+void AudioServer::handleMqttStateChanged()
 {
-    bool mqttConnected = MqttAgent::instance()->isConnected();
+    bool mqttConnected = MqttAgent::instance()->getState() == MqttAgent::MqttConnected;
     qDebug() << "MQTT connected changed:" << mqttConnected;
 
     writeTimer.stop();
@@ -482,13 +482,13 @@ void AudioServer::init()
     }
 
     auto mqtt = MqttAgent::instance();
-    this->connected = mqtt->isConnected();
+    this->connected = mqtt->getState() == MqttAgent::MqttConnected;
     connect(mqtt, &MqttAgent::audioServerMessage,
             this, &AudioServer::processMessage);
     connect(mqtt, &MqttAgent::dialogueManagerMessage,
             this, &AudioServer::processMessage);
-    connect(mqtt, &MqttAgent::connectedChanged,
-            this, &AudioServer::handleMqttConnected);
+    connect(mqtt, &MqttAgent::stateChanged,
+            this, &AudioServer::handleMqttStateChanged);
 
     auto settings = Settings::instance();
     connect(settings, &Settings::sessionStartChanged, [this] {
