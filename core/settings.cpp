@@ -407,3 +407,18 @@ bool Settings::getLogToFile()
 {
     return settings.value("logtofile", false).toBool();
 }
+
+void Settings::setVolume(float value)
+{
+    value = value < 1 ? 1 : value > 10 ? 10 : value;
+
+    if (getVolume() != value) {
+        settings.setValue("volume", value);
+        emit volumeChanged();
+    }
+}
+
+float Settings::getVolume()
+{
+    return settings.value("volume", 1.0).toFloat();
+}

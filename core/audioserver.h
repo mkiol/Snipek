@@ -187,6 +187,7 @@ private:
     bool isPlayingFinished();
     void setPlaying(bool playing);
     void updateListening();
+    void adjustVolume(QByteArray* data, int skip, float factor, bool le = true);
 
 private slots:
     void playFinishedHandler();

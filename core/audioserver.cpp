@@ -575,9 +575,17 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
         return;
     }
 
+    float vol = Settings::instance()->getVolume();
+
     if (reqIdToDataMap.contains(md.reqId)) {
         updateMd(md, reqIdToDetailsMap[md.reqId]);
-        reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
+        if (vol > 1.0) {
+            QByteArray tmp_data(msg.payload);
+            adjustVolume(&tmp_data, ad.start, vol);
+            reqIdToDataMap[md.reqId].append(tmp_data.data()+ad.start, ad.size);
+        } else {
+            reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
+        }
         if (currReqId == md.reqId && !writeTimer.isActive()) {
             qDebug() << "Audio write is needed";
             writeTimer.start();
@@ -585,8 +593,13 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
     } else {
         reqIdToDetailsMap[md.reqId] = md;
         reqIdToDetailsMap[md.reqId].audioDetails = ad;
-        reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
-
+        if (vol > 1.0) {
+            QByteArray tmp_data(msg.payload);
+            adjustVolume(&tmp_data, ad.start, vol);
+            reqIdToDataMap[md.reqId].append(tmp_data.data()+ad.start, ad.size);
+        } else {
+            reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
+        }
         bool play = playQueue.empty();
         playQueue.push(md.reqId);
         if (play)
@@ -844,6 +857,33 @@ bool AudioServer::checkSiteId(const QByteArray& data)
     }
 
     return true;
+}
+
+void AudioServer::adjustVolume(QByteArray* data, int skip, float factor, bool le)
+{
+    QDataStream sr(data, QIODevice::ReadOnly);
+    sr.setByteOrder(le ? QDataStream::LittleEndian : QDataStream::BigEndian);
+    QDataStream sw(data, QIODevice::WriteOnly);
+    sw.setByteOrder(le ? QDataStream::LittleEndian : QDataStream::BigEndian);
+    int16_t sample; // assuming 16-bit LPCM sample
+
+    if (data->size() >= skip) {
+        sr.skipRawData(skip);
+        sw.skipRawData(skip);
+    }
+
+    while (!sr.atEnd()) {
+        sr >> sample;
+        int32_t s = factor * static_cast<int32_t>(sample);
+        if (s > std::numeric_limits<int16_t>::max()) {
+            sample = std::numeric_limits<int16_t>::max();
+        } else if (s < std::numeric_limits<int16_t>::min()) {
+            sample = std::numeric_limits<int16_t>::min();
+        } else {
+            sample = static_cast<int16_t>(s);
+        }
+        sw << sample;
+    }
 }
 
 AudioServer::MessageDetails::MessageDetails(MessageType type, QString siteId,

@@ -29,6 +29,7 @@ class Settings: public QObject
     Q_PROPERTY (int sessionStart READ getSessionStart WRITE setSessionStart NOTIFY sessionStartChanged)
     Q_PROPERTY (bool snipsLocal READ getSnipsLocal WRITE setSnipsLocal NOTIFY snipsLocalChanged)
     Q_PROPERTY (bool logToFile READ getLogToFile WRITE setLogToFile NOTIFY logToFileChanged)
+    Q_PROPERTY (float volume READ getVolume WRITE setVolume NOTIFY volumeChanged)
 
 public:
     static Settings* instance(QObject* parent = nullptr);
@@ -66,6 +67,8 @@ public:
     Q_INVOKABLE bool isArm();
     void setLogToFile(bool value);
     bool getLogToFile();
+    void setVolume(float value);
+    float getVolume();
 
 signals:
     void siteChanged();
@@ -78,6 +81,7 @@ signals:
     void intentNsChanged();
     void snipsLocalChanged();
     void logToFileChanged();
+    void volumeChanged();
 
 private:
 #ifdef SAILFISH

@@ -276,6 +276,21 @@ Page {
                 text: qsTr("Advanced options")
             }
 
+            Slider {
+                width: parent.width
+                minimumValue: 1
+                maximumValue: 10
+                stepSize: 1
+                handleVisible: true
+                value: settings.volume
+                valueText: value
+                label: qsTr("Volume boost")
+
+                onValueChanged: {
+                    settings.volume = value
+                }
+            }
+
             ComboBox {
                 width: parent.width
                 label: qsTr("Language")
