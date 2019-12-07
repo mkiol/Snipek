@@ -39,7 +39,7 @@ Page {
                              "Snips installation directly on Sailfish OS phone. " +
                              "When Snipek and Snips are running on the same device, " +
                              "no network connectivity is required. Your phone can " +
-                             "be in off-line mode and the voice assistant sill works. " +
+                             "be in off-line mode and the voice assistant still works. " +
                              "Installation options (Local or Remote) can be configured " +
                              "in the Settings. To install Snips on Sailfish OS follow " +
                              "<a href=\"https://github.com/mkiol/Snipek" +
