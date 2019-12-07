@@ -183,7 +183,10 @@ void SkillServer::handleMqttStateChange()
     if (MqttAgent::instance()->getState() == MqttAgent::MqttConnected) {
         subscribe();
     } else {
-        // TODO reset skills
+        QHash<QString, Skill*>::iterator i;
+        for (i = sessionIdToSkills.begin(); i != sessionIdToSkills.end(); ++i)
+            i.value()->handleReset();
+        sessionIdToSkills.clear();
     }
 }
 

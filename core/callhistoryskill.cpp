@@ -144,6 +144,11 @@ void CallHistorySkill::handleSessionEnded(const QString& sessionId)
     }
 }
 
+void CallHistorySkill::handleReset()
+{
+    sessions.clear();
+}
+
 void CallHistorySkill::handleIntent(const Intent& intent)
 {
     QString text;

@@ -37,3 +37,8 @@ void Skill::handleSessionEnded(const QString& sessionId)
 {
     Q_UNUSED(sessionId);
 }
+
+void Skill::handleReset()
+{
+}
+

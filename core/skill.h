@@ -24,12 +24,21 @@ struct Intent
 class Skill
 {
 public:
-    virtual QStringList intentsNames() const = 0; // without namespace
+    // List of intents names supported by Skill
+    // (intent name should be without namespace)
+    virtual QStringList intentsNames() const = 0;
+    // Unique name of Skill
     virtual QString name() const = 0;
+    // Name of Skill displayed on Settings page
     virtual QString friendlyName() const = 0;
+    // Description of Skill displayed on Settings page
     virtual QString description() const = 0;
+    // Handle for intent invocation
     virtual void handleIntent(const Intent& intent) = 0;
+    // Handle for session ended event
     virtual void handleSessionEnded(const QString& sessionId);
+    // Handle for Snips disconnection
+    virtual void handleReset();
 };
 
 #endif // SKILL_H

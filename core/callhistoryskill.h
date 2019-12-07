@@ -53,6 +53,7 @@ public:
     QString description() const;
     void handleIntent(const Intent& intent);
     void handleSessionEnded(const QString& sessionId);
+    void handleReset();
 
 private:
     static void printEvent(const Event &event);
