@@ -2,6 +2,10 @@
 
 Voice assistant for Sailfish OS based on Snips software
 
+**Important Notice. It appears that staring from January 31, 2020
+[Snips will not longer be publicly available](https://forum.snips.ai/t/important-message-regarding-the-snips-console/4145).
+It means that Snipek further development will be very challenging and most likely not possible any more.**
+
 ## Description
 
 Snipek is a [Sailfish OS](https://sailfishos.org/) app that provides remote
@@ -225,12 +229,12 @@ There are two ways to install Snipek intents:
    $ ./snips_download.sh -a
    ```
 
-2. Alternatively, create your own assistant with [Snips console](https://console.snips.ai)
+2. ~~Alternatively, create your own assistant with [Snips console](https://console.snips.ai)
    and add Snipek intents from the store.
    Snipek intents are published [here](https://console.snips.ai/store/en/skill_4YMgn1YavPo).
    If you decide to fork Snipek intents, most likely namespace will change
    (e.g. `muki:getTime` to `userX:getTime`). You can update the namespace to
-   new one on Snipek app settings page.
+   new one on Snipek app settings page.~~
 
 On Sailfish OS, assistant is by default installed in
 `/home/nemo/.cache/harbour-snipek/harbour-snipek/snips` directory.
@@ -258,9 +262,9 @@ be supported in the future with the help of community.
 
 To create new language support following steps have to be taken:
 
-1. Using [Snips console](https://console.snips.ai), new assistant has to be created.
-2. All [Snipek intents](https://console.snips.ai/store/en/skill_4YMgn1YavPo) have to be forked and
-   translated to new language.
+1. ~~Using [Snips console](https://console.snips.ai), new assistant has to be created.~~
+2. ~~All [Snipek intents](https://console.snips.ai/store/en/skill_4YMgn1YavPo) have to be forked and
+   translated to new language.~~
 3. Using standard Qt tools,
    [Snipek UI and built-in skills](https://github.com/mkiol/Snipek/tree/master/sailfish/translations)
    have to be translated.
