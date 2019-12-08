@@ -278,8 +278,8 @@ Page {
 
             Slider {
                 width: parent.width
-                minimumValue: 1
-                maximumValue: 10
+                minimumValue: 0
+                maximumValue: 5
                 stepSize: 1
                 handleVisible: true
                 value: settings.volume

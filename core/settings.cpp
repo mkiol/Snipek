@@ -410,7 +410,7 @@ bool Settings::getLogToFile()
 
 void Settings::setVolume(float value)
 {
-    value = value < 1 ? 1 : value > 10 ? 10 : value;
+    value = value < 0.0 ? 0.0 : value > 5.0 ? 5.0 : value;
 
     if (getVolume() != value) {
         settings.setValue("volume", value);
@@ -420,5 +420,5 @@ void Settings::setVolume(float value)
 
 float Settings::getVolume()
 {
-    return settings.value("volume", 1.0).toFloat();
+    return settings.value("volume", 0.0).toFloat();
 }

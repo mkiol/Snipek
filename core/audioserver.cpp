@@ -579,9 +579,9 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
 
     if (reqIdToDataMap.contains(md.reqId)) {
         updateMd(md, reqIdToDetailsMap[md.reqId]);
-        if (vol > 1.0) {
+        if (vol > 0.0) {
             QByteArray tmp_data(msg.payload);
-            adjustVolume(&tmp_data, ad.start, vol);
+            adjustVolume(&tmp_data, ad.start, vol + 1.0);
             reqIdToDataMap[md.reqId].append(tmp_data.data()+ad.start, ad.size);
         } else {
             reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
@@ -593,9 +593,9 @@ void AudioServer::play(const MessageDetails& md, const Message& msg)
     } else {
         reqIdToDetailsMap[md.reqId] = md;
         reqIdToDetailsMap[md.reqId].audioDetails = ad;
-        if (vol > 1.0) {
+        if (vol > 0.0) {
             QByteArray tmp_data(msg.payload);
-            adjustVolume(&tmp_data, ad.start, vol);
+            adjustVolume(&tmp_data, ad.start, vol + 1.0);
             reqIdToDataMap[md.reqId].append(tmp_data.data()+ad.start, ad.size);
         } else {
             reqIdToDataMap[md.reqId].append(msg.payload.data()+ad.start, ad.size);
