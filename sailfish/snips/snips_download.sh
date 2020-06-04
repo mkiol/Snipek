@@ -423,7 +423,7 @@ done
 
 # check if script is executed on SFOS ARM device
 
-cpu_arch=$(uname -p) # machine cpu arch
+cpu_arch=$(uname -m) # machine cpu arch
 print "Info: Machine CPU arch is $cpu_arch."
 
 if [ $cpu_arch == "aarch64" ] || [[ $cpu_arch == *arm* ]]; then
@@ -613,7 +613,7 @@ if [ $INSTALL_DEBIAN_MAIN -ne 0 ]; then  # Debian main installation
   pkgs_to_install_names+=(libwrap0)
   pkgs_to_install_vers+=("7.6.q-26")
   pkgs_to_install_names+=(libssl1.1)
-  pkgs_to_install_vers+=("1.1.0k-1")
+  pkgs_to_install_vers+=("1.1.0")
   pkgs_to_install_names+=(libwebsockets8)
   pkgs_to_install_vers+=("2.0.3-2")
   pkgs_to_install_names+=(libc6)
