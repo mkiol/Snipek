@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Jun 04 2020 Michal Kosciesza <michal@mkiol.net> 2.0.1-1
+- Fix: Unknown CPU arch in snip_download.sh script
+
 * Thu Dec 05 2019 Michal Kosciesza <michal@mkiol.net> 2.0.0-1
 - Support for local Snips installation
 - Built-in skills

@@ -10,9 +10,9 @@
 
 namespace Snipek {
 static const char* APP_NAME = "Snipek";
-static const char* APP_VERSION = "2.0.0 (beta)";
+static const char* APP_VERSION = "2.0.1 (beta)";
 static const char* AUTHOR = "Michal Kosciesza";
-static const char* COPYRIGHT_YEAR = "2018-2019";
+static const char* COPYRIGHT_YEAR = "2018-2020";
 static const char* SUPPORT_EMAIL = "snipek@mkiol.net";
 static const char* PAGE = "https://github.com/mkiol/Snipek";
 static const char* PAGE_SNIPS_INSTALL = "https://github.com/mkiol/Snipek#snips-installation";

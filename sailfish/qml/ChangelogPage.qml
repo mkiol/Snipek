@@ -29,6 +29,15 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Version %1").arg("2.0.1")
+            }
+
+            LogItem {
+                title: "Bug fixes"
+                description: "Bugs discovered in the latest SFOS release were fixed."
+            }
+
+            SectionHeader {
                 text: qsTr("Version %1").arg("2.0.0")
             }
 
