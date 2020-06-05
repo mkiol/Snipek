@@ -79,7 +79,7 @@ QByteArray MqttAgent::makeUrl()
     auto s = Settings::instance();
     bool local = s->getSnipsLocal();
 
-    auto addr = local ? "127.1.0.0" : s->getMqttAddress();
+    auto addr = local ? "127.0.0.1" : s->getMqttAddress();
     int port = local ? 1883 : s->getMqttPort();
 
     return addr.isEmpty() || port < 1 ?
