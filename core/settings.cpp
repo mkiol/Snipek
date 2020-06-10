@@ -57,6 +57,15 @@ Settings::Settings(QObject* parent) :
     qDebug() << "HW name:" << hwName;
 }
 
+bool Settings::isDebug()
+{
+#ifdef QT_DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
+
 Settings* Settings::instance(QObject* parent)
 {
     if (Settings::inst == nullptr) {
@@ -338,8 +347,9 @@ QString Settings::getSnipsLocalDirDefault()
 QString Settings::getSnipsLocalDir()
 {
 #ifdef ARCH_ARM
-    auto dir = settings.value("snipslocaldir", QString()).toString();
-    return dir.isEmpty() ? getSnipsLocalDirDefault() : dir;
+    //auto dir = settings.value("snipslocaldir", QString()).toString();
+    //return dir.isEmpty() ? getSnipsLocalDirDefault() : dir;
+    return getSnipsLocalDirDefault();
 #else
     return QString();
 #endif

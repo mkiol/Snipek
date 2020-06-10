@@ -69,6 +69,7 @@ public:
     bool getLogToFile();
     void setVolume(float value);
     float getVolume();
+    Q_INVOKABLE bool isDebug();
 
 signals:
     void siteChanged();

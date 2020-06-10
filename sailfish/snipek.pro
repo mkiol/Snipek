@@ -75,7 +75,8 @@ images.files = images/*
 images.path = /usr/share/$${TARGET}/images
 INSTALLS += images
 
-snips.files = snips/*.sh
+snips.files += snips/*.sh
+snips.files += ../libs/mosquitto/build/armv7hl/mosquitto
 snips.path = /usr/share/$${TARGET}/snips
 INSTALLS += snips
 

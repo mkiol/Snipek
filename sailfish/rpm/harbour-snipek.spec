@@ -15,7 +15,7 @@ Name:       harbour-snipek
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Snipek
 Version:    2.0.1
-Release:    1
+Release:    5
 Group:      Qt/Qt
 License:    MPLv2.0
 URL:        https://github.com/mkiol/Snipek
@@ -74,4 +74,5 @@ desktop-file-install --delete-original       \
 # >> files
 %defattr(755,root,root,-)
 %{_datadir}/%{name}/snips/*.sh
+%{_datadir}/%{name}/snips/mosquitto
 # << files

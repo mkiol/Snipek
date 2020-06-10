@@ -82,7 +82,7 @@ Page {
                 }
             }
 
-            ListItem {
+            /*ListItem {
                 visible: settings.snipsLocal
                 contentHeight: visible ? recflow.height + 2 * Theme.paddingLarge : 0
 
@@ -125,7 +125,7 @@ Page {
                         }
                     }
                 }
-            }
+            }*/
 
             TextField {
                 visible: !settings.snipsLocal

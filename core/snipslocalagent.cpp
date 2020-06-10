@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QString>
 #include <QStringList>
+#include <QFile>
 
 #include "snipslocalagent.h"
 #include "settings.h"
@@ -16,6 +17,8 @@
 SnipsLocalAgent* SnipsLocalAgent::inst = nullptr;
 const QString SnipsLocalAgent::installScript("/usr/share/harbour-snipek/snips/snips_download.sh");
 const QString SnipsLocalAgent::startScript("/usr/share/harbour-snipek/snips/snips_start.sh");
+const QString SnipsLocalAgent::installLog("/home/nemo/snips_download.log");
+const QString SnipsLocalAgent::startLog("/home/nemo/snips_start.log");
 
 SnipsLocalAgent* SnipsLocalAgent::instance(QObject* parent)
 {
@@ -29,6 +32,10 @@ SnipsLocalAgent* SnipsLocalAgent::instance(QObject* parent)
 SnipsLocalAgent::SnipsLocalAgent(QObject *parent) : QThread(parent),
     reqQueue()
 {
+    // delete old log files
+    QFile::remove(installLog);
+    QFile::remove(startLog);
+
     auto s = Settings::instance();
     connect(s, &Settings::snipsLocalChanged, this, &SnipsLocalAgent::handleSettingsChange);
     if (s->getSnipsLocal()) {
@@ -111,7 +118,10 @@ int SnipsLocalAgent::doCheckInstalled()
     qDebug() << "Checking if Snips is installed...";
     auto s = Settings::instance();
     QStringList params;
-    params << installScript << "-c" << "-d" << s->getSnipsLocalDir();
+    //params << installScript << "-c" << "-d" << s->getSnipsLocalDir();
+    params << installScript << "-c";
+    if (s->getLogToFile())
+        params << "-l" << installLog;
     return execScript(params);
 }
 
@@ -120,7 +130,10 @@ int SnipsLocalAgent::doCheckRunning()
     qDebug() << "Checking if Snips is running...";
     auto s = Settings::instance();
     QStringList params;
-    params << startScript << "-c" << "-d" << s->getSnipsLocalDir();
+    //params << startScript << "-c" << "-d" << s->getSnipsLocalDir();
+    params << startScript << "-c";
+    if (s->getLogToFile())
+        params << "-l" << startLog;
     return execScript(params);
 }
 
@@ -129,7 +142,10 @@ int SnipsLocalAgent::doStop()
     qDebug() << "Stopping Snips...";
     auto s = Settings::instance();
     QStringList params;
-    params << startScript << "-k" << "-d" << s->getSnipsLocalDir();
+    //params << startScript << "-k" << "-d" << s->getSnipsLocalDir();
+    params << startScript << "-k";
+    if (s->getLogToFile())
+        params << "-l" << startLog;
     return execScript(params);
 }
 
@@ -138,7 +154,13 @@ int SnipsLocalAgent::doStart()
     qDebug() << "Starting Snips...";
     auto s = Settings::instance();
     QStringList params;
-    params << startScript << "-d" << s->getSnipsLocalDir();
+    //params << startScript << "-d" << s->getSnipsLocalDir();
+    params << startScript;
+    if (s->getLogToFile()) {
+        params << "-l" << startLog;
+        if (s->isDebug())
+            params << "-v";
+    }
     return execScript(params);
 }
 

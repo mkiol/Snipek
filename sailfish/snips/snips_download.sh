@@ -14,17 +14,14 @@
 # Display usage help:
 # $ snips_download.sh -h
 #
-# Download Snips on SFOS to default dir (SNIPS_DIR_DEFAULT):
+# Download Snips on SFOS to SNIPS_DIR_DEFAULT dir:
 # $ snips_download.sh
-#
-# Download Snips to specific dir (can be executed on SFOS or any other Linux machine):
-# $ snips_download.sh -d <dir>
 #
 # Download only Snipek assistant:
 # $ snips_download.sh -a
 #
-# Check is all needed files exist in specific dir:
-# $ snips_download.sh -c -d <dir>
+# Check is all needed files exist in SNIPS_DIR_DEFAULT dir:
+# $ snips_download.sh -c
 #
 # ------------------------------------------------------------------
 #
@@ -45,15 +42,7 @@
 #
 # from http://ftp.debian.org/debian:
 #  libgfortran.so.3
-#  mosquitto
 #  libstdc++.so.6
-#  libwrap.so.0
-#  libcrypto.so.1.1
-#  libssl.so.1.1
-#  libwebsockets.so.8
-#  libnsl.so.1
-#  libev.so.4
-#  libuv.so.1
 #  libatlas.so.3
 #  libcblas.so.3
 #  libf77blas.so.3
@@ -82,6 +71,7 @@ REUSE_DEB_FILES=0
 ARCH=armhf # Snips provides only binaries for armhf and amd64
 
 SNIPS_DIR_DEFAULT=/home/nemo/.cache/harbour-snipek/harbour-snipek/snips
+SNIPS_DATA_DIR=/usr/share/harbour-snipek/snips
 SNIPS_REPO_ROOT=https://raspbian.snips.ai/stretch
 SNIPS_DIST=stable
 DEBIAN_REPO_ROOT=http://ftp.debian.org/debian
@@ -98,12 +88,18 @@ QAAgACGmoZkjQgGgCXNOnSAEMwiAb7rZ8sCv4u5IpwoSEPNQBOBCWmg5MUFZJlNZuZq0BwAAE0Ag\
 wAAACAAIIAAwzAUpplGxUeLuSKcKEhczVoDgQlpoOTFBWSZTWWLU0qEAAALQAFAAAAEgACEmQZiQ\
 uLuSKcKEgxamlQg="
 
+LOG_FILE=/dev/null
+
 # ------------------------------------------------------------------
 
 work_dir=$(pwd) # current working dir
 declare -a pkgs_to_install_names
 declare -a pkgs_to_install_vers
 declare -a files_to_install
+
+log() {
+  echo "$1" >>"$LOG_FILE"
+}
 
 print() {
   echo "$1"
@@ -118,12 +114,12 @@ usage() {
   print "Download essential Snips binaries."
   print ""
   print "Options:"
-  print "  -d <DIR>     directory where files should be downloaded to (default is $SNIPS_DIR_DEFAULT)"
   print "  -c           instead new download, check if all needed files are present"
   print "  -a           download only assistant"
   print "  -k           keep deb packages and assistant archive file"
   print "  -r           instead download use existing deb packages and assistant archive file"
   print "  -h           display this help and exit"
+  print "  -l <FILE>    write log output to a file"
   print "  -V           output version information and exit"
 }
 
@@ -382,44 +378,43 @@ check_files() {
 
 # parse options
 
-while getopts ":Vkhrcad:" options; do
+while getopts ":Vkhrcal:" options; do
 case "${options}" in
   h)
     usage
-    exit 0
-    ;;
+    exit 0;;
   V)
     print "$VERSION"
-    exit 0
-    ;;
+    exit 0;;
   d)
-    SNIPS_DIR="${OPTARG}"
-    ;;
+    SNIPS_DIR="${OPTARG}";;
+  l)
+    LOG_FILE="${OPTARG}";;
   c)
-    CHECK_ONLY=1
-    ;;
+    CHECK_ONLY=1;;
   a)
     INSTALL_SNIPS=0
     INSTALL_DEBIAN_MAIN=0
     INSTALL_DEBIAN_NONFREE=0
     INSTALL_ASSISTANT=1
-    PATCH_PICO2WAVE=0
-    ;;
+    PATCH_PICO2WAVE=0;;
   k)
     KEEP_DEBS=1
-    KEEP_ASSISTANT=1
-    ;;
+    KEEP_ASSISTANT=1;;
   r)
-    REUSE_DEB_FILES=1
-    ;;
+    REUSE_DEB_FILES=1;;
   :)
-    exit_abnormal "Error: Option -$OPTARG requires an argument." 1
-    ;;
+    exit_abnormal "Error: Option -$OPTARG requires an argument." 1;;
   ?)
-    exit_abnormal "Error: Unknown option -$OPTARG." 1
-    ;;
+    exit_abnormal "Error: Unknown option -$OPTARG." 1;;
   esac
 done
+
+log
+log "*** $0, $(date) ***"
+if [ "$LOG_FILE" != "/dev/null" ]; then
+  exec >> "$LOG_FILE" 2>&1
+fi
 
 # check if script is executed on SFOS ARM device
 
@@ -493,6 +488,10 @@ else
   exit_abnormal "Error: Unknown architecture."
 fi
 
+log "SNIPS_DIR: $SNIPS_DIR"
+log "CHECK_ONLY: $CHECK_ONLY"
+log "ARCH: $ARCH"
+
 install_done_file="$SNIPS_DIR/install_done"
 
 # check only option
@@ -510,13 +509,6 @@ if [ $CHECK_ONLY -eq 1 ]; then
   files_to_install+=("$SNIPS_DIR/libgfortran.so.3")
   files_to_install+=("$SNIPS_DIR/mosquitto")
   files_to_install+=("$SNIPS_DIR/libstdc++.so.6")
-  files_to_install+=("$SNIPS_DIR/libwrap.so.0")
-  files_to_install+=("$SNIPS_DIR/libcrypto.so.1.1")
-  files_to_install+=("$SNIPS_DIR/libssl.so.1.1")
-  files_to_install+=("$SNIPS_DIR/libwebsockets.so.8")
-  files_to_install+=("$SNIPS_DIR/libnsl.so.1")
-  files_to_install+=("$SNIPS_DIR/libev.so.4")
-  files_to_install+=("$SNIPS_DIR/libuv.so.1")
   files_to_install+=("$SNIPS_DIR/libatlas.so.3")
   files_to_install+=("$SNIPS_DIR/libcblas.so.3")
   files_to_install+=("$SNIPS_DIR/libf77blas.so.3")
@@ -587,6 +579,7 @@ if [ $INSTALL_SNIPS -ne 0 ]; then  # Snips installation
   files_to_install+=("$SNIPS_DIR/deb-snips-hotword/usr/bin/snips-hotword")
   files_to_install+=("$SNIPS_DIR/deb-snips-nlu/usr/bin/snips-nlu")
   files_to_install+=("$SNIPS_DIR/deb-snips-tts/usr/bin/snips-tts")
+  files_to_install+=("$SNIPS_DATA_DIR/mosquitto")
   for file in "${files_to_install[@]}"
   do
     cp --dereference "$file" "$SNIPS_DIR/"
@@ -606,22 +599,10 @@ if [ $INSTALL_DEBIAN_MAIN -ne 0 ]; then  # Debian main installation
 
   pkgs_to_install_names+=(libgfortran3)
   pkgs_to_install_vers+=("6.3.0-18")
-  pkgs_to_install_names+=(mosquitto)
-  pkgs_to_install_vers+=("1.4.10-3")
   pkgs_to_install_names+=("libstdc++6")
   pkgs_to_install_vers+=("6.3.0-18")
-  pkgs_to_install_names+=(libwrap0)
-  pkgs_to_install_vers+=("7.6.q-26")
-  pkgs_to_install_names+=(libssl1.1)
-  pkgs_to_install_vers+=("1.1.0")
-  pkgs_to_install_names+=(libwebsockets8)
-  pkgs_to_install_vers+=("2.0.3-2")
   pkgs_to_install_names+=(libc6)
   pkgs_to_install_vers+=("2.24-11")
-  pkgs_to_install_names+=(libev4)
-  pkgs_to_install_vers+=("1:4.22-1")
-  pkgs_to_install_names+=(libuv1)
-  pkgs_to_install_vers+=("1.9.1-3")
   pkgs_to_install_names+=(libatlas3-base)
   pkgs_to_install_vers+=("3.10.3-1")
   if [ $PATCH_PICO2WAVE -eq 1 ] && [ $ARCH == "armhf" ]; then  # needed to patch pico2wave
@@ -638,15 +619,7 @@ if [ $INSTALL_DEBIAN_MAIN -ne 0 ]; then  # Debian main installation
   fi
 
   files_to_install+=("$SNIPS_DIR/deb-libgfortran3/usr/lib/$lib_dir/libgfortran.so.3")
-  files_to_install+=("$SNIPS_DIR/deb-mosquitto/usr/sbin/mosquitto")
   files_to_install+=("$SNIPS_DIR/deb-libstdc++6/usr/lib/$lib_dir/libstdc++.so.6")
-  files_to_install+=("$SNIPS_DIR/deb-libwrap0/lib/$lib_dir/libwrap.so.0")
-  files_to_install+=("$SNIPS_DIR/deb-libssl1.1/usr/lib/$lib_dir/libcrypto.so.1.1")
-  files_to_install+=("$SNIPS_DIR/deb-libssl1.1/usr/lib/$lib_dir/libssl.so.1.1")
-  files_to_install+=("$SNIPS_DIR/deb-libwebsockets8/usr/lib/$lib_dir/libwebsockets.so.8")
-  files_to_install+=("$SNIPS_DIR/deb-libc6/lib/$lib_dir/libnsl.so.1")
-  files_to_install+=("$SNIPS_DIR/deb-libev4/usr/lib/$lib_dir/libev.so.4")
-  files_to_install+=("$SNIPS_DIR/deb-libuv1/usr/lib/$lib_dir/libuv.so.1")
   files_to_install+=("$SNIPS_DIR/deb-libatlas3-base/usr/lib/libatlas.so.3")
   files_to_install+=("$SNIPS_DIR/deb-libatlas3-base/usr/lib/libcblas.so.3")
   files_to_install+=("$SNIPS_DIR/deb-libatlas3-base/usr/lib/libf77blas.so.3")

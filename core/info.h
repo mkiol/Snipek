@@ -10,7 +10,11 @@
 
 namespace Snipek {
 static const char* APP_NAME = "Snipek";
+#ifdef QT_DEBUG
+static const char* APP_VERSION = "2.0.1 (debug)";
+#else
 static const char* APP_VERSION = "2.0.1 (beta)";
+#endif
 static const char* AUTHOR = "Michal Kosciesza";
 static const char* COPYRIGHT_YEAR = "2018-2020";
 static const char* SUPPORT_EMAIL = "snipek@mkiol.net";

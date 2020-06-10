@@ -178,23 +178,17 @@ Here are other examples how scripts can be used:
 # Display usage help for snips_download.sh:
 $ snips_download.sh -h
 
-# Download Snips to default dir (on SFOS):
+# Download Snips binaries (on SFOS):
 $ snips_download.sh
 
-# Download Snips to specific dir (can be executed on SFOS or any Linux machine):
-$ snips_download.sh -d <dir>
-
-# Check if all needed files exist in specific dir:
-$ snips_download.sh -c -d <dir>
+# Check if all needed files exist:
+$ snips_download.sh -c
 
 # Display usage help for snips_start.sh:
 $ snips_start.sh -h
 
-# Start Snips that has been downloaded to default dir:
+# Start Snips:
 $ snips_start.sh
-
-# Start Snips that has been downloaded to specific dir:
-$ snips_start.sh -d <dir>
 
 # Stop Snips:
 $ snips_start.sh -k

@@ -54,6 +54,8 @@ private:
     };
     static const QString installScript;
     static const QString startScript;
+    static const QString installLog;
+    static const QString startLog;
     static SnipsLocalAgent* inst;
     std::queue<RequestType> reqQueue;
     SnipsStatus status = SnipsUnknown;
