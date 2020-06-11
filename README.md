@@ -2,14 +2,15 @@
 
 Voice assistant for Sailfish OS based on Snips software
 
-**Important Notice. It appears that staring from January 31, 2020
-[Snips will not longer be publicly available](https://forum.snips.ai/t/important-message-regarding-the-snips-console/4145).
-It means that Snipek further development will be very challenging and most likely not possible any more.**
+<span style="color:red">**Important Notice. Staring from January 31, 2020
+Snips technology is not longer publicly available.
+It means that Snipek further development will be very challenging and
+most likely not possible any more.**</span>
 
 ## Description
 
 Snipek is a [Sailfish OS](https://sailfishos.org/) app that provides remote
-microphone and speaker capability for [Snips voice system](https://snips.ai/).
+microphone and speaker capability for [Snips voice system](https://docs.snips.ai/).
 
 Snips is a voice platform that doesn’t require external cloud service.
 All processing (including voice) is entirely done locally, on a device where
@@ -73,7 +74,7 @@ and unofficially (with some hack):
 
 Keep in mind that **Snips is not an open source software**. The use of Snips is is governed by
 [Snips Terms of Use](https://docs.snips.ai/additional-resources/legal-and-privacy/website-terms-of-use).
-The source code is not publicly available. Snips publishes only binaries for ARM and x86_64.
+The source code is not publicly available. Snips company publishes only binaries for ARM and x86_64.
 
 ### Snips installation on Raspberry Pi
 
@@ -139,7 +140,7 @@ Here is quick step-by-step guide for Snips installation on a fresh Debian 9 (str
 ### Snips installation on Sailfish OS
 
 Snips is not an open source software and only binaries for ARM and x86_64 are available.
-There is no x86 build (32 bit) therefore (at least right now) installation on Jolla Tablet
+There is no x86 build (32 bit) therefore installation on Jolla Tablet
 and any other non-ARM Sailfish OS devices is not possible.
 
 To make Snips setup process as easy as possible, Snipek app provides two bash scripts:
@@ -166,9 +167,7 @@ Script might prompt you that `ar` or/and `curl` are missing. If these commands a
 you should install them and run the `snips_download.sh` once again:
 
 ```
-$ devel-su
-# pkcon install curl binutils
-# exit
+$ devel-su pkcon install curl binutils
 $ /usr/share/harbour-snipek/snips/snips_download.sh
 ```
 
@@ -189,6 +188,9 @@ $ snips_start.sh -h
 
 # Start Snips:
 $ snips_start.sh
+
+# Start Snips in a debug mode:
+$ snips_start.sh -v
 
 # Stop Snips:
 $ snips_start.sh -k
@@ -216,11 +218,10 @@ There are two ways to install Snipek intents:
    # unzip assistant_en.zip -d /usr/share/snips
    ```
 
-   To download and install on Sailfish OS use `snips_download.sh` script:
+   To download Snips binaries and assistant on Sailfish OS use `snips_download.sh` script:
 
    ```
-   $ cd /usr/share/harbour-snipek/snips
-   $ ./snips_download.sh -a
+   $ /usr/share/harbour-snipek/snips/snips_download.sh
    ```
 
 2. ~~Alternatively, create your own assistant with [Snips console](https://console.snips.ai)
@@ -230,9 +231,8 @@ There are two ways to install Snipek intents:
    (e.g. `muki:getTime` to `userX:getTime`). You can update the namespace to
    new one on Snipek app settings page.~~
 
-On Sailfish OS, assistant is by default installed in
+On Sailfish OS, assistant and Snips binaries are installed in
 `/home/nemo/.cache/harbour-snipek/harbour-snipek/snips` directory.
-You can change default dir in Snipek app settings.
 
 ## Languages support
 
@@ -251,19 +251,7 @@ It just forwards and receives audio samples to/from Snips.
 
 When Snipek is used for [voice commands that let you control your phone](#snipek-built-in-skills),
 language matters.
-Currently built-in skills and Snipek assistant support only English language. Another languages might
-be supported in the future with the help of community.
-
-To create new language support following steps have to be taken:
-
-1. ~~Using [Snips console](https://console.snips.ai), new assistant has to be created.~~
-2. ~~All [Snipek intents](https://console.snips.ai/store/en/skill_4YMgn1YavPo) have to be forked and
-   translated to new language.~~
-3. Using standard Qt tools,
-   [Snipek UI and built-in skills](https://github.com/mkiol/Snipek/tree/master/sailfish/translations)
-   have to be translated.
-
-Only translations for languages supported by Snips can be enabled.
+Currently built-in skills and Snipek assistant support only English language.
 
 ## Downloads
 
