@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Jun 11 2020 Michal Kosciesza <michal@mkiol.net> 2.0.2-1
+- Use custom-built mosquitto without tcp-wrapper
+
 * Thu Jun 04 2020 Michal Kosciesza <michal@mkiol.net> 2.0.1-1
 - Fix: Unknown CPU arch in snip_download.sh script
 

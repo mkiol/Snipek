@@ -29,6 +29,18 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Version %1").arg("2.0.2")
+            }
+
+            LogItem {
+                title: "Bug fixes and small improvements"
+                description: "Msquitto (MQTT broker) is now included in Snipek rpm package. " +
+                             "This fixes bug discovered on some SFOS devices. " +
+                             "Snips binaries download (Local installation option) " +
+                             "is much faster now."
+            }
+
+            SectionHeader {
                 text: qsTr("Version %1").arg("2.0.1")
             }
 

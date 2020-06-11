@@ -17,7 +17,6 @@
 # Start Snips:
 # $ snips_start.sh
 #
-#
 # Stop Snips:
 # $ snips_start.sh -k
 #
@@ -25,7 +24,7 @@
 # $ snips_start.sh -c
 #
 
-VERSION=1.0.0
+VERSION=2.0.0
 
 SNIPS_DIR_DEFAULT=/home/nemo/.cache/harbour-snipek/harbour-snipek/snips
 SNIPS_DIR=$SNIPS_DIR_DEFAULT

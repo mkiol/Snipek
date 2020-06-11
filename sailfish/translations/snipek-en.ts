@@ -57,27 +57,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="195"/>
+        <location filename="../../core/callhistoryskill.cpp" line="200"/>
         <source>You didn&apos;t have any missed calls today.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="197"/>
+        <location filename="../../core/callhistoryskill.cpp" line="202"/>
         <source>You didn&apos;t have any missed calls since %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="200"/>
+        <location filename="../../core/callhistoryskill.cpp" line="205"/>
         <source>You didn&apos;t have any calls today.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="202"/>
+        <location filename="../../core/callhistoryskill.cpp" line="207"/>
         <source>You didn&apos;t have any calls since %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../../core/callhistoryskill.cpp" line="212"/>
+        <location filename="../../core/callhistoryskill.cpp" line="217"/>
         <source>You had %n call(s) today.</source>
         <translation>
             <numerusform>You had %n call.</numerusform>
@@ -85,7 +85,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../core/callhistoryskill.cpp" line="214"/>
+        <location filename="../../core/callhistoryskill.cpp" line="219"/>
         <source>You had %n call(s) since %1.</source>
         <translation>
             <numerusform>You had %n call since %1.</numerusform>
@@ -93,7 +93,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../../core/callhistoryskill.cpp" line="207"/>
+        <location filename="../../core/callhistoryskill.cpp" line="212"/>
         <source>You had %n missed call(s) today.</source>
         <translation>
             <numerusform>You had %n missed call today.</numerusform>
@@ -106,18 +106,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="157"/>
-        <location filename="../../core/callhistoryskill.cpp" line="219"/>
+        <location filename="../../core/callhistoryskill.cpp" line="162"/>
+        <location filename="../../core/callhistoryskill.cpp" line="224"/>
         <source>Read next event?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../core/callhistoryskill.cpp" line="161"/>
+        <location filename="../../core/callhistoryskill.cpp" line="166"/>
         <source>That was the last call event.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../../core/callhistoryskill.cpp" line="209"/>
+        <location filename="../../core/callhistoryskill.cpp" line="214"/>
         <source>You had %n missed call(s) since %1.</source>
         <translation>
             <numerusform>You had %n missed call since %1.</numerusform>
@@ -168,6 +168,8 @@
     </message>
     <message>
         <location filename="../qml/ChangelogPage.qml" line="32"/>
+        <location filename="../qml/ChangelogPage.qml" line="44"/>
+        <location filename="../qml/ChangelogPage.qml" line="53"/>
         <source>Version %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -222,57 +224,57 @@
 <context>
     <name>FirstPage</name>
     <message>
-        <location filename="../qml/FirstPage.qml" line="23"/>
+        <location filename="../qml/FirstPage.qml" line="24"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="28"/>
+        <location filename="../qml/FirstPage.qml" line="29"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="28"/>
+        <location filename="../qml/FirstPage.qml" line="29"/>
         <source>Configure Snips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="34"/>
+        <location filename="../qml/FirstPage.qml" line="36"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="34"/>
+        <location filename="../qml/FirstPage.qml" line="36"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="58"/>
+        <location filename="../qml/FirstPage.qml" line="60"/>
         <source>Listening</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="59"/>
+        <location filename="../qml/FirstPage.qml" line="61"/>
         <source>Say wake word or tap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="60"/>
+        <location filename="../qml/FirstPage.qml" line="62"/>
         <source>Tap to wake up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="61"/>
+        <location filename="../qml/FirstPage.qml" line="63"/>
         <source>Say wake word</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="62"/>
+        <location filename="../qml/FirstPage.qml" line="64"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/FirstPage.qml" line="67"/>
+        <location filename="../qml/FirstPage.qml" line="69"/>
         <source>Snips is not configured</source>
         <translation type="unfinished"></translation>
     </message>
@@ -295,7 +297,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="282"/>
+        <location filename="../qml/SettingsPage.qml" line="297"/>
         <source>Language used for UI and built-in skills. Assistant that supports selected language has to be installed as well.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -345,12 +347,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="281"/>
+        <location filename="../qml/SettingsPage.qml" line="296"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="302"/>
+        <location filename="../qml/SettingsPage.qml" line="317"/>
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
@@ -362,21 +364,6 @@
     <message>
         <location filename="../qml/SettingsPage.qml" line="71"/>
         <source>Installation option</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="100"/>
-        <source>Installation directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="113"/>
-        <source>Change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/SettingsPage.qml" line="122"/>
-        <source>Set default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -445,12 +432,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="352"/>
+        <location filename="../qml/SettingsPage.qml" line="287"/>
+        <source>Volume boost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="367"/>
         <source>Enable logging</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="353"/>
+        <location filename="../qml/SettingsPage.qml" line="368"/>
         <source>Needed for troubleshooting purposes. The log data is stored in %1 file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -470,12 +462,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="337"/>
+        <location filename="../qml/SettingsPage.qml" line="352"/>
         <source>Enter namespace for built-in skills (default is &quot;%1&quot;)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="338"/>
+        <location filename="../qml/SettingsPage.qml" line="353"/>
         <source>Namespace for built-in skills</source>
         <translation type="unfinished"></translation>
     </message>

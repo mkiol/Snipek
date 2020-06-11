@@ -56,7 +56,7 @@
 #  assistant_en.zip
 #
 
-VERSION=1.0.0
+VERSION=2.0.0
 
 INSTALL_SNIPS=1
 INSTALL_DEBIAN_MAIN=1
